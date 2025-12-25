@@ -1,11 +1,10 @@
-// src/main.jsx
-import React, { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import './index.css'; // File CSS gốc
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css' // ĐẢM BẢO CÓ DÒNG NÀY ✅
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
     <App />
-  </StrictMode>,
-);
+  </React.StrictMode>,
+)
