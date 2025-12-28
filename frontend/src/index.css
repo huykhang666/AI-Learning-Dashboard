@@ -1,1 +1,13 @@
 @import "tailwindcss";
+:root {
+  --primary-blue: #2563EB;   /* Màu xanh nút bấm */
+  --bg-light: #F8FAFC;       /* Màu nền tổng thể (Hơi xám xanh nhạt) */
+  --sidebar-white: #FFFFFF;  /* Trắng Sidebar */
+  --text-dark: #1E293B;      /* Màu chữ chính */
+}
+
+body {
+  background-color: var(--bg-light); /* Đổi nền body sang màu xám nhạt */
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+}

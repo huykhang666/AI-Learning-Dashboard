@@ -1,54 +1,37 @@
-// src/components/Navbar/index.jsx
 import React from 'react';
-import { Search, Bell, User, Settings, LogOut } from 'lucide-react';
-import './style.css'; 
+import { Search, Bell, MessageSquare } from 'lucide-react';
 
 const Navbar = () => {
   return (
-    // Dùng tên class trực tiếp (Không dùng styles.class)
-    <nav className="navbarContainer">
-      
-      {/* 1. Thanh Search */}
-      <div className="searchContainer">
-        <Search className="searchIcon" />
+    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10">
+      {/* Search Bar */}
+      <div className="relative w-96">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
         <input 
           type="text" 
-          placeholder="Search..." 
-          className="searchInput"
+          placeholder="Tìm kiếm khóa học..." 
+          className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all text-sm"
         />
       </div>
-      
-      {/* 2. Các Icons và Profile */}
-      <div className="navIcons">
+
+      {/* Actions */}
+      <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3 pr-5 border-r border-slate-200">
+          <Bell className="text-slate-500 cursor-pointer hover:text-blue-600 transition-colors" size={20} />
+          <MessageSquare className="text-slate-500 cursor-pointer hover:text-blue-600 transition-colors" size={20} />
+        </div>
         
-        {/* Nút Notifications */}
-        <button className="navButton" title="Notifications">
-          <Bell size={20} color="#333" />
-        </button>
-        
-        {/* Profile Dropdown Trigger */}
-        <div className="profileDropdown">
-            <img 
-              src="https://via.placeholder.com/35"
-              alt="User Profile"
-              className="profileImage"
-              title="Profile"
-            />
-            {/* Đây là nội dung Dropdown (Tạm ẩn) */}
-            <div className="dropdownContent">
-                <div className="dropdownItem">
-                    <User size={16} /> Profile
-                </div>
-                <div className="dropdownItem">
-                    <Settings size={16} /> Settings
-                </div>
-                <div className="dropdownItem">
-                    <LogOut size={16} /> Sign Out
-                </div>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-bold text-slate-800 leading-none">Khang Huy</p>
+            <p className="text-[11px] text-slate-400 mt-1">Học viên Pro</p>
+          </div>
+          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-blue-200">
+            K
+          </div>
         </div>
       </div>
-    </nav>
+    </header>
   );
 };
 
