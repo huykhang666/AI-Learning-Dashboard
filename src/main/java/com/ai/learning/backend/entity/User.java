@@ -1,11 +1,11 @@
 package com.ai.learning.backend.entity;
 
+import com.ai.learning.backend.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,12 +50,20 @@ public class User {
     @Column(name = "creat_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role;
+
     //Get time the automatically
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.provider == null) {
             this.provider = "LOCAL";
+        }
+
+        if (this.role == null) {
+            this.role = Role.USER;
         }
     }
 }
