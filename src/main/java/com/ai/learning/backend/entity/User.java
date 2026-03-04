@@ -2,10 +2,7 @@ package com.ai.learning.backend.entity;
 
 import com.ai.learning.backend.entity.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +29,7 @@ public class User {
     @Column(name = "password",nullable = false)
     private String password;
 
-    @Column(name = "fistname",length = 20)
+    @Column(name = "firstname",length = 20)
     private String firstName;
 
     @Column(name = "lastname", length = 20)
@@ -40,14 +38,26 @@ public class User {
     @Column(name = "date_of_birth")
     private String dateOfBirth;
 
+    //Phân loại tài khoản
+    private boolean isPremium = false;
+
+    // Số video đã xử lý trong ngày hôm nay
+    private int dailyUploadCount = 0;
+
+    // Ngày cuối cùng thực hiện upload (để biết khi nào cần reset dailyUploadCount về 0)
+    private LocalDate lastUploadDate = LocalDate.now();
+
+    //Mã khách hàng trên hệ thống thanh toán nếu cần
+    private String paymentCustomerId;
+
     //Tuần 7 làm
-    @Column(name = "provider_id")
+    @Column(name = "provider")
     private String provider;
 
     @Column(name = "provider_id")
     private String providerId;
 
-    @Column(name = "creat_at", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
