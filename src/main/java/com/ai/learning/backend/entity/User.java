@@ -36,7 +36,7 @@ public class User {
     private String lastName;
 
     @Column(name = "date_of_birth")
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
 
     //Phân loại tài khoản
     private boolean isPremium = false;

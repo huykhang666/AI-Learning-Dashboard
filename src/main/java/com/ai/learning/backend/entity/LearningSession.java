@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class LearningSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
+    private long id;
 
     @Column(nullable = false)
     private String title;
@@ -29,6 +29,8 @@ public class LearningSession {
     @Column(nullable = false)
     private SessionStatus status;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
     // Many-to-one relationship with User.
     // Multiple records can belong to a single user.
     // LAZY fetch to prevent unnecessary joins.
