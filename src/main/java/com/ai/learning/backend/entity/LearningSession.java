@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 public class LearningSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "learning_session_id")
+    private long learningSessionId;
 
     @Column(nullable = false)
     private String title;

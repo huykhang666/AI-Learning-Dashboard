@@ -1,6 +1,6 @@
 package com.ai.learning.backend.entity.enums;
 
-public enum Role {
+public enum MessageRole {
     USER,
-    ADMIN
+    AI
 }

@@ -13,13 +13,17 @@ import lombok.*;
 public class AIResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "ai_result_id")
+    private long aiResultId;
 
-    @Column(columnDefinition = "LONGTEXT",nullable = false)
+    @Column(columnDefinition = "TEXT",nullable = false)
     private String transcript;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String summary;
+
+    @Column(columnDefinition = "TEXT")
+    private String keyPoints;
 
     // One-to-one relationship with LearningSession.
     // Each record is associated with exactly one session.

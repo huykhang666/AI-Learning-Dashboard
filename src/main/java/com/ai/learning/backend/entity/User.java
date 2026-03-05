@@ -1,6 +1,6 @@
 package com.ai.learning.backend.entity;
 
-import com.ai.learning.backend.entity.enums.Role;
+import com.ai.learning.backend.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,7 +62,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Role role;
+    private UserRole role;
 
     //Get time the automatically
     @PrePersist
@@ -73,7 +73,7 @@ public class User {
         }
 
         if (this.role == null) {
-            this.role = Role.USER;
+            this.role = UserRole.USER;
         }
     }
 }
