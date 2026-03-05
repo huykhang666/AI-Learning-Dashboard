@@ -13,7 +13,7 @@ import lombok.*;
 public class AIResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
+    private long id;
 
     @Column(columnDefinition = "LONGTEXT",nullable = false)
     private String transcript;

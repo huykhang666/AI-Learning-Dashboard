@@ -1,4 +1,21 @@
 package com.ai.learning.backend.dto.response;
 
+import com.ai.learning.backend.entity.enums.SessionStatus;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SessionListResponse {
+    long id;
+    String title;
+    String videoUrl;
+    String description;
+    SessionStatus status;
+    LocalDateTime createdAt;
 }
