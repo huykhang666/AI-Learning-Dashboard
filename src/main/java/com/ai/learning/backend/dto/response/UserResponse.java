@@ -4,16 +4,18 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserReponse {
+public class UserResponse {
+    Integer userId;
     String username;
     String firstname;
     String lastname;
     String email;
-    LocalDate dateOfBirth;
+    LocalDateTime dateOfBirth;
 }

@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SessionDetailResponse {
-    long learningSessionId;
+    Integer learningSessionId;
     String title;
     String videoUrl;
     String transcript;

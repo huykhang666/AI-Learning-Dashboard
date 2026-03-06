@@ -14,7 +14,7 @@ public class AIResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ai_result_id")
-    private long aiResultId;
+    private Integer aiResultId;
 
     @Column(columnDefinition = "TEXT",nullable = false)
     private String transcript;

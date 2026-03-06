@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
     String username;
-    String firstname;
-    String lastname;
+    String firstName;
+    String lastName;
     String email;
     String password;
     LocalDate dateOfBirth;
