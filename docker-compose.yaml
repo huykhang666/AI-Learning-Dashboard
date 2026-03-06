@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mirror.gcr.io/library/postgres:15-alpine
+    container_name: ai_learning_dashboard
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ai_learning_dashboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
