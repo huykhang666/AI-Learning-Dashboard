@@ -5,6 +5,8 @@ import com.ai.learning.backend.dto.request.UpdateUserRequest;
 import com.ai.learning.backend.dto.response.UserResponse;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.entity.enums.UserRole;
+import com.ai.learning.backend.exception.AppException;
+import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse register(RegisterRequest request) {
         //Check if the email address already exists.
         if(userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã tồn tại");
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
 
         //Creating a User Object from a Request
@@ -51,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
         //Find a user in the database by username.
         User user = userRepository.findByUsername(name)
-                .orElseThrow(()-> new RuntimeException("Không tìm thấy thông tin người dùng")) ;
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         return mapToResponse(user);
     }
 
@@ -59,7 +61,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateProfileRequest(Integer id, UpdateUserRequest request) {
         //Find the old user in the database
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng để cập nhật"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         //Update the fields that the User has submitted.
         if(request.getFirstname() != null) user.setFirstName(request.getFirstname());
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean canUpload(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new RuntimeException("Không tìm thấy  người dùng")) ;
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND)) ;
         if(user.isPremium())
             return true;
         return user.getDailyUploadCount() < 10;
@@ -82,7 +84,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUsage(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         user.setDailyUploadCount(user.getDailyUploadCount() + 1);
         userRepository.save(user);
