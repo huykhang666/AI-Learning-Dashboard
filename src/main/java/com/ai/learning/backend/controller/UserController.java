@@ -2,8 +2,10 @@ package com.ai.learning.backend.controller;
 
 import com.ai.learning.backend.dto.request.RegisterRequest;
 import com.ai.learning.backend.dto.request.UpdateUserRequest;
+import com.ai.learning.backend.dto.response.ApiResponse;
 import com.ai.learning.backend.dto.response.UserResponse;
 import com.ai.learning.backend.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,27 +17,33 @@ public class UserController {
 
     //Register
     @PostMapping("/register")
-    public UserResponse register(@RequestBody RegisterRequest request) {
-        return userService.register(request);
+    public UserResponse register(@RequestBody @Valid RegisterRequest request) {
+        return ApiResponse.<UserResponse>builder().
+                result(userService.register(request)).build().getResult();
     }
 
     @GetMapping("/my-info")
     public UserResponse getMyInfo() {
-        return userService.getMyInfo();
+        return ApiResponse.<UserResponse>builder().
+                result(userService.getMyInfo()).build().getResult();
     }
 
     @PutMapping("/{id}")
     public UserResponse updateProfile(@PathVariable Integer id,@RequestBody UpdateUserRequest request) {
-        return userService.updateProfileRequest(id,request);
+        return ApiResponse.<UserResponse>builder().
+                result(userService.updateProfileRequest(id,request)).build().getResult();
     }
 
     @GetMapping("/{id}/can-upload")
     public boolean canUpload(@PathVariable Integer id) {
-        return userService.canUpload(id);
+        return ApiResponse.<Boolean>builder().
+                result(userService.canUpload(id)).build().getResult();
     }
 
     @GetMapping("/{id}/update-usage")
-    public void updateUsage(@PathVariable Integer id) {
+    public ApiResponse.ApiResponseBuilder<Void> updateUsage(@PathVariable Integer id) {
         userService.updateUsage(id);
+        return ApiResponse.<Void>builder().
+                message("Update usage successfully");
     }
 }

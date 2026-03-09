@@ -1,9 +1,6 @@
 package com.ai.learning.backend.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -21,9 +18,18 @@ public enum ErrorCode {
     INVALID_KEY(1004,"Invalid error code",HttpStatus.BAD_REQUEST),
     INVALID_USERNAME(1005, "Username must have at least 3 characters.",HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(1006,"The password must have at least 6 characters.",HttpStatus.BAD_REQUEST),
-
+    INVALID_EMAIL(1008,"Invalid email format",HttpStatus.BAD_REQUEST),
     //Security error
-    UNAUTHORIZED(1007, "You do not have access.", HttpStatus.UNAUTHORIZED);
+    UNAUTHORIZED(1007, "You do not have access.", HttpStatus.UNAUTHORIZED),
+
+
+    //REQUIRED
+    EMAIL_IS_REQUIRED(1009,"Email is required",HttpStatus.BAD_REQUEST),
+    USERNAME_IS_REQUIRED(1010,"Username is required",HttpStatus.BAD_REQUEST),
+    FIRSTNAME_IS_REQUIRED(1011,"Firstname is required",HttpStatus.BAD_REQUEST),
+    LASTNAME_IS_REQUIRED(1012,"Lastname is required",HttpStatus.BAD_REQUEST),
+    PASSWORD_IS_REQUIRED(1013,"Password is required",HttpStatus.BAD_REQUEST);
+
 
     private final int code;
     private final String message;
@@ -33,6 +39,4 @@ public enum ErrorCode {
         this.message = message;
         this.statusCode = statusCode;
     }
-
-
 }
