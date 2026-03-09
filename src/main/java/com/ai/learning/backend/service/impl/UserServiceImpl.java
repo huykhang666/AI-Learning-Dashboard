@@ -7,19 +7,20 @@ import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.entity.enums.UserRole;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
+import com.ai.learning.backend.mapper.UserMapper;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     public UserResponse register(RegisterRequest request) {
@@ -28,21 +29,14 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
 
-        //Creating a User Object from a Request
-        User user = User.builder()
-                .email(request.getEmail())
-                .username(request.getUsername())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .dateOfBirth(request.getDateOfBirth())
-                .role(UserRole.USER)
-                .isPremium(false)
-                .dailyUploadCount(0)
-                .build();
+        User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(UserRole.USER);
+        user.setDailyUploadCount(0);
+        user.setPremium(false);
 
         User savedUser = userRepository.save(user);
-        return mapToResponse(savedUser);
+        return userMapper.toUserResponse(savedUser);
     }
 
     @Override
@@ -54,7 +48,7 @@ public class UserServiceImpl implements UserService {
         //Find a user in the database by username.
         User user = userRepository.findByUsername(name)
                 .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
-        return mapToResponse(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -64,12 +58,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         //Update the fields that the User has submitted.
-        if(request.getFirstname() != null) user.setFirstName(request.getFirstname());
-        if(request.getLastname() != null) user.setLastName(request.getLastname());
-        if(request.getDateOfBirth() != null) user.setDateOfBirth(LocalDate.from(request.getDateOfBirth()));
+       userMapper.updateUser(user,request);
 
-        User savedUser = userRepository.save(user);
-        return mapToResponse(savedUser);
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     @Override
@@ -88,16 +79,5 @@ public class UserServiceImpl implements UserService {
 
         user.setDailyUploadCount(user.getDailyUploadCount() + 1);
         userRepository.save(user);
-    }
-
-    private UserResponse mapToResponse(User user) {
-        return UserResponse.builder()
-                .userId(user.getUserId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstname(user.getFirstName())
-                .lastname(user.getLastName())
-                .dateOfBirth(user.getDateOfBirth().atStartOfDay())
-                .build();
     }
 }
