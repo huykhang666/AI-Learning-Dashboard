@@ -16,7 +16,7 @@ public interface UserMapper {
 
     @Mapping(target = "firstname", source = "firstName")
     @Mapping(target = "lastname", source = "lastName")
-    @Mapping(target = "dateOfBirth", expression = "java(user.getDateOfBirth().atStartOfDay())")
+    @Mapping(target = "dateOfBirth", source = "dateOfBirth")
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "firstName", source = "firstname")

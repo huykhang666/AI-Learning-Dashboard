@@ -1,9 +1,10 @@
 package com.ai.learning.backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -16,5 +17,6 @@ public class UserResponse {
     String firstname;
     String lastname;
     String email;
-    LocalDateTime dateOfBirth;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    LocalDate dateOfBirth;
 }

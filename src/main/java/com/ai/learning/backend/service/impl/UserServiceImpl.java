@@ -29,6 +29,11 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
 
+        //Check if the username already exists.
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(UserRole.USER);
