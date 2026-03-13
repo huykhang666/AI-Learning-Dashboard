@@ -17,25 +17,38 @@ function HeroSection(){
                         <a href="#" className="bg-indigo-600 text-white text-base font-bold px-6 py-3 rounded-full hover:bg-indigo-700 hover:-translate-y-2 transition">Bắt đầu miễn phí</a>
                         <a href="#" className="bg-white text-black text-base font-bold px-5 py-3 rounded-full hover:-translate-y-2 transition">Xem tính năng</a>
                     </div>
-                    {/* THỐNG KÊ */}
-<div className="flex items-center gap-6 mt-10">
-
-  {/* AVATAR */}
-  <div className="flex items-center">
-    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold -ml-0">A</div>
-    <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold -ml-2">B</div>
-    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold -ml-2">C</div>
-    <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs font-bold -ml-2">D</div>
-    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-bold -ml-2">E</div>
-  </div>
-  <span className="text-sm text-gray-600 font-medium">2.000+ sinh viên tin dùng</span>
-  <span className="text-sm text-gray-600 font-medium">4.9/5</span>
-  <span className="text-sm text-gray-600 font-medium">50K+ video đã xử lý</span>
-
-</div>
+                    <div className="flex items-center gap-6 mt-10">
+                        <div className="flex items-center">
+                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold -ml-0">A</div>
+                            <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold -ml-2">B</div>
+                            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold -ml-2">C</div>
+                            <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs font-bold -ml-2">D</div>
+                            <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-bold -ml-2">E</div>
+                        </div>
+                        <span className="text-sm text-gray-600 font-medium">2.000+ sinh viên tin dùng</span>
+                        <span className="text-sm text-gray-600 font-medium">4.9/5</span>
+                        <span className="text-sm text-gray-600 font-medium">50K+ video đã xử lý</span>
+                    </div>
                 </div>
-                <div className="flex-1">
-                    Phai    
+                <div className="flex-1 flex justify-end">
+                    <div className="bg-white rounded-2xl shadow-lg p-6 w-96">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex gap-1.5">
+                                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                            </div>
+                            <span className="text-xs text-gray-400 font-medium">UPLOAD WIDGET</span>
+                        </div>
+                        <div className="flex gap-2 mb-4 border-black-600">
+                            <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition">
+                                Upload File
+                            </button>
+                            <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-400 hover:bg-gray-50 transition">
+                                YouTube Link
+                            </button>
+                        </div>
+                    </div>   
                 </div>
             </div>
         </section>
