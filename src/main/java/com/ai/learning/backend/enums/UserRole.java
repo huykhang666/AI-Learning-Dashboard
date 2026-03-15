@@ -1,4 +1,4 @@
-package com.ai.learning.backend.entity.enums;
+package com.ai.learning.backend.enums;
 
 public enum UserRole {
     USER,

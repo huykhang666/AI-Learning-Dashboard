@@ -1,6 +1,6 @@
 package com.ai.learning.backend.entity;
 
-import com.ai.learning.backend.entity.enums.SessionStatus;
+import com.ai.learning.backend.enums.SessionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

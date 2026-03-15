@@ -1,6 +1,7 @@
 package com.ai.learning.backend.repository;
 
 import com.ai.learning.backend.entity.User;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -20,5 +21,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     // Find username
     Optional<User> findByUsername(String username);
 
-
+    //Delete User
+    void deleteByUserId(Integer userId);
 }

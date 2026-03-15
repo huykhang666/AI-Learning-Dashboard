@@ -7,11 +7,16 @@ import com.ai.learning.backend.dto.response.UserResponse;
 import com.ai.learning.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final UserService userService;
 
@@ -49,4 +54,25 @@ public class UserController {
         return ApiResponse.<Void>builder().
                 message("Update usage successfully");
     }
+
+    @DeleteMapping("/{userId}")
+    public ApiResponse<Void> deleteUser(@PathVariable  Integer userId) {
+        userService.deleteUser(userId);
+        return ApiResponse.<Void>builder()
+                .message("User has been deleted successfully")
+                .build();
+    }
+
+    @GetMapping
+    public ApiResponse<List<UserResponse>> getUsers() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("User đang gọi API: {}", authentication.getName());
+        log.info("Quyền hạn đang có: {}", authentication.getAuthorities());
+
+        return ApiResponse.<List<UserResponse>>builder()
+                .code(1000)
+                .result(userService.getUsers())
+                .build();
+    }
+
 }

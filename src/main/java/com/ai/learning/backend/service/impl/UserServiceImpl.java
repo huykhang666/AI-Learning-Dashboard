@@ -4,19 +4,25 @@ import com.ai.learning.backend.dto.request.RegisterRequest;
 import com.ai.learning.backend.dto.request.UpdateUserRequest;
 import com.ai.learning.backend.dto.response.UserResponse;
 import com.ai.learning.backend.entity.User;
-import com.ai.learning.backend.entity.enums.UserRole;
+import com.ai.learning.backend.enums.UserRole;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.UserMapper;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,6 +45,10 @@ public class UserServiceImpl implements UserService {
         user.setRole(UserRole.USER);
         user.setDailyUploadCount(0);
         user.setPremium(false);
+
+        Set<String> roles = new HashSet<>();
+        roles.add(UserRole.USER.name());
+        user.setRoles(roles);
 
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponse(savedUser);
@@ -84,5 +94,23 @@ public class UserServiceImpl implements UserService {
 
         user.setDailyUploadCount(user.getDailyUploadCount() + 1);
         userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(Integer userId) {
+        if(!userRepository.existsById(userId)) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        userRepository.deleteById(userId);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> getUsers() {
+        log.info("In method get users");
+        return userRepository.findAll().stream()
+                .map(userMapper::toUserResponse)
+                .toList();
     }
 }

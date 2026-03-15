@@ -47,7 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
-        var token = jwtUtils.generateToken(request.getUsername());
+        var token = jwtUtils.generateToken(user);
 
         return AuthenticationResponse.builder()
                 .token(token)

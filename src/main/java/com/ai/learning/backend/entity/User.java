@@ -1,11 +1,12 @@
 package com.ai.learning.backend.entity;
 
-import com.ai.learning.backend.entity.enums.UserRole;
+import com.ai.learning.backend.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -38,6 +39,15 @@ public class User {
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    //User permissions (USER, ADMIN, Premium)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "role_name")
+    private Set<String> roles;
 
     //Phân loại tài khoản
     private boolean isPremium = false;

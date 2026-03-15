@@ -1,7 +1,6 @@
 package com.ai.learning.backend.dto.response;
 
-import com.ai.learning.backend.entity.LearningSession;
-import com.ai.learning.backend.entity.enums.SessionStatus;
+import com.ai.learning.backend.enums.SessionStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
