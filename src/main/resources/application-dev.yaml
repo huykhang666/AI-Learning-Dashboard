@@ -10,11 +10,12 @@ spring:
       client:
         registration:
           google:
-            client-id: 652291090161-jl10a5ld9ugehmf20rp6asq5mhtbpgj9.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
               - email
               - profile
+
   jpa:
     hibernate:
       ddl-auto: update
