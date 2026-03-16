@@ -1,7 +1,10 @@
+import { useState} from "react"
 function HeroSection(){
+    const [activeTab, setActiveTab] = useState("youtube")
     return (
         <section className="bg-gradient-to-br from-slate-100 to-blue-100">
             <div className="max-w-7xl mx-auto px-4 py-20 flex items-center justify-between">
+                {/* LEFT */}
                 <div className="flex-1">
                     <div className="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-1.5 rounded-full mb-6">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -30,6 +33,7 @@ function HeroSection(){
                         <span className="text-sm text-gray-600 font-medium">50K+ video đã xử lý</span>
                     </div>
                 </div>
+                {/* RIGHT */}
                 <div className="flex-1 flex justify-end">
                     <div className="bg-white rounded-2xl shadow-lg p-6 w-96">
                         <div className="flex items-center justify-between mb-4">
@@ -40,15 +44,27 @@ function HeroSection(){
                             </div>
                             <span className="text-xs text-gray-400 font-medium">UPLOAD WIDGET</span>
                         </div>
-                        <div className="flex gap-2 mb-4 border-black-600">
-                            <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition">
+                        <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-xl">
+                            <button onClick={() => setActiveTab("file")} className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${ activeTab === "file" ? "bg-white shadow-sm text-gray-700" : "text-gray-400 hover:text-gray-600"}`}>
                                 Upload File
                             </button>
-                            <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-400 hover:bg-gray-50 transition">
+                            <button onClick={() => setActiveTab("youtube")} className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${ activeTab === "youtube" ? "bg-white shadow-sm text-gray-700" : "text-gray-400 hover:text-gray-600" }`} >
                                 YouTube Link
                             </button>
                         </div>
-                    </div>   
+                        {activeTab === "youtube" ? (
+                            <input type="text" placeholder="https://youtube.com/watch?v=..." className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500 outline-none focus:border-indigo-400 mb-4"/>
+                        ) : (
+                            <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 mb-4 flex flex-col items-center justify-center gap-2">
+                                <p className="text-sm font-medium text-gray-600">Kéo & thả file video vào đây</p>
+                                <button className="mt-2 border border-gray-300 text-sm px-4 py-1.5 rounded-lg text-gray-600 hover:bg-gray-50">
+                                    Chọn file
+                                </button>
+                            </div>
+                        )}
+                        <button className="w-full bg-indigo-600 rounded-full py-4 text-white font-bold hover:bg-indigo-700 transition ">PROCESS VIDEO</button>
+                        <p className="text-center text-xs text-gray-400 mt-3"> Miễn phí · Không cần thẻ tín dụng </p>
+                    </div>  
                 </div>
             </div>
         </section>
