@@ -36,8 +36,10 @@ public class SecurityConfig {
     }
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "api/v1/users/register",
-            "api/v1/auth/login"
+            "/api/v1/users/register",
+            "/api/v1/auth/login",
+            "/oauth2/**",
+            "/login/oauth2/**"
     };
 
     @Bean
@@ -50,6 +52,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
 
                 );
+
+        httpSecurity.oauth2Login(oauth2 -> oauth2
+                .defaultSuccessUrl("/api/v1/users", true) // Tạm thời redirect về đây để test
+        );
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
