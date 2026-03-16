@@ -1,4 +1,4 @@
-package com.ai.learning.backend.security;
+package com.ai.learning.backend.config;
 
 import com.ai.learning.backend.enums.UserRole;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +55,11 @@ public class SecurityConfig {
                 oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+        );
+
+        httpSecurity.exceptionHandling(exception ->
+                exception.accessDeniedHandler(new CustomAccessDeniedHandler())
         );
 
         httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));

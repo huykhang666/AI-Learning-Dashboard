@@ -8,6 +8,7 @@ import com.ai.learning.backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<UserResponse>> getUsers() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("User đang gọi API: {}", authentication.getName());

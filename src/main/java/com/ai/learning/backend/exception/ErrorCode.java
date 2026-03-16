@@ -28,8 +28,13 @@ public enum ErrorCode {
     USERNAME_IS_REQUIRED(1010,"Username is required",HttpStatus.BAD_REQUEST),
     FIRSTNAME_IS_REQUIRED(1011,"Firstname is required",HttpStatus.BAD_REQUEST),
     LASTNAME_IS_REQUIRED(1012,"Lastname is required",HttpStatus.BAD_REQUEST),
-    PASSWORD_IS_REQUIRED(1013,"Password is required",HttpStatus.BAD_REQUEST);
+    PASSWORD_IS_REQUIRED(1013,"Password is required",HttpStatus.BAD_REQUEST),
+    INVALID_CREDENTIALS(1014, "Invalid username or password", HttpStatus.UNAUTHORIZED),
 
+    TOKEN_EXPIRED(1015, "Token has expired", HttpStatus.UNAUTHORIZED),
+    INVALID_TOKEN(1016, "Invalid token", HttpStatus.UNAUTHORIZED),
+
+    FORBIDDEN(1017, "You do not have permission to access this resource", HttpStatus.FORBIDDEN);
 
     private final int code;
     private final String message;

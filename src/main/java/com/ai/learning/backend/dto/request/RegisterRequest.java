@@ -15,8 +15,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterRequest {
-    @Size(min = 3,message = "INVALID_USERNAME")
+
     @NotBlank(message = "USERNAME_IS_REQUIRED")
+    @Size(min = 3,message = "INVALID_USERNAME")
     String username;
 
     @NotBlank(message = "FIRSTNAME_IS_REQUIRED")
