@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaBolt } from "react-icons/fa";
 
 const T = {
   primary: "#2563EB",
@@ -55,14 +56,14 @@ const Field = ({
   error,
   right,
 }) => (
-  <div style={{ marginBottom: 11 }}>
+  <div style={{ marginBottom: 6 }}>
     <label
       style={{
         display: "block",
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 700,
         color: T.text,
-        marginBottom: 5,
+        marginBottom: 3,
         fontFamily: F,
       }}
     >
@@ -76,7 +77,7 @@ const Field = ({
         onChange={onChange}
         style={{
           width: "100%",
-          padding: "10px 36px 10px 12px",
+          padding: "8px 36px 8px 12px",
           borderRadius: 10,
           border: `1.5px solid ${error ? T.danger : T.border}`,
           fontSize: 13,
@@ -110,7 +111,7 @@ const Field = ({
       )}
     </div>
     {error && (
-      <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F }}>
+      <p style={{ fontSize: 11, color: T.danger, marginTop: 2, fontFamily: F }}>
         ⚠ {error}
       </p>
     )}
@@ -241,22 +242,68 @@ export default function PageRegister({ onRegister, onGoLogin }) {
     );
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", fontFamily: F }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        fontFamily: F,
+        overflow: "hidden",
+        boxSizing: "border-box",
+      }}
+    >
       {/* LEFT */}
       <div
         style={{
-          width: "50%",
+          flex: "1 1 50%",
+          minWidth: 0,
           background:
             "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "40px 44px",
+          padding: "70px 44px 40px",
           position: "relative",
           overflow: "hidden",
+          boxSizing: "border-box",
         }}
       >
+        {/* Nút quay lại */}
+        <button
+          onClick={() => {
+            window.location.href = "/";
+          }}
+          style={{
+            position: "absolute",
+            top: 20,
+            left: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "rgba(255,255,255,.15)",
+            border: "1px solid rgba(255,255,255,.25)",
+            borderRadius: 10,
+            padding: "7px 14px",
+            cursor: "pointer",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 600,
+            fontFamily: F,
+            backdropFilter: "blur(4px)",
+            transition: "background .15s",
+            zIndex: 10,
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(255,255,255,.25)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "rgba(255,255,255,.15)")
+          }
+        >
+          ← Quay lại
+        </button>
+
         <div
           style={{
             position: "absolute",
@@ -285,7 +332,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
             display: "flex",
             alignItems: "center",
             gap: 10,
-            marginBottom: 36,
+            marginBottom: 28,
             zIndex: 1,
             alignSelf: "flex-start",
           }}
@@ -299,36 +346,47 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 20,
             }}
           >
-            ⚡
+            <FaBolt size={20} color="#F59E0B" />
           </div>
           <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
             AI-Learning DashBoard
           </span>
         </div>
 
-        <div style={{ zIndex: 1, textAlign: "center", maxWidth: 340 }}>
+        <div
+          style={{
+            zIndex: 1,
+            textAlign: "center",
+            maxWidth: 340,
+            width: "100%",
+          }}
+        >
           <h2
             style={{
-              fontSize: 30,
+              fontSize: 28,
               fontWeight: 900,
               color: "#fff",
               lineHeight: 1.2,
-              marginBottom: 12,
+              marginBottom: 10,
             }}
           >
             Học thông minh hơn
             <br />
-            với sức mạnh của AI ⚡
+            với sức mạnh của AI{" "}
+            <FaBolt
+              size={22}
+              color="#F59E0B"
+              style={{ verticalAlign: "middle", display: "inline" }}
+            />
           </h2>
           <p
             style={{
-              fontSize: 14,
+              fontSize: 13,
               color: "rgba(255,255,255,.8)",
-              lineHeight: 1.75,
-              marginBottom: 28,
+              lineHeight: 1.7,
+              marginBottom: 22,
             }}
           >
             Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời mọi
@@ -338,8 +396,8 @@ export default function PageRegister({ onRegister, onGoLogin }) {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 10,
-              marginBottom: 36,
+              gap: 8,
+              marginBottom: 28,
             }}
           >
             {[
@@ -355,7 +413,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
                   gap: 12,
                   background: "rgba(255,255,255,.13)",
                   borderRadius: 12,
-                  padding: "11px 16px",
+                  padding: "10px 16px",
                   border: "1px solid rgba(255,255,255,.2)",
                   textAlign: "left",
                 }}
@@ -392,46 +450,50 @@ export default function PageRegister({ onRegister, onGoLogin }) {
         </div>
       </div>
 
-      {/* RIGHT — scrollable */}
+      {/* RIGHT */}
       <div
         style={{
-          width: "50%",
+          flex: "1 1 50%",
+          minWidth: 0,
           background: T.bg,
-          overflowY: "auto",
+          overflow: "hidden",
           display: "flex",
-          alignItems: "flex-start",
+          alignItems: "center",
           justifyContent: "center",
-          padding: "32px 48px",
+          padding: "16px 48px",
+          height: "100vh",
+          boxSizing: "border-box",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 380, paddingTop: 8 }}>
+        <div style={{ width: "100%", maxWidth: 420 }}>
           <h1
             style={{
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: 800,
               color: T.text,
-              marginBottom: 4,
+              marginBottom: 2,
+              marginTop: 0,
             }}
           >
             Tạo tài khoản mới 🚀
           </h1>
           <p
             style={{
-              fontSize: 13,
+              fontSize: 12,
               color: T.textMid,
-              marginBottom: 20,
+              marginBottom: 10,
               fontWeight: 500,
+              marginTop: 0,
             }}
           >
             Miễn phí. Không cần thẻ tín dụng.
           </p>
 
-          {/* Google */}
           <button
             onClick={() => onRegister()}
             style={{
               width: "100%",
-              padding: "11px",
+              padding: "9px",
               borderRadius: 11,
               border: `1.5px solid ${T.border}`,
               background: T.white,
@@ -441,11 +503,12 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               justifyContent: "center",
               gap: 9,
               fontWeight: 600,
-              fontSize: 14,
+              fontSize: 13,
               color: T.text,
-              marginBottom: 18,
+              marginBottom: 10,
               fontFamily: F,
               boxShadow: "0 1px 3px rgba(0,0,0,.06)",
+              boxSizing: "border-box",
             }}
           >
             <GIcon /> Đăng ký với Google
@@ -456,11 +519,18 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              marginBottom: 18,
+              marginBottom: 10,
             }}
           >
             <div style={{ flex: 1, height: 1, background: T.border }} />
-            <span style={{ fontSize: 12, color: T.textLight, fontWeight: 500 }}>
+            <span
+              style={{
+                fontSize: 11,
+                color: T.textLight,
+                fontWeight: 500,
+                whiteSpace: "nowrap",
+              }}
+            >
               hoặc tạo tài khoản
             </span>
             <div style={{ flex: 1, height: 1, background: T.border }} />
@@ -482,15 +552,14 @@ export default function PageRegister({ onRegister, onGoLogin }) {
             error={errors.email}
           />
 
-          {/* Password + strength */}
-          <div style={{ marginBottom: 11 }}>
+          <div style={{ marginBottom: 6 }}>
             <label
               style={{
                 display: "block",
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 700,
                 color: T.text,
-                marginBottom: 5,
+                marginBottom: 3,
                 fontFamily: F,
               }}
             >
@@ -504,7 +573,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
                 onChange={set("pass")}
                 style={{
                   width: "100%",
-                  padding: "10px 36px 10px 12px",
+                  padding: "8px 36px 8px 12px",
                   borderRadius: 10,
                   border: `1.5px solid ${errors.pass ? T.danger : T.border}`,
                   fontSize: 13,
@@ -545,8 +614,8 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               </button>
             </div>
             {form.pass && (
-              <div style={{ marginTop: 6 }}>
-                <div style={{ display: "flex", gap: 3, marginBottom: 3 }}>
+              <div style={{ marginTop: 4 }}>
+                <div style={{ display: "flex", gap: 3, marginBottom: 2 }}>
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
@@ -573,7 +642,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               </div>
             )}
             {errors.pass && (
-              <p style={{ fontSize: 11, color: T.danger, marginTop: 3 }}>
+              <p style={{ fontSize: 11, color: T.danger, marginTop: 2 }}>
                 ⚠ {errors.pass}
               </p>
             )}
@@ -588,8 +657,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
             error={errors.confirm}
           />
 
-          {/* Agree */}
-          <div style={{ marginBottom: 18 }}>
+          <div style={{ marginBottom: 10 }}>
             <label
               style={{
                 display: "flex",
@@ -601,8 +669,8 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               <div
                 onClick={() => setAgree(!agree)}
                 style={{
-                  width: 16,
-                  height: 16,
+                  width: 15,
+                  height: 15,
                   borderRadius: 4,
                   border: `2px solid ${errors.agree ? T.danger : agree ? T.primary : "#CBD5E1"}`,
                   background: agree ? T.primary : T.white,
@@ -616,16 +684,14 @@ export default function PageRegister({ onRegister, onGoLogin }) {
                 }}
               >
                 {agree && (
-                  <span
-                    style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}
-                  >
+                  <span style={{ color: "#fff", fontSize: 9, fontWeight: 900 }}>
                     ✓
                   </span>
                 )}
               </div>
               <span
                 style={{
-                  fontSize: 12,
+                  fontSize: 11,
                   color: T.textMid,
                   lineHeight: 1.6,
                   fontWeight: 500,
@@ -658,8 +724,8 @@ export default function PageRegister({ onRegister, onGoLogin }) {
                 style={{
                   fontSize: 11,
                   color: T.danger,
-                  marginTop: 3,
-                  paddingLeft: 24,
+                  marginTop: 2,
+                  paddingLeft: 23,
                 }}
               >
                 ⚠ {errors.agree}
@@ -672,13 +738,13 @@ export default function PageRegister({ onRegister, onGoLogin }) {
             disabled={loading}
             style={{
               width: "100%",
-              padding: "12px",
+              padding: "10px",
               borderRadius: 11,
               border: "none",
               background: loading ? "#BFDBFE" : T.primary,
               color: "#fff",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: 14,
               cursor: loading ? "not-allowed" : "pointer",
               fontFamily: F,
               display: "flex",
@@ -687,6 +753,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
               gap: 8,
               boxShadow: loading ? "none" : `0 4px 14px ${T.primary}40`,
               transition: "background .2s",
+              boxSizing: "border-box",
             }}
             onMouseEnter={(e) => {
               if (!loading) e.currentTarget.style.background = T.primaryHover;
@@ -698,8 +765,8 @@ export default function PageRegister({ onRegister, onGoLogin }) {
             {loading && (
               <div
                 style={{
-                  width: 16,
-                  height: 16,
+                  width: 15,
+                  height: 15,
                   borderRadius: "50%",
                   border: "2px solid rgba(255,255,255,.4)",
                   borderTopColor: "#fff",
@@ -713,9 +780,9 @@ export default function PageRegister({ onRegister, onGoLogin }) {
           <p
             style={{
               textAlign: "center",
-              marginTop: 16,
-              marginBottom: 24,
-              fontSize: 13,
+              marginTop: 10,
+              marginBottom: 0,
+              fontSize: 12,
               color: T.textMid,
               fontWeight: 500,
             }}
