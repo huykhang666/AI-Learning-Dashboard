@@ -9,14 +9,17 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.security.Key;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+
 
 @Component
 @Slf4j
@@ -24,6 +27,8 @@ public class JwtUtils {
     @NonFinal
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
+
+
 
     public String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
@@ -49,6 +54,28 @@ public class JwtUtils {
         }
 
     }
+    public String generateRefreshToken(String email) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(email)
+                .issuer("AI-Learning-DashBoard")
+                .issueTime(new Date())
+                // Set 7 ngày (168 giờ)
+                .expirationTime(new Date(Instant.now().plus(168, ChronoUnit.HOURS).toEpochMilli()))
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            log.error("Cannot create refresh token", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     public boolean validateToken(String token) throws JOSEException, ParseException {
         JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
@@ -66,4 +93,6 @@ public class JwtUtils {
 
         return stringJoiner.toString();
     }
+
+
 }

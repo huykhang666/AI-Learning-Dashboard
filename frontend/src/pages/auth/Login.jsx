@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaBolt } from "react-icons/fa";
 
 const T = {
   primary: "#2563EB",
@@ -139,11 +140,21 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", fontFamily: F }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        fontFamily: F,
+        overflow: "hidden",
+        boxSizing: "border-box",
+      }}
+    >
       {/* LEFT */}
       <div
         style={{
-          width: "50%",
+          flex: "1 1 50%",
+          minWidth: 0,
           background:
             "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
           display: "flex",
@@ -153,8 +164,44 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
           padding: "40px 44px",
           position: "relative",
           overflow: "hidden",
+          boxSizing: "border-box",
         }}
       >
+        {/* Nút quay lại */}
+        <button
+          onClick={() => {
+            window.location.href = "/";
+          }}
+          style={{
+            position: "absolute",
+            top: 20,
+            left: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            background: "rgba(255,255,255,.15)",
+            border: "1px solid rgba(255,255,255,.25)",
+            borderRadius: 10,
+            padding: "7px 14px",
+            cursor: "pointer",
+            color: "#fff",
+            fontSize: 13,
+            fontWeight: 600,
+            fontFamily: F,
+            backdropFilter: "blur(4px)",
+            transition: "background .15s",
+            zIndex: 10,
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(255,255,255,.25)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "rgba(255,255,255,.15)")
+          }
+        >
+          ← Quay lại
+        </button>
+
         <div
           style={{
             position: "absolute",
@@ -186,6 +233,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
             marginBottom: 40,
             zIndex: 1,
             alignSelf: "flex-start",
+            marginTop: 48,
           }}
         >
           <div
@@ -197,10 +245,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 20,
             }}
           >
-            ⚡
+            <FaBolt size={20} color="#F59E0B" />
           </div>
           <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
             AI-Learning DashBoard
@@ -219,7 +266,12 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
           >
             Học thông minh hơn
             <br />
-            với sức mạnh của AI ⚡
+            với sức mạnh của AI{" "}
+            <FaBolt
+              size={24}
+              color="#F59E0B"
+              style={{ verticalAlign: "middle", display: "inline" }}
+            />
           </h2>
           <p
             style={{
@@ -293,13 +345,15 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
       {/* RIGHT */}
       <div
         style={{
-          width: "50%",
+          flex: "1 1 50%",
+          minWidth: 0,
           background: T.bg,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           padding: "32px 48px",
           overflowY: "auto",
+          boxSizing: "border-box",
         }}
       >
         <div style={{ width: "100%", maxWidth: 380 }}>
@@ -324,7 +378,6 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
             Đăng nhập để tiếp tục hành trình học tập
           </p>
 
-          {/* Google */}
           <button
             onClick={() => onLogin()}
             style={{

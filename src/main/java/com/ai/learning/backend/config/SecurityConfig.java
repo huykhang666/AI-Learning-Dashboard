@@ -1,6 +1,7 @@
 package com.ai.learning.backend.config;
 
 import com.ai.learning.backend.enums.UserRole;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,9 @@ import java.util.List;
 public class SecurityConfig {
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
+
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -68,7 +72,7 @@ public class SecurityConfig {
                 exception.accessDeniedHandler(new CustomAccessDeniedHandler())
         );
 
-        httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource));
         return httpSecurity.build();
     }
 
@@ -91,17 +95,5 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // Cho phép cổng của Frontend gọi vào
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 }
