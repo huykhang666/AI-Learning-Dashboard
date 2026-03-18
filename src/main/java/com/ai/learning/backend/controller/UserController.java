@@ -5,6 +5,8 @@ import com.ai.learning.backend.dto.request.UpdateUserRequest;
 import com.ai.learning.backend.dto.response.ApiResponse;
 import com.ai.learning.backend.dto.response.UserResponse;
 import com.ai.learning.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +20,13 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User Controller", description = "User-related APIs")
 public class UserController {
     private final UserService userService;
+    @Operation(
+            summary = "Lấy thông tin cá nhân",
+            description = "Yêu cầu phải có Access Token ở Header"
+    )
 
     //Register
     @PostMapping("/register")

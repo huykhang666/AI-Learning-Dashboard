@@ -27,3 +27,11 @@ spring:
 
 jwt:
   signerKey: "3af58fafc186e3e97a499c70732004cbac3e58ca779189091e038c8a80a179ae"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+  override-with-generic-response: false
