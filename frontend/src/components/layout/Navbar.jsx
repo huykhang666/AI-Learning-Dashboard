@@ -2,15 +2,15 @@ import { FaBolt } from "react-icons/fa";
 
 function Navbar({ onLogin, onRegister }) {
   const menuItems = [
-    { label: " TRANG CHỦ", href: "#" },
-    { label: " TÍNH NĂNG", href: "#" },
+    { label: " TRANG CHỦ", href: "#HeroSection"},
+    { label: " TÍNH NĂNG", href: "#Feature" },
     { label: " BẢNG GIÁ", href: "#" },
     { label: " VỀ CHÚNG TÔI", href: "#" },
     { label: " FAQ", href: "#" },
   ];
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="bg-indigo-600 text-white w-7 h-7 flex items-center justify-center rounded-lg">

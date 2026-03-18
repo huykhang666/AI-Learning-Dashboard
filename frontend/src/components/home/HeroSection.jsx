@@ -2,7 +2,7 @@ import { useState} from "react"
 function HeroSection(){
     const [activeTab, setActiveTab] = useState("youtube")
     return (
-        <section className="bg-gradient-to-br from-slate-100 to-blue-100">
+        <section className="bg-gradient-to-br from-slate-100 to-blue-100" id="HeroSection">
             <div className="max-w-7xl mx-auto px-4 py-20 flex items-center justify-between">
                 {/* LEFT */}
                 <div className="flex-1">

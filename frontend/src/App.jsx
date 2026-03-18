@@ -3,7 +3,7 @@ import Navbar from "./components/layout/Navbar";
 import HeroSection from "./components/home/HeroSection";
 import PageLogin from "./pages/auth/Login";
 import PageRegister from "./pages/auth/Register";
-
+import Feature from "./components/home/Feature";
 function App() {
   const [screen, setScreen] = useState("home"); // "home" | "login" | "register"
 
@@ -33,6 +33,10 @@ function App() {
         onRegister={() => setScreen("register")}
       />
       <HeroSection
+        onLogin={() => setScreen("login")}
+        onRegister={() => setScreen("register")}
+      />
+      <Feature
         onLogin={() => setScreen("login")}
         onRegister={() => setScreen("register")}
       />
