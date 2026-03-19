@@ -1,13 +1,35 @@
 function About() {
+    const members = [
+    {
+        avatar: "👨‍💼",
+        name: "Nguyễn Huy Khang",
+        role: "Backend",
+        description: "Cựu kỹ sư Google, 10 năm kinh nghiệm AI/ML"
+    },
+    {
+        avatar: "👨‍💼",
+        name: "Nguyễn Trọng Hiểu",
+        role: "Frontend",
+        description: "PhD NLP, chuyên gia xử lý ngôn ngữ tự nhiên"
+    },
+    {
+        avatar: "👨‍💼",
+        name: "Lê Quang Chí",
+        role: "Frontend",
+        description: "Cựu Product Manager tại VNG và Tiki"
+    }
+    ]
   return (
-    <section id="ve-chung-toi" className="bg-white py-20">
+    <section id="About" className="bg-gray-100 py-20" >
       <div className="max-w-7xl mx-auto px-4">
+        {/* TIEU DE */}
         <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 text-indigo-500 font-medium text-2xl mb-4"> Về chúng tôi</div>
             <h2 className="text-gray-900 text-4xl font-bold mb-4">Chúng tôi xây dựng tương lai giáo dục</h2>
         </div>
+        {/* CARD */}
+        <div className="flex items-center gap-20 border-b-2 py-10 border-green-500">
 
-        <div className="flex items-center gap-20">
             <div className="flex-1">
                 <p className="text-gray-500 text-base mb-4">
                     AI-Learning DashBoard được thành lập năm 2024 bởi những kỹ sư đam mê giáo dục và AI. Chúng tôi tin rằng mọi sinh viên đều xứng đáng có công cụ học tập thông minh nhất.
@@ -34,7 +56,7 @@ function About() {
                     </div>
                 </div>
             </div>
-    
+
             <div className="flex-1">
               <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-8 text-white">
                 <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium mb-6">
@@ -61,7 +83,22 @@ function About() {
             </div>
             </div>
         </div>
-
+        {/* DOi NGU */}
+        <div className="mt-12">
+            <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">
+                Đội ngũ sáng lập
+            </h2>
+            <div className="grid grid-cols-3 gap-12">
+                {members.map((member) => (
+                <div key={member.name} className="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:border-indigo-400 transition">
+                    <div className="text-5xl mb-4">{member.avatar}</div>
+                    <h3 className="font-bold text-gray-900 mb-1">{member.name}</h3>
+                    <p className="text-indigo-500 text-sm font-medium mb-3">{member.role}</p>
+                    <p className="text-gray-500 text-sm">{member.description}</p>
+                </div>
+                ))}
+            </div>
+        </div>
       </div>
     </section>
   )
