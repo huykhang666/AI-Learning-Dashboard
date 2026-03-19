@@ -13,6 +13,7 @@ public enum ErrorCode {
     USER_EXISTED(1001,"The username already exists.",HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1002,"The email already exists.",HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND(1003, "No user found",HttpStatus.NOT_FOUND),
+    USER_NOT_EXISTED(1018,"The username not exists",HttpStatus.BAD_REQUEST),
 
     //Validation error
     INVALID_KEY(1004,"Invalid error code",HttpStatus.BAD_REQUEST),
@@ -34,7 +35,11 @@ public enum ErrorCode {
     TOKEN_EXPIRED(1015, "Token has expired", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN(1016, "Invalid token", HttpStatus.UNAUTHORIZED),
 
-    FORBIDDEN(1017, "You do not have permission to access this resource", HttpStatus.FORBIDDEN);
+    FORBIDDEN(1017, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
+
+    //LEARNING SESSION
+    LESSON_NOT_FOUND(1019,"Lesson not found",HttpStatus.NOT_FOUND),
+    LESSON_NOT_EXISTED(1020,"Lesson not exists",HttpStatus.NOT_FOUND);
 
     private final int code;
     private final String message;

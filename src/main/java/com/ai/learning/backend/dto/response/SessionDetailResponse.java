@@ -16,5 +16,5 @@ public class SessionDetailResponse {
     String transcript;
     String summary;
     String keyPoints;
-    SessionStatus staus;
+    SessionStatus status;
 }

@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateSessionRequest {
+public class SessionRequest {
     private String title;
     private String videoUrl;
     private String description;
