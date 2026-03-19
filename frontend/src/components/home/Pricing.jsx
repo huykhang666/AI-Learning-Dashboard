@@ -60,7 +60,7 @@ function Pricing() {
          <section id="Pricing" className="bg-gray-50 py-20">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-12">
-                    <div className="inline-flex itemns-center gap-2 font-bold text-base text-blue-600 mb-4">BẢNG GIÁ </div>
+                    <div className="inline-flex items-center gap-2 text-indigo-500 font-medium text-2xl mb-4">BẢNG GIÁ </div>
                     <h2 className="text-4xl font-bold text-gray-900 mb-4">Chọn gói phù hợp với bạn </h2>
                     <p className="text-gray-500 test-base max-w-xl mx-auto"> Miễn phí để bắt đầu. Nâng cấp bất kỳ lúc nào khi bạn cần nhiều hơn.</p>
                 </div>
