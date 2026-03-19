@@ -4,6 +4,7 @@ import HeroSection from "./components/home/HeroSection";
 import PageLogin from "./pages/auth/Login";
 import PageRegister from "./pages/auth/Register";
 import Feature from "./components/home/Feature";
+import Pricing from "./components/home/Pricing";
 function App() {
   const [screen, setScreen] = useState("home"); // "home" | "login" | "register"
 
@@ -37,6 +38,10 @@ function App() {
         onRegister={() => setScreen("register")}
       />
       <Feature
+        onLogin={() => setScreen("login")}
+        onRegister={() => setScreen("register")}
+      />
+      <Pricing
         onLogin={() => setScreen("login")}
         onRegister={() => setScreen("register")}
       />

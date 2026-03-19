@@ -1,6 +1,12 @@
 package com.ai.learning.backend.config;
 
 import com.ai.learning.backend.enums.UserRole;
+import com.ai.learning.backend.security.oauth2.OAuth2SuccessHandler;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +40,9 @@ public class SecurityConfig {
     @Autowired
     private CorsConfigurationSource corsConfigurationSource;
 
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
@@ -43,7 +52,10 @@ public class SecurityConfig {
             "/api/v1/users/register",
             "/api/v1/auth/login",
             "/oauth2/**",
-            "/login/oauth2/**"
+            "/login/oauth2/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     @Bean
@@ -58,7 +70,9 @@ public class SecurityConfig {
                 );
 
         httpSecurity.oauth2Login(oauth2 -> oauth2
-                .defaultSuccessUrl("/api/v1/users", true) // Tạm thời redirect về đây để test
+                .successHandler(oAuth2SuccessHandler)
+                .authorizationEndpoint(auth -> auth.baseUri("/oauth2/authorization"))
+                .redirectionEndpoint(red -> red.baseUri("/login/oauth2/code/*"))
         );
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
@@ -93,6 +107,22 @@ public class SecurityConfig {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
+    }
+
+    @Configuration
+    public class OpenApiConfig {
+        @Bean
+        public OpenAPI customOpenAPI() {
+            return new OpenAPI()
+                    .info(new Info().title("AI Learning API").version("1.0"))
+                    .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                    .components(new Components()
+                            .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                                    .name("bearerAuth")
+                                    .type(SecurityScheme.Type.HTTP)
+                                    .scheme("bearer")
+                                    .bearerFormat("JWT")));
+        }
     }
 
 

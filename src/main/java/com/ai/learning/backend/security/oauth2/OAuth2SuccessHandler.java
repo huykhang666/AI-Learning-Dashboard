@@ -20,15 +20,17 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
-        //Retrieve the information of the recently logged-in user.
-        CustomUserDetails userDetails = (CustomUserDetails)  authentication.getPrincipal();
 
-        //Generate a "key" token.
-        String token = jwtUtils.generateRefreshToken(userDetails.getUsername());
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        String targetUrl = "http://localhost:5174/oauth2/callback?token=" + token;
+        String accessToken = jwtUtils.generateToken(userDetails.getUser());
+        String refreshToken = jwtUtils.generateRefreshToken(userDetails.getUsername());
 
-        clearAuthenticationAttributes(request);
+        String targetUrl = "http://localhost:5173/oauth2/callback"
+                + "?token=" + accessToken
+                + "&refreshToken=" + refreshToken;
+
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
+
     }
 }
