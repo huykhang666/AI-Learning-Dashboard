@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
 
 const T = {
@@ -113,6 +113,16 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [remember, setRemember] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setVisible(true), 20);
+  }, []);
+
+  const handleGoRegister = () => {
+    setVisible(false);
+    setTimeout(() => onGoRegister(), 250);
+  };
 
   const handleLogin = () => {
     if (email === "admin" && pass === "admin123") {
@@ -140,438 +150,457 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   };
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        fontFamily: F,
-        overflow: "hidden",
-        boxSizing: "border-box",
-      }}
-    >
-      {/* LEFT */}
+    <>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <div
         style={{
-          flex: "1 1 50%",
-          minWidth: 0,
-          background:
-            "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
+          width: "100vw",
+          height: "100vh",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 44px",
-          position: "relative",
+          fontFamily: F,
           overflow: "hidden",
           boxSizing: "border-box",
         }}
       >
-        {/* Nút quay lại */}
-        <button
-          onClick={() => {
-            window.location.href = "/";
-          }}
+        {/* LEFT */}
+        <div
           style={{
-            position: "absolute",
-            top: 20,
-            left: 20,
+            width: "50%",
+            flexShrink: 0,
+            background:
+              "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: 6,
-            background: "rgba(255,255,255,.15)",
-            border: "1px solid rgba(255,255,255,.25)",
-            borderRadius: 10,
-            padding: "7px 14px",
-            cursor: "pointer",
-            color: "#fff",
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: F,
-            backdropFilter: "blur(4px)",
-            transition: "background .15s",
-            zIndex: 10,
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background = "rgba(255,255,255,.25)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background = "rgba(255,255,255,.15)")
-          }
-        >
-          ← Quay lại
-        </button>
-
-        <div
-          style={{
-            position: "absolute",
-            top: -80,
-            left: -80,
-            width: 300,
-            height: 300,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,.06)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -60,
-            right: -60,
-            width: 240,
-            height: 240,
-            borderRadius: "50%",
-            background: "rgba(56,189,248,.15)",
-          }}
-        />
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 40,
-            zIndex: 1,
-            alignSelf: "flex-start",
-            marginTop: 48,
+            justifyContent: "center",
+            padding: "40px 44px",
+            position: "relative",
+            overflow: "hidden",
+            boxSizing: "border-box",
+            height: "100vh",
           }}
         >
-          <div
+          <button
+            onClick={() => {
+              window.location.href = "/";
+            }}
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 12,
-              background: "rgba(255,255,255,.18)",
+              position: "absolute",
+              top: 20,
+              left: 20,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <FaBolt size={20} color="#F59E0B" />
-          </div>
-          <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
-            AI-Learning DashBoard
-          </span>
-        </div>
-
-        <div style={{ zIndex: 1, textAlign: "center", maxWidth: 340 }}>
-          <h2
-            style={{
-              fontSize: 30,
-              fontWeight: 900,
+              gap: 6,
+              background: "rgba(255,255,255,.15)",
+              border: "1px solid rgba(255,255,255,.25)",
+              borderRadius: 10,
+              padding: "7px 14px",
+              cursor: "pointer",
               color: "#fff",
-              lineHeight: 1.2,
-              marginBottom: 12,
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: F,
+              backdropFilter: "blur(4px)",
+              transition: "background .15s",
+              zIndex: 10,
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background = "rgba(255,255,255,.25)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "rgba(255,255,255,.15)")
+            }
           >
-            Học thông minh hơn
-            <br />
-            với sức mạnh của AI{" "}
-            <FaBolt
-              size={24}
-              color="#F59E0B"
-              style={{ verticalAlign: "middle", display: "inline" }}
-            />
-          </h2>
-          <p
+            ← Quay lại
+          </button>
+          <div
             style={{
-              fontSize: 14,
-              color: "rgba(255,255,255,.8)",
-              lineHeight: 1.75,
-              marginBottom: 32,
+              position: "absolute",
+              top: -80,
+              left: -80,
+              width: 300,
+              height: 300,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,.06)",
             }}
-          >
-            Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời mọi
-            câu hỏi.
-          </p>
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: -60,
+              right: -60,
+              width: 240,
+              height: 240,
+              borderRadius: "50%",
+              background: "rgba(56,189,248,.15)",
+            }}
+          />
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
+              alignItems: "center",
               gap: 10,
-              marginBottom: 40,
+              marginBottom: 36,
+              zIndex: 1,
+              alignSelf: "center",
             }}
           >
-            {[
-              ["🎙", "AI Whisper bóc băng tự động"],
-              ["✨", "Tóm tắt nội dung thông minh"],
-              ["💬", "Chatbot hỏi đáp theo bài giảng"],
-            ].map(([ic, txt]) => (
-              <div
-                key={txt}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  background: "rgba(255,255,255,.13)",
-                  borderRadius: 12,
-                  padding: "12px 16px",
-                  border: "1px solid rgba(255,255,255,.2)",
-                  textAlign: "left",
-                }}
-              >
-                <span style={{ fontSize: 18 }}>{ic}</span>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>
-                  {txt}
-                </span>
-              </div>
-            ))}
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: "rgba(255,255,255,.18)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <FaBolt size={20} color="#F59E0B" />
+            </div>
+            <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
+              AI-Learning DashBoard
+            </span>
           </div>
-          <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
-            {[
-              ["2K+", "Người dùng"],
-              ["50K+", "Video xử lý"],
-              ["98%", "Hài lòng"],
-            ].map(([v, l]) => (
-              <div key={l}>
-                <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
-                  {v}
-                </div>
+          <div
+            style={{
+              zIndex: 1,
+              textAlign: "center",
+              maxWidth: 340,
+              width: "100%",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 28,
+                fontWeight: 900,
+                color: "#fff",
+                lineHeight: 1.2,
+                marginBottom: 10,
+              }}
+            >
+              Học thông minh hơn
+              <br />
+              với sức mạnh của AI{" "}
+              <FaBolt
+                size={22}
+                color="#F59E0B"
+                style={{ verticalAlign: "middle", display: "inline" }}
+              />
+            </h2>
+            <p
+              style={{
+                fontSize: 13,
+                color: "rgba(255,255,255,.8)",
+                lineHeight: 1.7,
+                marginBottom: 22,
+              }}
+            >
+              Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời
+              mọi câu hỏi.
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                marginBottom: 28,
+              }}
+            >
+              {[
+                ["🎙", "AI Whisper bóc băng tự động"],
+                ["✨", "Tóm tắt nội dung thông minh"],
+                ["💬", "Chatbot hỏi đáp theo bài giảng"],
+              ].map(([ic, txt]) => (
                 <div
+                  key={txt}
                   style={{
-                    fontSize: 11,
-                    color: "rgba(255,255,255,.6)",
-                    marginTop: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    background: "rgba(255,255,255,.13)",
+                    borderRadius: 12,
+                    padding: "10px 16px",
+                    border: "1px solid rgba(255,255,255,.2)",
+                    textAlign: "left",
                   }}
                 >
-                  {l}
+                  <span style={{ fontSize: 18 }}>{ic}</span>
+                  <span
+                    style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}
+                  >
+                    {txt}
+                  </span>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
+              {[
+                ["2K+", "Người dùng"],
+                ["50K+", "Video xử lý"],
+                ["98%", "Hài lòng"],
+              ].map(([v, l]) => (
+                <div key={l}>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
+                    {v}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "rgba(255,255,255,.6)",
+                      marginTop: 2,
+                    }}
+                  >
+                    {l}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* RIGHT */}
-      <div
-        style={{
-          flex: "1 1 50%",
-          minWidth: 0,
-          background: T.bg,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "32px 48px",
-          overflowY: "auto",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: 380 }}>
-          <h1
-            style={{
-              fontSize: 26,
-              fontWeight: 800,
-              color: T.text,
-              marginBottom: 4,
-            }}
-          >
-            Chào mừng trở lại! 👋
-          </h1>
-          <p
-            style={{
-              fontSize: 13,
-              color: T.textMid,
-              marginBottom: 24,
-              fontWeight: 500,
-            }}
-          >
-            Đăng nhập để tiếp tục hành trình học tập
-          </p>
-
-          <button
-            onClick={() => onLogin()}
-            style={{
-              width: "100%",
-              padding: "11px",
-              borderRadius: 11,
-              border: `1.5px solid ${T.border}`,
-              background: T.white,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 9,
-              fontWeight: 600,
-              fontSize: 14,
-              color: T.text,
-              marginBottom: 20,
-              fontFamily: F,
-              boxShadow: "0 1px 3px rgba(0,0,0,.06)",
-            }}
-          >
-            <GIcon /> Đăng nhập với Google
-          </button>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 20,
-            }}
-          >
-            <div style={{ flex: 1, height: 1, background: T.border }} />
-            <span style={{ fontSize: 12, color: T.textLight, fontWeight: 500 }}>
-              hoặc đăng nhập với email
-            </span>
-            <div style={{ flex: 1, height: 1, background: T.border }} />
-          </div>
-
-          <Field
-            label="Email"
-            type="email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors({});
-            }}
-            error={errors.email}
-          />
-          <Field
-            label="Mật khẩu"
-            type={showPass ? "text" : "password"}
-            placeholder="••••••••"
-            value={pass}
-            onChange={(e) => {
-              setPass(e.target.value);
-              setErrors({});
-            }}
-            error={errors.pass}
-            right={
-              <button
-                onClick={() => setShowPass(!showPass)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 14,
-                  color: T.textLight,
-                  padding: 0,
-                }}
-              >
-                {showPass ? "🙈" : "👁"}
-              </button>
-            }
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <label
+        {/* RIGHT — fade in */}
+        <div
+          style={{
+            flex: "1 1 50%",
+            minWidth: 0,
+            background: T.bg,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "32px 48px",
+            overflowY: "auto",
+            boxSizing: "border-box",
+            transition: "opacity .25s ease, transform .25s ease",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(10px)",
+          }}
+        >
+          <div style={{ width: "100%", maxWidth: 380 }}>
+            <h1
+              style={{
+                fontSize: 26,
+                fontWeight: 800,
+                color: T.text,
+                marginBottom: 4,
+                marginTop: 0,
+              }}
+            >
+              Chào mừng trở lại! 👋
+            </h1>
+            <p
+              style={{
+                fontSize: 13,
+                color: T.textMid,
+                marginBottom: 24,
+                fontWeight: 500,
+                marginTop: 0,
+              }}
+            >
+              Đăng nhập để tiếp tục hành trình học tập
+            </p>
+            <button
+              onClick={() => onLogin()}
+              style={{
+                width: "100%",
+                padding: "11px",
+                borderRadius: 11,
+                border: `1.5px solid ${T.border}`,
+                background: T.white,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 9,
+                fontWeight: 600,
+                fontSize: 14,
+                color: T.text,
+                marginBottom: 20,
+                fontFamily: F,
+                boxShadow: "0 1px 3px rgba(0,0,0,.06)",
+                boxSizing: "border-box",
+              }}
+            >
+              <GIcon /> Đăng nhập với Google
+            </button>
+            <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 7,
-                cursor: "pointer",
+                gap: 10,
+                marginBottom: 20,
               }}
             >
-              <div
-                onClick={() => setRemember(!remember)}
+              <div style={{ flex: 1, height: 1, background: T.border }} />
+              <span
                 style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: 4,
-                  border: `2px solid ${remember ? T.primary : "#CBD5E1"}`,
-                  background: remember ? T.primary : T.white,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  transition: "all .15s",
+                  fontSize: 12,
+                  color: T.textLight,
+                  fontWeight: 500,
+                  whiteSpace: "nowrap",
                 }}
               >
-                {remember && (
-                  <span
-                    style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}
-                  >
-                    ✓
-                  </span>
-                )}
-              </div>
-              <span style={{ fontSize: 12, color: T.textMid, fontWeight: 500 }}>
-                Ghi nhớ đăng nhập
+                hoặc đăng nhập với email
               </span>
-            </label>
-            <span
+              <div style={{ flex: 1, height: 1, background: T.border }} />
+            </div>
+            <Field
+              label="Email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrors({});
+              }}
+              error={errors.email}
+            />
+            <Field
+              label="Mật khẩu"
+              type={showPass ? "text" : "password"}
+              placeholder="••••••••"
+              value={pass}
+              onChange={(e) => {
+                setPass(e.target.value);
+                setErrors({});
+              }}
+              error={errors.pass}
+              right={
+                <button
+                  onClick={() => setShowPass(!showPass)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    color: T.textLight,
+                    padding: 0,
+                  }}
+                >
+                  {showPass ? "🙈" : "👁"}
+                </button>
+              }
+            />
+            <div
               style={{
-                fontSize: 12,
-                color: T.primary,
-                cursor: "pointer",
-                fontWeight: 700,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 20,
               }}
             >
-              Quên mật khẩu?
-            </span>
-          </div>
-
-          <button
-            onClick={handleLogin}
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px",
-              borderRadius: 11,
-              border: "none",
-              background: loading ? "#BFDBFE" : T.primary,
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: loading ? "not-allowed" : "pointer",
-              fontFamily: F,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              boxShadow: loading ? "none" : `0 4px 14px ${T.primary}40`,
-              transition: "background .2s",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) e.currentTarget.style.background = T.primaryHover;
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) e.currentTarget.style.background = T.primary;
-            }}
-          >
-            {loading && (
-              <div
+              <label
                 style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  border: "2px solid rgba(255,255,255,.4)",
-                  borderTopColor: "#fff",
-                  animation: "spin .7s linear infinite",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
+                  cursor: "pointer",
                 }}
-              />
-            )}
-            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-          </button>
-
-          <p
-            style={{
-              textAlign: "center",
-              marginTop: 18,
-              fontSize: 13,
-              color: T.textMid,
-              fontWeight: 500,
-            }}
-          >
-            Chưa có tài khoản?{" "}
-            <span
-              onClick={onGoRegister}
-              style={{ color: T.primary, fontWeight: 700, cursor: "pointer" }}
+              >
+                <div
+                  onClick={() => setRemember(!remember)}
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: 4,
+                    border: `2px solid ${remember ? T.primary : "#CBD5E1"}`,
+                    background: remember ? T.primary : T.white,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    transition: "all .15s",
+                  }}
+                >
+                  {remember && (
+                    <span
+                      style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}
+                    >
+                      ✓
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{ fontSize: 12, color: T.textMid, fontWeight: 500 }}
+                >
+                  Ghi nhớ đăng nhập
+                </span>
+              </label>
+              <span
+                style={{
+                  fontSize: 12,
+                  color: T.primary,
+                  cursor: "pointer",
+                  fontWeight: 700,
+                }}
+              >
+                Quên mật khẩu?
+              </span>
+            </div>
+            <button
+              onClick={handleLogin}
+              disabled={loading}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: 11,
+                border: "none",
+                background: loading ? "#BFDBFE" : T.primary,
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: 15,
+                cursor: loading ? "not-allowed" : "pointer",
+                fontFamily: F,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                boxShadow: loading ? "none" : `0 4px 14px ${T.primary}40`,
+                transition: "background .2s",
+                boxSizing: "border-box",
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) e.currentTarget.style.background = T.primaryHover;
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) e.currentTarget.style.background = T.primary;
+              }}
             >
-              Đăng ký ngay
-            </span>
-          </p>
+              {loading && (
+                <div
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    border: "2px solid rgba(255,255,255,.4)",
+                    borderTopColor: "#fff",
+                    animation: "spin .7s linear infinite",
+                  }}
+                />
+              )}
+              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+            </button>
+            <p
+              style={{
+                textAlign: "center",
+                marginTop: 18,
+                marginBottom: 0,
+                fontSize: 13,
+                color: T.textMid,
+                fontWeight: 500,
+              }}
+            >
+              Chưa có tài khoản?{" "}
+              <span
+                onClick={handleGoRegister}
+                style={{ color: T.primary, fontWeight: 700, cursor: "pointer" }}
+              >
+                Đăng ký ngay
+              </span>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
