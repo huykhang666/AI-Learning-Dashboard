@@ -5,13 +5,20 @@ spring:
     password: root
     driver-class-name: org.postgresql.Driver
 
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 510MB
+
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+#            client-id: ${GOOGLE_CLIENT_ID}
+#            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: 652291090161-jl10a5ld9ugehmf20rp6asq5mhtbpgj9.apps.googleusercontent.com
+            client-secret: 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
             scope:
               - email
               - profile
@@ -23,7 +30,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+
 
 jwt:
   signerKey: "3af58fafc186e3e97a499c70732004cbac3e58ca779189091e038c8a80a179ae"
@@ -35,3 +43,7 @@ springdoc:
     path: /swagger-ui.html
     operations-sorter: alpha
   override-with-generic-response: false
+
+app:
+  upload:
+    dir: D:/ai-learning/uploads

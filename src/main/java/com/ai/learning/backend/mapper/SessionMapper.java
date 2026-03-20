@@ -20,7 +20,7 @@ public interface SessionMapper {
     @Mapping(target = "learningSessionId", source = "session.learningSessionId")
     @Mapping(target = "status", source = "session.status")
     @Mapping(target = "transcript", source = "aiResult.transcript")
-    @Mapping(target = "summary", source = "session.summary")
-    @Mapping(target = "keyPoints", source = "session.keyPoints")
+    @Mapping(target = "summary", source = "aiResult.summary")
+    @Mapping(target = "keyPoints", source = "aiResult.keyPoints")
     SessionDetailResponse toDetailResponse(LearningSession session, AIResult aiResult);
 }

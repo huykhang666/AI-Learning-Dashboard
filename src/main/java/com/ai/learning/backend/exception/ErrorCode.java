@@ -39,7 +39,14 @@ public enum ErrorCode {
 
     //LEARNING SESSION
     LESSON_NOT_FOUND(1019,"Lesson not found",HttpStatus.NOT_FOUND),
-    LESSON_NOT_EXISTED(1020,"Lesson not exists",HttpStatus.NOT_FOUND);
+    LESSON_NOT_EXISTED(1020,"Lesson not exists",HttpStatus.NOT_FOUND),
+
+    //LOCAL STORAGE
+    FILE_TOO_LARGE(1021,"File size exceeds the 500MB limit",HttpStatus.BAD_REQUEST),
+    INVALID_FILE_FORMAT(1022,"Invalid file format. Only MP4, MOV and AVI supported",HttpStatus.BAD_REQUEST),
+    UPLOAD_FAILED(1023,"Failed to store file on local storage", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_NOT_FOUND(1024,"Request file could not be found", HttpStatus.NOT_FOUND),
+    EMPTY_FILE(1025,"Upload file is empty",HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final String message;

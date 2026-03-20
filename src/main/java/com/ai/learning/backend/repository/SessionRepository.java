@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface SessionRepository extends JpaRepository<LearningSession,Long> {
-    List<LearningSession> findByUserOrderByCreatedAtDesc(String user);
+    List<LearningSession> findByUserUsernameOrderByCreatedAtDesc(String username);
 
     List<LearningSession> findByStatus(SessionStatus sessionStatus);
 }

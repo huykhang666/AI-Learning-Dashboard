@@ -67,7 +67,7 @@ public class SessionServiceImpl implements SessionService {
                 .getContext()
                 .getAuthentication()
                 .getName();
-        return sessionRepository.findByUserOrderByCreatedAtDesc(username)
+        return sessionRepository.findByUserUsernameOrderByCreatedAtDesc(username)
                 .stream()
                 .map(sessionMapper::toListResponse)
                 .toList();
