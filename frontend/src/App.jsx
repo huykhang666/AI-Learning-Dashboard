@@ -6,6 +6,8 @@ import PageRegister from "./pages/auth/Register";
 import Feature from "./components/home/Feature";
 import Pricing from "./components/home/Pricing";
 import About from "./components/home/About";
+import FAQ from "./components/home/FAQ";
+import Footer from "./components/home/Footer";
 function App() {
   const [screen, setScreen] = useState("home"); // "home" | "login" | "register"
 
@@ -47,6 +49,14 @@ function App() {
         onRegister={() => setScreen("register")}
       />
       <About
+        onLogin={() => setScreen("login")}
+        onRegister={() => setScreen("register")}
+      />
+      <FAQ
+        onLogin={() => setScreen("login")}
+        onRegister={() => setScreen("register")}
+      />
+      <Footer
         onLogin={() => setScreen("login")}
         onRegister={() => setScreen("register")}
       />

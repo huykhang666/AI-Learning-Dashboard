@@ -117,57 +117,7 @@ const Field = ({
     )}
   </div>
 );
-
-export default function PageRegister({ onRegister, onGoLogin }) {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    pass: "",
-    confirm: "",
-  });
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [agree, setAgree] = useState(false);
-  const [done, setDone] = useState(false);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => setVisible(true), 20);
-  }, []);
-
-  const handleGoLogin = () => {
-    setVisible(false);
-    setTimeout(() => onGoLogin(), 250);
-  };
-
-  const set = (k) => (e) => {
-    setForm((f) => ({ ...f, [k]: e.target.value }));
-    setErrors({});
-  };
-  const strength = calcStrength(form.pass);
-
-  const handleRegister = () => {
-    const e = {};
-    if (!form.name.trim()) e.name = "Vui lòng nhập họ tên";
-    if (!form.email) e.email = "Vui lòng nhập email";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email không hợp lệ";
-    if (!form.pass) e.pass = "Vui lòng nhập mật khẩu";
-    else if (form.pass.length < 8) e.pass = "Mật khẩu tối thiểu 8 ký tự";
-    if (form.confirm !== form.pass) e.confirm = "Mật khẩu không khớp";
-    if (!agree) e.agree = "Bạn cần đồng ý với điều khoản";
-    if (Object.keys(e).length) {
-      setErrors(e);
-      return;
-    }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setDone(true);
-    }, 1500);
-  };
-
-  const LeftPanel = () => (
+ const LeftPanel = () => (
     <div
       style={{
         width: "50%",
@@ -358,6 +308,54 @@ export default function PageRegister({ onRegister, onGoLogin }) {
     </div>
   );
 
+export default function PageRegister({ onRegister, onGoLogin }) {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    pass: "",
+    confirm: "",
+  });
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [agree, setAgree] = useState(false);
+  const [done, setDone] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => setVisible(true), 20);
+  }, []);
+
+  const handleGoLogin = () => {
+    setVisible(false);
+    setTimeout(() => onGoLogin(), 250);
+  };
+
+  const set = (k) => (e) => {
+    setForm((f) => ({ ...f, [k]: e.target.value }));
+    setErrors({});
+  };
+  const strength = calcStrength(form.pass);
+
+  const handleRegister = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = "Vui lòng nhập họ tên";
+    if (!form.email) e.email = "Vui lòng nhập email";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email không hợp lệ";
+    if (!form.pass) e.pass = "Vui lòng nhập mật khẩu";
+    else if (form.pass.length < 8) e.pass = "Mật khẩu tối thiểu 8 ký tự";
+    if (form.confirm !== form.pass) e.confirm = "Mật khẩu không khớp";
+    if (!agree) e.agree = "Bạn cần đồng ý với điều khoản";
+    if (Object.keys(e).length) {
+      setErrors(e);
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setDone(true);
+    }, 1500);
+  };
   if (done)
     return (
       <>
