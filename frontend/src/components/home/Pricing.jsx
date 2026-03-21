@@ -75,7 +75,7 @@ function Pricing() {
                         }`}
                         >
                         {plan.badge && (
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-4 py-1.5 rounded-full whitespace-nowrap">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-blue-600 border text-xs font-bold px-4 py-1.5 rounded-full whitespace-nowrap">
                             {plan.badge}
                             </div>
                         )}
