@@ -35,7 +35,7 @@ function Pricing() {
         "Hỗ trợ 24/7",
         ],
         buttonText: "Dùng thử 7 ngày miễn phí",
-        buttonStyle: "bg-white text-indigo-600 font-bold hover:bg-gray-50"
+        buttonStyle: "bg-white bg-gradient-to-r from-blue-700 to-cyan-500 shadow-gray-600 font-bold hover:bg-gray-50"
     },
     {
         name: "Premium Năm",
@@ -53,14 +53,14 @@ function Pricing() {
         "Hỗ trợ riêng VIP",
         ],
         buttonText: "Chọn gói năm",
-        buttonStyle: "bg-indigo-600 text-white hover:bg-indigo-700"
+        buttonStyle: "bg-gradient-to-r from-blue-700 to-cyan-500 shadow-gray-600 text-white hover:from-indigo-600 hover:to-blue-500"
     }
     ]
     return(
          <section id="Pricing" className="bg-gray-50 py-20">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-12">
-                    <div className="inline-flex items-center gap-2 text-indigo-500 font-medium text-2xl mb-4">BẢNG GIÁ </div>
+                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4">BẢNG GIÁ </div>
                     <h2 className="text-4xl font-bold text-gray-900 mb-4">Chọn gói phù hợp với bạn </h2>
                     <p className="text-gray-500 test-base max-w-xl mx-auto"> Miễn phí để bắt đầu. Nâng cấp bất kỳ lúc nào khi bạn cần nhiều hơn.</p>
                 </div>
@@ -70,7 +70,7 @@ function Pricing() {
                         key={plan.name}
                         className={`relative rounded-2xl p-8 flex flex-col gap-4 ${
                             plan.highlight
-                            ? "bg-indigo-600 text-white shadow-xl"
+                            ? "bg-gradient-to-r from-blue-700 to-cyan-500 shadow-gray-600 text-white shadow-xl"
                             : "bg-white text-gray-900 shadow-sm"
                         }`}
                         >

@@ -24,7 +24,7 @@ function About() {
       <div className="max-w-7xl mx-auto px-4">
         {/* TIEU DE */}
         <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 text-indigo-500 font-medium text-2xl mb-4"> Về chúng tôi</div>
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4"> Về chúng tôi</div>
             <h2 className="text-gray-900 text-4xl font-bold mb-4">Chúng tôi xây dựng tương lai giáo dục</h2>
         </div>
         {/* CARD */}
@@ -58,7 +58,7 @@ function About() {
             </div>
 
             <div className="flex-1">
-              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-8 text-white">
+              <div className="bg-gradient-to-r from-blue-700 to-cyan-500 rounded-3xl p-8 text-white">
                 <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium mb-6">
                 🎯 TẦM NHÌN
                 </div>
