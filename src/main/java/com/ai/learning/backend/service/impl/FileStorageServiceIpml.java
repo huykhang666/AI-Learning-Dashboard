@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -36,6 +37,7 @@ public class FileStorageServiceIpml implements FileStorageService {
     FileMetadataRepository fileMetadataRepository;
     FileMetadataMapper mapper;
     UserRepository userRepository;
+    private final FileMetadataMapper fileMetadataMapper;
 
     @NonFinal
     @Value("${app.upload.dir}")
@@ -44,18 +46,17 @@ public class FileStorageServiceIpml implements FileStorageService {
     @Override
     @Transactional
     public FileMetadataResponse storeFile(MultipartFile multipartFile, FileMetadataRequest request) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Integer userId;
+        String identity = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser;
+
         try {
-            userId = Integer.valueOf(username);
+            Integer userId = Integer.valueOf(identity);
+            currentUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         } catch (NumberFormatException e) {
-
-            userId = 1;
+            currentUser = userRepository.findByUsername(identity)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         }
-
-        User currentUser = userRepository.findById(Integer.valueOf(userId))
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
 
         //Create temp entity
         FileMetadata entity = FileMetadata.builder()
@@ -92,5 +93,23 @@ public class FileStorageServiceIpml implements FileStorageService {
 
         FileMetadata saved = fileMetadataRepository.save(entity);
         return mapper.toResponse(saved);
+    }
+
+    @Override
+    public List<FileMetadataResponse> getMyVideos() {
+        String identity = SecurityContextHolder.getContext().getAuthentication().getName();
+        Integer userId;
+
+        try {
+            userId = Integer.valueOf(identity);
+        } catch (NumberFormatException e) {
+            userId = userRepository.findByUsername(identity)
+                    .map(User::getUserId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        }
+
+        return  fileMetadataRepository.findByUser_UserId(userId).stream()
+                .map(fileMetadataMapper::toResponse)
+                .toList();
     }
 }

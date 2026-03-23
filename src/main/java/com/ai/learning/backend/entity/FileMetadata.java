@@ -19,6 +19,9 @@ public class FileMetadata {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long fileMetadataId;
 
+    @Column(name = "file_name", length = 255)
+    private String fileName;
+
     @Column(nullable = false)
     String title;
 

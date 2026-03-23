@@ -7,7 +7,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface FileMetadataMapper {
-    @Mapping(target = "ownerName", expression = "java(fileMetadata.getUser().getFirstName() + \" \" + fileMetadata.getUser().getLastName())")    @Mapping(target = "friendlySize", expression = "java(formatSize(fileMetadata.getSize()))")
+    @Mapping(target = "ownerName", expression = "java(fileMetadata.getUser().getFirstName() + \" \" + fileMetadata.getUser().getLastName())")
+    @Mapping(target = "friendlySize", expression = "java(formatSize(fileMetadata.getSize()))")
     FileMetadataResponse toResponse(FileMetadata fileMetadata);
 
     default String formatSize(Long bytes) {
