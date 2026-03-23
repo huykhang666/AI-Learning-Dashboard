@@ -63,12 +63,12 @@ function Feature() {
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4">TÍNH NĂNG</div>
-                    <h2 className="text-gray-900 text-4xl font-bold mb-4">
+                    <h2 className="text-gray-900 text-2xl md:text-4xl font-bold mb-4">
                         Tất cả công cụ bạn cần có để học thông minh
                     </h2>
                     <p className="text-gray-700 text-base max-w-xl mx-auto">Từ bóc băng tự động đến chat AI thông minh - mọi thứ trong một nền tảng duy nhất. </p>
                 </div>
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {features.map((item) => (
                         <FeatureCard
                             key={item.title}
@@ -80,9 +80,9 @@ function Feature() {
                 </div>
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4 mt-20"> CÁCH HOẠT ĐỘNG </div>
-                    <h2 className="text-gray-900 font-bold text-4xl mb-4">Chỉ 3 bước đơn giản</h2>
+                    <h2 className="text-gray-900 font-bold text-2xl md:text-4xl mb-4">Chỉ 3 bước đơn giản</h2>
                 </div>
-                <div className="grid grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {action.map((item) => (
                         <FeatureCard
                             key={item.title}

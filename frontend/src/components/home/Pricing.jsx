@@ -1,5 +1,5 @@
 import { FaHeart } from "react-icons/fa"
-function Pricing() {
+function Pricing({onRegister}) {
     const plans = [
     {
         name: "Free",
@@ -61,10 +61,10 @@ function Pricing() {
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4">BẢNG GIÁ </div>
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">Chọn gói phù hợp với bạn </h2>
+                    <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">Chọn gói phù hợp với bạn </h2>
                     <p className="text-gray-500 test-base max-w-xl mx-auto"> Miễn phí để bắt đầu. Nâng cấp bất kỳ lúc nào khi bạn cần nhiều hơn.</p>
                 </div>
-                <div className="grid grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                     {plans.map((plan) => (
                         <div
                         key={plan.name}
@@ -96,7 +96,7 @@ function Pricing() {
                             </li>
                             ))}
                         </ul>
-                        <button className={`w-full py-3 rounded-full font-bold transition mt-4 ${plan.buttonStyle}`}>
+                        <button className={`w-full py-3 rounded-full font-bold transition mt-4 ${plan.buttonStyle}`} onClick={onRegister}>
                             {plan.buttonText}
                         </button>
                         </div>
@@ -106,7 +106,7 @@ function Pricing() {
                 {/* PAYMENT */}
                 <div className="text-center mt-10">
                     <p className="text-gray-400 text-sm mb-4">Phương thức thanh toán được hỗ trợ</p>
-                    <div className="flex items-center justify-center gap-4">
+                    <div className="flex flex-wrap justify-center gap-3 md:gap-4">
 
                         <div className="flex items-center gap-2 px-4 py-2 rounded-full shadow-sm border border-purple-500 bg-purple-100 hover:-translate-y-2 transition">
                         <span><FaHeart color="#a40caf" size={16} /></span>

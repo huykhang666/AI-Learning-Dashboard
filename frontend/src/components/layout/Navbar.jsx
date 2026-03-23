@@ -1,6 +1,8 @@
+import { useState } from "react"
 import { FaBolt } from "react-icons/fa";
 
 function Navbar({ onLogin, onRegister }) {
+  const [isOpen, setIsOpen] = useState(false)
   const menuItems = [
     { label: " TRANG CHỦ", href: "#HeroSection"},
     { label: " TÍNH NĂNG", href: "#Feature" },
@@ -19,7 +21,7 @@ function Navbar({ onLogin, onRegister }) {
           <span className="font-bold text-base">AI-LearningDashBoard</span>
         </div>
 
-        <ul className="flex items-center gap-1">
+        <ul className=" hidden md:flex flex items-center gap-1">
           {menuItems.map((item) => (
             <li key={item.label}>
               <a
@@ -32,7 +34,7 @@ function Navbar({ onLogin, onRegister }) {
           ))}
         </ul>
 
-        <div className="flex items-center gap-1">
+        <div className=" hidden md:flex flex items-center gap-1">
           <button
             onClick={onLogin}
             className="font-bold border border-gray-300 px-3 py-1.5 rounded-full hover:text-indigo-600 bg-white"
@@ -46,7 +48,34 @@ function Navbar({ onLogin, onRegister }) {
             Sign Up Free
           </button>
         </div>
-      </div>
+         {/* HAMBURGER - chỉ hiện mobile */}
+        <button className="md:hidden text-gray-600" onClick={() => setIsOpen(!isOpen)}>
+          {isOpen ? "✕" : "☰"}
+        </button>
+        </div>
+        {/* MENU MOBILE */}
+        {isOpen && (
+          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 flex flex-col gap-2">
+            {menuItems.map((item) => (
+              <a
+
+                key={item.label}
+                href={item.href}
+                className="text-sm text-gray-600 py-2 active:text-indigo-600 active:bg-gray-100"
+                onClick={() => setIsOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+            <hr />
+            <button onClick={onLogin} className="text-sm font-bold text-gray-700 py-2 text-left">
+              Đăng nhập
+            </button>
+            <button onClick={onRegister} className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white text-sm text-center font-bold px-4 py-2 rounded-full">
+              Sign Up Free
+            </button>
+          </div>
+        )}
     </nav>
   );
 }

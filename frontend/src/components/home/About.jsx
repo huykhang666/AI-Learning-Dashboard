@@ -4,19 +4,24 @@ function About() {
         avatar: "👨‍💼",
         name: "Nguyễn Huy Khang",
         role: "Backend",
-        description: "Cựu kỹ sư Google, 10 năm kinh nghiệm AI/ML"
+        description: "Sinh viên UTC2"
     },
     {
         avatar: "👨‍💼",
         name: "Nguyễn Trọng Hiểu",
         role: "Frontend",
-        description: "PhD NLP, chuyên gia xử lý ngôn ngữ tự nhiên"
+        description: "Sinh viên UTC2"
     },
     {
         avatar: "👨‍💼",
         name: "Lê Quang Chí",
         role: "Frontend",
-        description: "Cựu Product Manager tại VNG và Tiki"
+        description: "Sinh viên UTC2"
+    },{
+        avatar: "👨‍💼",
+        name: "Trần Minh Huấn",
+        role: "Frontend",
+        description: "Sinh viên UTC2"
     }
     ]
   return (
@@ -25,10 +30,10 @@ function About() {
         {/* TIEU DE */}
         <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4"> Về chúng tôi</div>
-            <h2 className="text-gray-900 text-4xl font-bold mb-4">Chúng tôi xây dựng tương lai giáo dục</h2>
+            <h2 className="text-gray-900 text-2xl md:text-4xl font-bold mb-4">Chúng tôi xây dựng tương lai giáo dục</h2>
         </div>
         {/* CARD */}
-        <div className="flex items-center gap-20 border-b-2 py-10 border-green-500">
+        <div className="flex flex-col md:flex-row items-center gap-20 border-b-2 py-10 border-green-500">
 
             <div className="flex-1">
                 <p className="text-gray-500 text-base mb-4">
@@ -37,7 +42,7 @@ function About() {
                 <p className="text-gray-500 text-base mb-8">
                     Sứ mệnh của chúng tôi là giúp sinh viên Việt Nam tiếp cận nội dung bài giảng một cách hiệu quả hơn, tiết kiệm thời gian và nâng cao chất lượng học tập thông qua công nghệ AI tiên tiến nhất.
                 </p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <div className="border border-gray-200 rounded-2xl p-4">
                         <p className="text-2xl font-black text-indigo-600">2.000+</p>
                         <p className="text-sm text-gray-500">Sinh viên</p>
@@ -88,7 +93,7 @@ function About() {
             <h2 className="text-3xl font-bold text-gray-900 text-center mb-10">
                 Đội ngũ sáng lập
             </h2>
-            <div className="grid grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
                 {members.map((member) => (
                 <div key={member.name} className="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:border-indigo-400 transition">
                     <div className="text-5xl mb-4">{member.avatar}</div>
