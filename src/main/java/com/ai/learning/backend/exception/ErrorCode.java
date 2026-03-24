@@ -46,7 +46,9 @@ public enum ErrorCode {
     INVALID_FILE_FORMAT(1022,"Invalid file format. Only MP4, MOV and AVI supported",HttpStatus.BAD_REQUEST),
     UPLOAD_FAILED(1023,"Failed to store file on local storage", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_NOT_FOUND(1024,"Request file could not be found", HttpStatus.NOT_FOUND),
-    EMPTY_FILE(1025,"Upload file is empty",HttpStatus.BAD_REQUEST);
+    EMPTY_FILE(1025,"Upload file is empty",HttpStatus.BAD_REQUEST),
+
+    JOB_NOT_FOUND(1026, "Job not found", HttpStatus.NOT_FOUND);
 
     private final int code;
     private final String message;

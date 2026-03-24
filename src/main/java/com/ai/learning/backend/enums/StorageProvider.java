@@ -2,6 +2,6 @@ package com.ai.learning.backend.enums;
 
 public enum StorageProvider {
     LOCAL,
-    CLOUDINARY,
+    S3,
     YOUTUBE
 }
