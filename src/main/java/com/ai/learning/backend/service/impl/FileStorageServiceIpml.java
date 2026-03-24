@@ -3,12 +3,15 @@ package com.ai.learning.backend.service.impl;
 import com.ai.learning.backend.dto.request.FileMetadataRequest;
 import com.ai.learning.backend.dto.response.FileMetadataResponse;
 import com.ai.learning.backend.entity.FileMetadata;
+import com.ai.learning.backend.entity.ProcessJob;
 import com.ai.learning.backend.entity.User;
+import com.ai.learning.backend.enums.SessionStatus;
 import com.ai.learning.backend.enums.StorageProvider;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.FileMetadataMapper;
 import com.ai.learning.backend.repository.FileMetadataRepository;
+import com.ai.learning.backend.repository.ProcessJobRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.FileStorageService;
 import jakarta.transaction.Transactional;
@@ -38,13 +41,14 @@ public class FileStorageServiceIpml implements FileStorageService {
     FileMetadataMapper mapper;
     UserRepository userRepository;
     private final FileMetadataMapper fileMetadataMapper;
+    ProcessJobRepository processJobRepository;
+    ProcessJobImpl processJobService;
 
     @NonFinal
     @Value("${app.upload.dir}")
     String uploadDir;
 
     @Override
-    @Transactional
     public FileMetadataResponse storeFile(MultipartFile multipartFile, FileMetadataRequest request) {
         String identity = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser;
@@ -92,6 +96,18 @@ public class FileStorageServiceIpml implements FileStorageService {
         }
 
         FileMetadata saved = fileMetadataRepository.save(entity);
+
+        ProcessJob job = ProcessJob.builder()
+                .fileMetadata(saved)
+                .status(SessionStatus.PROCESSING)
+                .build();
+
+        ProcessJob savedJob = processJobRepository.saveAndFlush(job);
+
+        System.out.println("Đã tạo Job với ID: " + savedJob.getProcessJobId());
+
+        processJobService.startProcessAsync(savedJob.getProcessJobId());
+
         return mapper.toResponse(saved);
     }
 

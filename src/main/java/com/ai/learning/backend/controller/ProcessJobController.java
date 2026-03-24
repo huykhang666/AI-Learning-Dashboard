@@ -2,6 +2,7 @@ package com.ai.learning.backend.controller;
 
 import com.ai.learning.backend.dto.response.ApiResponse;
 import com.ai.learning.backend.dto.response.ProcessJobResponse;
+import com.ai.learning.backend.entity.LearningSession;
 import com.ai.learning.backend.service.ProcessJobService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

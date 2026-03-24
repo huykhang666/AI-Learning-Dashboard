@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -50,6 +52,8 @@ public class ProcessJobImpl implements ProcessJobService {
             Thread.sleep(10000);
 
             job.setStatus(SessionStatus.COMPLETED);
+            job.setErrorMessage("Complete Video");
+            job.setUpdatedAt(LocalDateTime.now());
             processJobRepository.save(job);
             log.info("Job ID: {} completed successfully!", jobId);
         } catch (Exception e) {
@@ -61,12 +65,13 @@ public class ProcessJobImpl implements ProcessJobService {
     }
 
     @Override
-    public ProcessJobResponse getJobStatus(Long sessionId) {
-       return processJobRepository.findByFileMetadata_FileStorageId(sessionId)
+    public ProcessJobResponse getJobStatus(Long SessionId) {
+       return processJobRepository.findByFileMetadata_FileMetadataId(SessionId)
                .map(job -> ProcessJobResponse.builder()
                        .processJobId(job.getProcessJobId())
                        .status(job.getStatus().name())
-                       .errorMessage(job.getErrorMessage())
+                       .updateAt(job.getUpdatedAt())
+                       .errorMessage(job.getStatus() == SessionStatus.COMPLETED ? "Complete Video" : job.getErrorMessage())
                        .build())
                .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
     }
