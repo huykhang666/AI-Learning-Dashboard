@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/dashboard/Dashboard"
 import Sidebar from "./components/layout/Sidebar";
 function App() {
-  const [screen, setScreen] = useState("home"); 
+  const [screen, setScreen] = useState("dashboard"); 
 
   if (screen === "login") {
     return (
