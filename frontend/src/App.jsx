@@ -2,6 +2,8 @@ import { useState } from "react";
 import PageLogin from "./pages/Login";
 import PageRegister from "./pages/Register";
 import Home from "./pages/Home";
+import Dashboard from "./pages/dashboard/Dashboard"
+import Sidebar from "./components/layout/Sidebar";
 function App() {
   const [screen, setScreen] = useState("home"); 
 
@@ -25,9 +27,10 @@ function App() {
   }
   if (screen === "dashboard") {
     return (
-      <div>
-        <Dashboar/>
-      </div>
+      <div className="flex">
+        <Sidebar onLogout={() => setScreen("home")} />
+        <Dashboard />
+    </div>
     );
   }
   return (
