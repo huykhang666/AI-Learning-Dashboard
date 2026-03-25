@@ -8,7 +8,7 @@ function App() {
   if (screen === "login") {
     return (
       <PageLogin
-        onLogin={() => setScreen("home")}
+        onLogin={() => setScreen("dashboard")}
         onGoRegister={() => setScreen("register")}
         onAdminLogin={() => setScreen("home")}
       />
@@ -23,7 +23,13 @@ function App() {
       />
     );
   }
-
+  if (screen === "dashboard") {
+    return (
+      <div>
+        <Dashboar/>
+      </div>
+    );
+  }
   return (
     <div>
       <Home
