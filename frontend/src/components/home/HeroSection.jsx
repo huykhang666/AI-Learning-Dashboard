@@ -18,7 +18,7 @@ function HeroSection({onRegister}){
                     <p className="text-base text-gray-600 mb-8 max-w-md"> Up load video bài giảng - AI tự động bóc băng, tóm tắt và trả lời mọi câu hỏi. Học hiểu quả hơn gấp 3 lần!</p>
                     <div className="flex items-center gap-4">
                         <a href="#" className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white text-base font-bold px-6 py-3 rounded-full hover:bg-indigo-700 hover:-translate-y-2 transition">Bắt đầu miễn phí</a>
-                        <a href="#" className="bg-white text-black text-base font-bold px-5 py-3 rounded-full hover:-translate-y-2 transition">Xem tính năng</a>
+                        <a href="#Feature" className="bg-white text-black text-base font-bold px-5 py-3 rounded-full hover:-translate-y-2 transition">Xem tính năng</a>
                     </div>
                     <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mt-10">
                         <div className="flex items-center">

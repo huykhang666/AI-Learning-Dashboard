@@ -1,15 +1,9 @@
 import { useState } from "react";
-import Navbar from "./components/layout/Navbar";
-import HeroSection from "./components/home/HeroSection";
-import PageLogin from "./pages/auth/Login";
-import PageRegister from "./pages/auth/Register";
-import Feature from "./components/home/Feature";
-import Pricing from "./components/home/Pricing";
-import About from "./components/home/About";
-import FAQ from "./components/home/FAQ";
-import Footer from "./components/home/Footer";
+import PageLogin from "./pages/Login";
+import PageRegister from "./pages/Register";
+import Home from "./pages/Home";
 function App() {
-  const [screen, setScreen] = useState("home"); // "home" | "login" | "register"
+  const [screen, setScreen] = useState("home"); 
 
   if (screen === "login") {
     return (
@@ -32,33 +26,9 @@ function App() {
 
   return (
     <div>
-      <Navbar
-        onLogin={() => setScreen("login")}
+      <Home
         onRegister={() => setScreen("register")}
-      />
-      <HeroSection
         onLogin={() => setScreen("login")}
-        onRegister={() => setScreen("register")}
-      />
-      <Feature
-        onLogin={() => setScreen("login")}
-        onRegister={() => setScreen("register")}
-      />
-      <Pricing
-        onLogin={() => setScreen("login")}
-        onRegister={() => setScreen("register")}
-      />
-      <About
-        onLogin={() => setScreen("login")}
-        onRegister={() => setScreen("register")}
-      />
-      <FAQ
-        onLogin={() => setScreen("login")}
-        onRegister={() => setScreen("register")}
-      />
-      <Footer
-        onLogin={() => setScreen("login")}
-        onRegister={() => setScreen("register")}
       />
     </div>
   );
