@@ -1,64 +1,56 @@
 import os
-import whisper
 import json
-from fastapi import FastAPI, UploadFile, File
-from openai import OpenAI
+import re
+import whisper
+from groq import Groq 
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from dotenv import load_dotenv
 
 load_dotenv()
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 app = FastAPI()
+model_whisper = whisper.load_model("base")
 
-client = OpenAI(api_key=os.getenv("AI_API_KEY"))
-
-print("--- Đang nạp model AI Whisper... ---")
-model = whisper.load_model("base")
-print("--- Đã nạp xong model! Sẵn sàng bóc băng ---")
+def extract_json(text: str):
+    try:
+        match = re.search(r'\{.*\}', text, re.DOTALL)
+        return json.loads(match.group()) if match else {"summary": text, "key_points": []}
+    except: return {"summary": text, "key_points": []}
 
 @app.post("/ai/process-video")
 async def process_video(file: UploadFile = File(...)):
-    # Bước A: Lưu file video tạm thời để AI đọc
-    temp_name = f"temp_{file.filename}"
-    with open(temp_name, "wb") as buffer:
-        buffer.write(await file.read())
-
+    temp_file = f"temp_{file.filename}"
     try:
-        # Bước B: Whisper bóc băng âm thanh thành văn bản (Speech-to-Text)
-        print(f"--- Đang bóc băng file: {file.filename} ---")
-        result = model.transcribe(temp_name)
-        transcript = result["text"]
+        with open(temp_file, "wb") as buffer:
+            buffer.write(await file.read())
 
-        # Bước C: Gửi văn bản sang GPT-4o-mini để tóm tắt & lấy ý chính
-        print("--- Đang nhờ GPT tóm tắt nội dung bài giảng ---")
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
+        print(f"🎧 Whisper đang bóc băng...")
+        result = model_whisper.transcribe(temp_file, fp16=False)
+        transcript = result.get("text", "").strip()
+
+        print("🧠 Groq (Llama 3) đang tóm tắt...")
+        chat_completion = client.chat.completions.create(
             messages=[
-                {
-                    "role": "system", 
-                    "content": "Bạn là chuyên gia giáo dục. Hãy tóm tắt transcript bài giảng sau thành JSON gồm: "
-                               "'summary' (đoạn văn tóm tắt khoảng 3-5 câu) và "
-                               "'key_points' (một mảng các chuỗi chứa các ý chính quan trọng). Trả về JSON thuần."
-                },
+                {"role": "system", "content": "Bạn là trợ lý học tập. Trả về JSON gồm 'summary' và 'key_points' bằng tiếng Việt."},
                 {"role": "user", "content": transcript}
             ],
-            response_format={ "type": "json_object" }
+            model="qwen/qwen3-32b", 
+            response_format={"type": "json_object"}
         )
 
-        # Trả kết quả về cho Spring Boot
-        return {
-            "fileName": file.filename,
-            "transcript": transcript,
-            "analysis": json.loads(response.choices[0].message.content)
-        }
+        analysis = json.loads(chat_completion.choices[0].message.content)
 
+        return {
+            "status": "success",
+            "transcript": transcript,
+            "analysis": analysis
+        }
     except Exception as e:
-        return {"status": "error", "message": str(e)}
-        
+        return {"error": str(e)}
     finally:
-        if os.path.exists(temp_name):
-            os.remove(temp_name)
+        if os.path.exists(temp_file): os.remove(temp_file)
 
 if __name__ == "__main__":
     import uvicorn
-    # Chạy server ở cổng 8000
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

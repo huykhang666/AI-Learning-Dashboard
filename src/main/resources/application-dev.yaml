@@ -17,13 +17,14 @@ spring:
           google:
 #            client-id: ${GOOGLE_CLIENT_ID}
 #            client-secret: ${GOOGLE_CLIENT_SECRET}
-#            client-id: 652291090161-jl10a5ld9ugehmf20rp6asq5mhtbpgj9.apps.googleusercontent.com
-#            client-secret: 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
+            client-id: 652291090161-jl10a5ld9ugehmf20rp6asq5mhtbpgj9.apps.googleusercontent.com
+            client-secret: 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
             redirect-uri: "http://localhost:8080/login/oauth2/code/google"
             scope:
               - email
               - profile
-
+  codec:
+    max-in-memory-size: 10MB
   jpa:
     hibernate:
       ddl-auto: update
@@ -50,3 +51,7 @@ app:
     dir: D:/ai-learning/uploads
   oauth2:
     authorizedRedirectUri: http://localhost:5173/oauth2/redirect
+
+ai:
+  service:
+    url: "http://localhost:8000"
