@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 // Layout & UI
 import Sidebar from "./components/layout/Sidebar";
 import Navbar from "./components/layout/Navbar";
+import Header from "./components/layout/header";
 
 // Pages
 import LandingPage from "./pages/Home";
@@ -59,6 +60,7 @@ function AppRoutes() {
           <div className="flex" style={{ minHeight: "100vh", background: "#F4F7FE" }}>
             <Sidebar onLogout={handleLogout} />
             <div style={{ flex: 1 }}>
+              <Header/>
               <Routes>
                 <Route path="dash" element={<DashboardPage />} />
                 <Route path="*" element={<Navigate to="dash" />} />
