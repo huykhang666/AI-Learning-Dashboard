@@ -12,6 +12,7 @@ import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
 import DashboardPage from "./pages/dashboard/Dashboard";
 import OAuth2RedirectHandler from "./pages/Auth/OAuth2RedirectHandler";
+import HistoryPage from "./pages/history/History";
 
 function AppRoutes() {
   const navigate = useNavigate();
@@ -63,6 +64,7 @@ function AppRoutes() {
               <Header/>
               <Routes>
                 <Route path="dash" element={<DashboardPage />} />
+                  <Route path="history" element={<HistoryPage />} />
                 <Route path="*" element={<Navigate to="dash" />} />
               </Routes>
             </div>
