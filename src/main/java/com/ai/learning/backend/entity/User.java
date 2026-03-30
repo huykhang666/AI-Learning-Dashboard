@@ -62,7 +62,6 @@ public class User {
     //Mã khách hàng trên hệ thống thanh toán nếu cần
     private String paymentCustomerId;
 
-    //Tuần 7 làm
     @Column(name = "provider")
     private String provider;
 

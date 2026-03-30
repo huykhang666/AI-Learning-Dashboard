@@ -33,5 +33,7 @@ public class ProcessJob {
     @OneToOne
     private FileMetadata fileMetadata;
 
-
+    @OneToOne
+    @JoinColumn(name = "learning_session_id")
+    private LearningSession learningSession;
 }
