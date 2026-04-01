@@ -1,0 +1,250 @@
+.page {
+  padding: 28px;
+  flex: 1;
+  overflow-y: auto;
+  background: #f4f6fb;
+  min-height: 100%;
+}
+
+/* Header */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 2px;
+}
+
+.pageSub {
+  font-size: 12px;
+  color: #8b90a7;
+  margin: 0;
+}
+
+.searchCourses {
+  border: 1px solid #eef0f6;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #1a1d2e;
+  outline: none;
+  width: 200px;
+  background: #fff;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.searchCourses:focus {
+  border-color: #4f6ef7;
+}
+
+.searchCourses::placeholder {
+  color: #b0b5c8;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.tabBtn {
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-size: 13px;
+  color: #8b90a7;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.tabBtn:hover {
+  background: #eef0f6;
+  color: #1a1d2e;
+}
+
+.tabActive {
+  background: linear-gradient(135deg, #4f84f7, rgb(0, 140, 255)) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 0;
+  color: #8b90a7;
+  font-size: 14px;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  overflow: hidden;
+  border-radius: 14px;
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+.cardActions {
+  margin-top: auto;
+}
+.cardTop {
+  margin: -18px -18px 12px -18px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(79, 110, 247, 0.1);
+}
+
+.cardBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.cardIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-size: 26px;
+  text-align: center;
+  margin: 0 auto 12px;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1d2e;
+  margin: 0 0 4px;
+  line-height: 1.3;
+  padding-right: 50px;
+  min-height: 48px;
+}
+
+.cardLessons {
+  font-size: 12px;
+  color: #8b90a7;
+  margin: 0 0 10px;
+}
+
+.progressBar {
+  height: 5px;
+  background: #eef0f6;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.progressLabel {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+}
+
+.btnView {
+  flex: 1;
+  padding: 7px;
+  border: 1.5px solid blue;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: blue;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.btnView:hover {
+  background: #f4f6fb;
+}
+
+.btnLatest {
+  flex: 1;
+  padding: 7px;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.btnLatest:hover {
+  opacity: 0.85;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 16px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .pageHeader {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .searchCourses {
+    width: 100%;
+  }
+}
