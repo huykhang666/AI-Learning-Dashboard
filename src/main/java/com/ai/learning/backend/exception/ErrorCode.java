@@ -49,7 +49,9 @@ public enum ErrorCode {
     EMPTY_FILE(1025,"Upload file is empty",HttpStatus.BAD_REQUEST),
 
     JOB_NOT_FOUND(1026, "Job not found", HttpStatus.NOT_FOUND),
-    SESSION_NOT_FOUND(1027,"Learning session not found", HttpStatus.NOT_FOUND);
+    SESSION_NOT_FOUND(1027,"Learning session not found", HttpStatus.NOT_FOUND),
+
+    RESULT_NOT_FOUND(1028,"AI Result not found",HttpStatus.NOT_FOUND);
 
     private final int code;
     private final String message;
