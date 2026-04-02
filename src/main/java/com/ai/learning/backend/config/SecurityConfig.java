@@ -53,7 +53,9 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/api/uploads/video",
             "/uploads/**",
-            "/api/jobs/**"
+            "/api/jobs/**",
+            "/api/v1/sessions/**",
+            "/api/v1/sessions/**"
     };
 
     @Bean

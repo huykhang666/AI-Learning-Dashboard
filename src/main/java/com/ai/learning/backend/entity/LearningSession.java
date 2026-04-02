@@ -49,4 +49,10 @@ public class LearningSession {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) this.status = SessionStatus.PENDING;
     }
+
+    @OneToOne(mappedBy = "learningSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private AIResult aiResult;
+
+    @OneToOne(mappedBy = "learningSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ProcessJob processJob;
 }

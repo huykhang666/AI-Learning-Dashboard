@@ -1,5 +1,12 @@
+import MyCourses from "./pages/MyCourses/MyCourses.jsx";
 import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 
 // Layout & UI
 import Sidebar from "./components/layout/Sidebar";
@@ -55,25 +62,29 @@ function AppRoutes() {
         }
       />
       <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
-      
+
       <Route
         path="/app/*"
         element={
-          <div className="flex" style={{ minHeight: "100vh", background: "#F4F7FE" }}>
+          <div
+            className="flex"
+            style={{ minHeight: "100vh", background: "#F4F7FE" }}
+          >
             <Sidebar onLogout={handleLogout} />
             <div style={{ flex: 1 }}>
-              <Header/>
+              <Header />
               <Routes>
                 <Route path="dash" element={<DashboardPage />} />
                   <Route path="history" element={<HistoryPage />} />
                   <Route path="premium" element={<PremiumPage />} />
+                <Route path="courses" element={<MyCourses />} />
                 <Route path="*" element={<Navigate to="dash" />} />
               </Routes>
             </div>
           </div>
         }
       />
-      
+
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
