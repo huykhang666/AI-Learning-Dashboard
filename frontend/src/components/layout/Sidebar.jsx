@@ -18,13 +18,13 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const userData = { name: "NGUYỄN HUY KHANG", plan: "Free Plan", avatar: "NK" };
 
   const menuItems = [
-    { label: "Dashboard", key: "dashboard" },
-    { label: "MyCourses", key: "courses" },
-    { label: "Lịch sử", key: "History" },
-    { label: "Analytics", key: "analytics" },
-    { label: "Premium", key: "premium", badge: "FREE" },
-    { label: "Settings", key: "settings" },
-    { label: "Help Center", key: "help" },
+    { label: "Dashboard", key: "dashboard", path: "/app/dash" },
+    { label: "MyCourses", key: "courses", path: "/app/courses" },
+    { label: "Lịch sử", key: "History", path: "/app/history" },
+    { label: "Analytics", key: "analytics", path: "/app/analytics" },
+    { label: "Premium", key: "premium", badge: "FREE", path: "/app/premium" },
+    { label: "Settings", key: "settings", path: "/app/settings" },
+    { label: "Help Center", key: "help", path: "/app/help" },
   ];
 
   const handleMenuClick = (key) => {
@@ -58,7 +58,7 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
 
       <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
         {menuItems.map((item) => (
-          <button
+          <NavLink
             key={item.key}
             onClick={() => handleMenuClick(item.key)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left
@@ -68,7 +68,7 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
             {item.badge && (
               <span className="ml-auto bg-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">{item.badge}</span>
             )}
-          </button>
+          </NavLink>
         ))}
       </nav>
 
