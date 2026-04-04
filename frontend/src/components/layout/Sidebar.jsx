@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaBolt, FaSignOutAlt, FaTimes } from "react-icons/fa";
 
 function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const navigate = useNavigate();
-  const [active, setActive] = useState("dashboard");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
@@ -26,15 +26,6 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
     { label: "Settings", key: "settings", path: "/app/settings" },
     { label: "Help Center", key: "help", path: "/app/help" },
   ];
-
-  const handleMenuClick = (key) => {
-    setActive(key);
-    if (key === "courses") navigate("/app/courses");
-    else if (key === "dashboard") navigate("/app/dash");
-    else if (key === "History") navigate("/app/history");
-    else if (key === "premium") navigate("/app/premium");
-    onMobileClose();
-  };
 
   const SidebarInner = ({ showClose }) => (
     <div className="flex flex-col h-full px-3 py-4 overflow-y-auto relative">
@@ -60,9 +51,11 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
         {menuItems.map((item) => (
           <NavLink
             key={item.key}
-            onClick={() => handleMenuClick(item.key)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left
-              ${active === item.key ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-50"}`}
+            to={item.path}
+            className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left
+            ${isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-50"}`
+            }
           >
             <span className={item.key === "premium" ? "text-orange-500 font-bold" : ""}>{item.label}</span>
             {item.badge && (
