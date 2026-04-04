@@ -6,7 +6,6 @@ from groq import Groq
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from dotenv import load_dotenv
 
-# --- [BƯỚC 1] FIX LỖI TOKENIZER TRÊN WINDOWS (CỰC QUAN TRỌNG) ---
 try:
     from transformers import GPT2Tokenizer
     if not hasattr(GPT2Tokenizer, "additional_special_tokens"):
@@ -22,13 +21,13 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 app = FastAPI()
 
-# --- [BƯỚC 2] LOAD MODEL WHISPER (DÙNG BẢN BASE ĐA NGÔN NGỮ) ---
+# --- LOAD MODEL WHISPER (DÙNG BẢN BASE ĐA NGÔN NGỮ) ---
 print("🚀 Đang tải model Whisper (Base)...")
 model_whisper = whisper.load_model("base")
 
 @app.post("/ai/process-video")
 async def process_video(file: UploadFile = File(...)):
-    # Đảm bảo tên file không có ký tự đặc biệt gây lỗi OS
+
     temp_file = f"temp_{file.filename.replace(' ', '_')}"
     try:
         # Lưu file video tạm từ Java gửi sang
@@ -37,9 +36,8 @@ async def process_video(file: UploadFile = File(...)):
 
         print(f"🎧 Whisper đang bóc băng file: {file.filename}")
         
-        # [BƯỚC 3] BÓC BĂNG - Dùng FFmpeg bóc ra text
-        # fp16=False để chạy ổn định trên CPU/GPU Windows
-        # Nếu video tiếng Việt Khang có thể để language="vi"
+        # BÓC BĂNG - Dùng FFmpeg bóc ra text
+
         result = model_whisper.transcribe(temp_file, fp16=False, language="vi", task="transcribe")
         transcript = result.get("text", "").strip()
 
@@ -48,7 +46,7 @@ async def process_video(file: UploadFile = File(...)):
 
         print("🧠 Groq (Llama 3) đang phân tích và tóm tắt...")
         
-        # [BƯỚC 4] GỬI SANG GROQ (Dùng Llama 3 cho ổn định)
+       
         chat_completion = client.chat.completions.create(
             messages=[
                 {
@@ -64,7 +62,7 @@ async def process_video(file: UploadFile = File(...)):
                 },
                 {"role": "user", "content": f"Dưới đây là nội dung bài học: {transcript}"}
             ],
-            # Khang check model này trên Groq Dashboard nhé (thường là llama-3.3-70b-versatile)
+       
             model="llama-3.3-70b-versatile", 
             response_format={"type": "json_object"}
         )
@@ -85,7 +83,6 @@ async def process_video(file: UploadFile = File(...)):
         return {"error": str(e)}
     
     finally:
-        # Luôn luôn xóa file tạm để không đầy ổ cứng
         if os.path.exists(temp_file):
             os.remove(temp_file)
 
