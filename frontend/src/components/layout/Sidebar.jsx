@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaBolt, FaSignOutAlt } from "react-icons/fa";
 import Dashboard from "../../pages/dashboard/Dashboard";
 
@@ -14,13 +14,13 @@ function Sidebar({ onLogout }) {
     avatar: "NK", // Chữ cái đầu để làm ảnh đại diện
   };
   const menuItems = [
-    { label: "Dashboard", key: "dashboard" },
-    { label: "MyCourses", key: "courses" },
-    { label: "Lịch sử", key: "History" },
-    { label: "Analytics", key: "analytics" },
-    { label: "Premium", key: "premium", badge: "FREE" },
-    { label: "Settings", key: "settings" },
-    { label: "Help Center", key: "help" },
+    { label: "Dashboard", key: "dashboard", path: "/app/dash" },
+    { label: "MyCourses", key: "courses", path: "/app/courses" },
+    { label: "Lịch sử", key: "History", path: "/app/history" },
+    { label: "Analytics", key: "analytics", path: "/app/analytics" },
+    { label: "Premium", key: "premium", badge: "FREE", path: "/app/premium" },
+    { label: "Settings", key: "settings", path: "/app/settings" },
+    { label: "Help Center", key: "help", path: "/app/help" },
   ];
   return (
     <aside className="w-64 min-h-screen bg-white border-r border-gray-100 flex flex-col px-3 py-4">
@@ -38,8 +38,9 @@ function Sidebar({ onLogout }) {
       <hr className=" border-gray-500 border mb-2" />
       <nav className="flex flex-col gap-1 flex-1">
         {menuItems.map((item) => (
-          <button
+          <NavLink
             key={item.key}
+            to={item.path}
             onClick={() => {
               setActive(item.key);
               if (item.key === "courses") navigate("/app/courses");
@@ -59,7 +60,7 @@ function Sidebar({ onLogout }) {
                 {item.badge}
               </span>
             )}
-          </button>
+          </NavLink>
         ))}
       </nav>
       <div className="bg-indigo-100 flex items-center justify-center border border-blue-300 rounded-xl py-2 px-4 flex-col gap-4 mb-4">
