@@ -15,6 +15,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,30 +30,43 @@ public class AIResultServiceImpl implements AIResultService {
     public void saveResult(AiAnalysisResponse response, LearningSession session) {
         log.info("Saving for Session: {}", session.getLearningSessionId());
 
-        String keyPoints = (response.getAnalysis() != null && response.getAnalysis().getKeyPoints() != null)
-                ? String.join("\n",response.getAnalysis().getKeyPoints())
+        var analysis = response.getAnalysis();
+
+        String keyPoints = (response.getAnalysis() != null && response.getAnalysis().getKey_points() != null)
+                ? String.join("\n",response.getAnalysis().getKey_points())
+                : "";
+        String keywords = (analysis != null && analysis.getKeywords() != null)
+                ? String.join(", ", analysis.getKeywords())
                 : "";
 
         AIResult aiResult = AIResult.builder()
                 .transcript(response.getTranscript())
                 .summary(response.getAnalysis().getSummary())
                 .keyPoints(keyPoints)
+                .keywords(keywords)
                 .learningSession(session)
                 .build();
 
         aiResultRepository.save(aiResult);
     }
 
+    //Get AI analysis results by session ID
     @Override
     public AIResultResponse getResultById(Long sessionId) {
         log.info("AI Result for session: {}", sessionId);
         AIResult aiResult = aiResultRepository.findByLearningSession_LearningSessionId((long) sessionId.intValue())
                 .orElseThrow(() -> new AppException(ErrorCode.RESULT_NOT_FOUND));
 
-        return  AIResultResponse.builder()
+        return AIResultResponse.builder()
                 .transcript(aiResult.getTranscript())
                 .summary(aiResult.getSummary())
-                .keyPoints(aiResult.getKeyPoints())
+
+                .keyPoints(aiResult.getKeyPoints() != null
+                        ? Arrays.asList(aiResult.getKeyPoints().split("\n"))
+                        : Collections.emptyList())
+                .keywords(aiResult.getKeywords() != null
+                        ? Arrays.asList(aiResult.getKeywords().split(", "))
+                        : Collections.emptyList())
                 .build();
     }
 

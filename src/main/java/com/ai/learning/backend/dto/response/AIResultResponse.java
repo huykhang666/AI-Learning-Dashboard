@@ -1,7 +1,10 @@
 package com.ai.learning.backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -11,5 +14,8 @@ import lombok.experimental.FieldDefaults;
 public class AIResultResponse {
     String transcript;
     String summary;
-    String keyPoints;
+    @JsonProperty("key_points")
+    List<String> keyPoints;
+    @JsonProperty("keywords")
+    List<String> keywords;
 }

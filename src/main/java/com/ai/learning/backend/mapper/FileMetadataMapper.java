@@ -8,6 +8,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface FileMetadataMapper {
+    @Mapping(target = "learningSessionId", source = "learningSession.learningSessionId")
     @Mapping(target = "ownerName", expression = "java(fileMetadata.getUser().getFirstName() + \" \" + fileMetadata.getUser().getLastName())")
     @Mapping(target = "friendlySize", expression = "java(formatSize(fileMetadata.getSize()))")
     FileMetadataResponse toResponse(FileMetadata fileMetadata);

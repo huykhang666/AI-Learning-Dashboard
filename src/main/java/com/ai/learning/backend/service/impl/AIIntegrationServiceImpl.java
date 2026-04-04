@@ -10,7 +10,7 @@ import com.ai.learning.backend.repository.AIResultRepository;
 import com.ai.learning.backend.repository.ProcessJobRepository;
 import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.service.AIIntegrationService;
-import com.ai.learning.backend.service.AIResultService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,81 +19,97 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.time.LocalDateTime;
 
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AIIntegrationServiceImpl implements AIIntegrationService {
-    final WebClient aiWebClient;
-    final AIResultService aiResultService;
-    final SessionRepository sessionRepository;
-    final ProcessJobRepository processJobRepository;
+    WebClient aiWebClient;
+    SessionRepository sessionRepository;
+    ProcessJobRepository processJobRepository;
+    AIResultRepository aiResultRepository;
 
+    //Process video using AI and save analysis results
     @Override
     @Async("taskExecutor")
-    public void processAndSaveAnalysis(MultipartFile file, Long sessionId) {
-            log.info("Initializing AI analysis for Session ID: {}",sessionId);
+    @Transactional
+    public void processAndSaveAnalysis(String filePath, Long sessionId) {
+        if (filePath == null || filePath.isEmpty()) {
+            return;
+        }
 
-            LearningSession session = sessionRepository.findById(sessionId)
-                    .orElseThrow(() -> new AppException(ErrorCode.SESSION_NOT_FOUND));
+        LearningSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_EXISTED));
 
-            //Init or Update Job to Processing
-            ProcessJob job = getOrCreateJob(session);
-            job.setStatus(SessionStatus.PROCESSING);
-            processJobRepository.save(job);
-            try {
-                //Prepare Multipart Request
-                MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-                bodyBuilder.part("file", file.getResource());
+        ProcessJob job = getJob(session);
 
-                log.info("Sending video payload to FastAPI for Session");
+        try {
+            updateJobStatus(session, job, SessionStatus.PROCESSING, null);
 
-                //Call FastAPI and block for result
-                AiAnalysisResponse response = aiWebClient.post()
-                        .uri("/ai/process-video")
-                        .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
-                        .retrieve()
-                        .bodyToMono(AiAnalysisResponse.class)
-                        .block();
+            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+            bodyBuilder.part("file", new org.springframework.core.io.FileSystemResource(new java.io.File(filePath)));
 
-                if(response != null && response.getAnalysis() != null) {
-                    aiResultService.saveResult(response,session);
+            AiAnalysisResponse response = aiWebClient.post()
+                    .uri("/ai/process-video")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                    .retrieve()
+                    .bodyToMono(AiAnalysisResponse.class)
+                    .block();
 
-                    //Finalize status
-                    updateJobStatus(job, SessionStatus.COMPLETED,null);
-                    updateSessionStatus(session,SessionStatus.COMPLETED);
-                    log.info("Success - Session: {}",sessionId);
-                }
-            } catch (Exception e) {
-              log.error("Failed - Session: {}", sessionId);
-              updateJobStatus(job, SessionStatus.FAILED,e.getMessage());
-              updateSessionStatus(session,SessionStatus.FAILED);
+            if (response != null && "success".equals(response.getStatus())) {
+                saveAiResult(session, response);
+                updateJobStatus(session, job, SessionStatus.COMPLETED, "Analysis successful");
+            } else {
+                throw new RuntimeException("AI Response status is not success");
             }
+        } catch (Exception e) {
+            log.error("AI Workflow Error for Session {}: {}", sessionId, e.getMessage());
+            updateJobStatus(session, job, SessionStatus.FAILED, e.getMessage());
+        }
     }
 
-    private ProcessJob getOrCreateJob(LearningSession session) {
-        ProcessJob job = session.getProcessJob();
-        return (job != null)
-                ? job
-                : ProcessJob.builder()
+    private void saveAiResult(LearningSession session, AiAnalysisResponse response) {
+        var analysis = response.getAnalysis();
+
+        String keyPointsStr = (analysis.getKey_points() != null) ? String.join("\n", analysis.getKey_points()) : "";
+        String keywordsStr = "";
+        if (analysis.getKeywords() != null && !analysis.getKeywords().isEmpty()) {
+            keywordsStr = String.join(", ", analysis.getKeywords());
+        } else {
+            keywordsStr = "No Keywords"; // Để debug xem Python có gửi gì về không
+        }
+        AIResult aiResult = AIResult.builder()
                 .learningSession(session)
+                .transcript(response.getTranscript())
+                .summary(analysis.getSummary())
+                .keyPoints(keyPointsStr)
+                .keywords(keywordsStr)
                 .build();
+        aiResultRepository.save(aiResult);
     }
 
-    private void updateJobStatus(ProcessJob job, SessionStatus status, String error) {
+    private ProcessJob getJob(LearningSession session) {
+        ProcessJob job = session.getProcessJob();
+
+        if (job == null) {
+            job = processJobRepository.findByLearningSession_LearningSessionId(session.getLearningSessionId())
+                    .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+        }
+        return job;
+    }
+
+    private void updateJobStatus(LearningSession session, ProcessJob job, SessionStatus status, String error) {
         job.setStatus(status);
         job.setErrorMessage(error);
         job.setUpdatedAt(LocalDateTime.now());
         processJobRepository.save(job);
-    }
 
-    private void updateSessionStatus(LearningSession session, SessionStatus status) {
         session.setStatus(status);
         sessionRepository.save(session);
     }

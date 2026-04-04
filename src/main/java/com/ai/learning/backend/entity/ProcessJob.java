@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,7 +30,12 @@ public class ProcessJob {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     @OneToOne
+    @JoinColumn(name = "file_metadata_id")
     private FileMetadata fileMetadata;
 
     @OneToOne

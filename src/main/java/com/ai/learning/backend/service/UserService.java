@@ -15,16 +15,16 @@ public interface UserService {
         UserResponse getMyInfo();
 
         //Update profile information of a user
-        UserResponse updateProfileRequest(Integer id, UpdateUserRequest request);
+        UserResponse updateProfileRequest(Long id, UpdateUserRequest request);
 
         // Check if the user is allowed to upload (based on quota/premium)
-        boolean canUpload(Integer userId);
+        boolean canUpload(Long userId);
 
         //Update user upload
-        void updateUsage(Integer userId);
+        void updateUsage(Long userId);
 
         //Delete User
-        void deleteUser(Integer userId);
+        void deleteUser(Long userId);
 
         //Get list user
         public List<UserResponse> getUsers();

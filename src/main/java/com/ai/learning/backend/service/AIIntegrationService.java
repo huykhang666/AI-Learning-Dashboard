@@ -5,5 +5,5 @@ import com.ai.learning.backend.entity.ProcessJob;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AIIntegrationService {
-    void processAndSaveAnalysis(MultipartFile file, Long sessionId);
+    void processAndSaveAnalysis(String filePath, Long sessionId);
 }

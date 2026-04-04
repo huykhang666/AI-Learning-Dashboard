@@ -22,13 +22,10 @@ public class FileMetadata {
     @Column(name = "file_name", length = 255)
     private String fileName;
 
-    @Column(nullable = false)
-    String title;
-
     @Column(columnDefinition = "TEXT", nullable = false)
-    String url;
+    String fileUrl;
 
-    String contentType;
+    String fileType;
 
     Long size;
 
@@ -42,6 +39,9 @@ public class FileMetadata {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     User user;
+
+    @OneToOne(mappedBy = "fileMetadata")
+    LearningSession learningSession;
 
     @PrePersist
     protected void onCreate() {

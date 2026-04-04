@@ -12,15 +12,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileMetadataResponse {
+    Long learningSessionId;
     Long fileMetadataId;
     String title;
     String url;
     String contentType;
     Long size;
-
     String friendlySize;
     StorageProvider storageProvider;
     LocalDateTime createdAt;
-
     String ownerName;
 }

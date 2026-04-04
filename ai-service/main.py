@@ -6,51 +6,90 @@ from groq import Groq
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from dotenv import load_dotenv
 
+# --- [BƯỚC 1] FIX LỖI TOKENIZER TRÊN WINDOWS (CỰC QUAN TRỌNG) ---
+try:
+    from transformers import GPT2Tokenizer
+    if not hasattr(GPT2Tokenizer, "additional_special_tokens"):
+        setattr(GPT2Tokenizer, "additional_special_tokens", property(lambda self: []))
+    if not hasattr(GPT2Tokenizer, "additional_special_tokens_ids"):
+        setattr(GPT2Tokenizer, "additional_special_tokens_ids", property(lambda self: []))
+    print("✅ Đã vá lỗi Tokenizer thành công!")
+except Exception as e:
+    print(f"⚠️ Cảnh báo Fix Tokenizer: {e}")
+
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 app = FastAPI()
-model_whisper = whisper.load_model("base")
 
-def extract_json(text: str):
-    try:
-        match = re.search(r'\{.*\}', text, re.DOTALL)
-        return json.loads(match.group()) if match else {"summary": text, "key_points": []}
-    except: return {"summary": text, "key_points": []}
+# --- [BƯỚC 2] LOAD MODEL WHISPER (DÙNG BẢN BASE ĐA NGÔN NGỮ) ---
+print("🚀 Đang tải model Whisper (Base)...")
+model_whisper = whisper.load_model("base")
 
 @app.post("/ai/process-video")
 async def process_video(file: UploadFile = File(...)):
-    temp_file = f"temp_{file.filename}"
+    # Đảm bảo tên file không có ký tự đặc biệt gây lỗi OS
+    temp_file = f"temp_{file.filename.replace(' ', '_')}"
     try:
+        # Lưu file video tạm từ Java gửi sang
         with open(temp_file, "wb") as buffer:
             buffer.write(await file.read())
 
-        print(f"🎧 Whisper đang bóc băng...")
-        result = model_whisper.transcribe(temp_file, fp16=False)
+        print(f"🎧 Whisper đang bóc băng file: {file.filename}")
+        
+        # [BƯỚC 3] BÓC BĂNG - Dùng FFmpeg bóc ra text
+        # fp16=False để chạy ổn định trên CPU/GPU Windows
+        # Nếu video tiếng Việt Khang có thể để language="vi"
+        result = model_whisper.transcribe(temp_file, fp16=False, language="vi", task="transcribe")
         transcript = result.get("text", "").strip()
 
-        print("🧠 Groq (Llama 3) đang tóm tắt...")
+        if not transcript:
+            return {"error": "Không trích xuất được âm thanh từ video. Kiểm tra lại file video."}
+
+        print("🧠 Groq (Llama 3) đang phân tích và tóm tắt...")
+        
+        # [BƯỚC 4] GỬI SANG GROQ (Dùng Llama 3 cho ổn định)
         chat_completion = client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "Bạn là trợ lý học tập. Trả về JSON gồm 'summary' và 'key_points' bằng tiếng Việt."},
-                {"role": "user", "content": transcript}
+                {
+                    "role": "system", 
+                    "content": (
+                        "Bạn là trợ lý học tập chuyên nghiệp. "
+                        "Hãy phân tích nội dung và trả về JSON chuẩn gồm các trường: "
+                        "'summary' (tóm tắt bài học ngắn gọn), "
+                        "'key_points' (danh sách các ý chính, mỗi ý một dòng), "
+                        "và 'keywords' (danh sách từ khóa phân loại). "
+                        "Tất cả nội dung phải bằng tiếng Việt."
+                    )
+                },
+                {"role": "user", "content": f"Dưới đây là nội dung bài học: {transcript}"}
             ],
-            model="qwen/qwen3-32b", 
+            # Khang check model này trên Groq Dashboard nhé (thường là llama-3.3-70b-versatile)
+            model="llama-3.3-70b-versatile", 
             response_format={"type": "json_object"}
         )
 
-        analysis = json.loads(chat_completion.choices[0].message.content)
+        # Trích xuất JSON từ Groq
+        analysis_content = chat_completion.choices[0].message.content
+        analysis = json.loads(analysis_content)
 
+        print("✅ Xử lý hoàn tất!")
         return {
             "status": "success",
             "transcript": transcript,
             "analysis": analysis
         }
+
     except Exception as e:
+        print(f"❌ Lỗi: {str(e)}")
         return {"error": str(e)}
+    
     finally:
-        if os.path.exists(temp_file): os.remove(temp_file)
+        # Luôn luôn xóa file tạm để không đầy ổ cứng
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
 
 if __name__ == "__main__":
     import uvicorn
+    # Chạy trên port 8000
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

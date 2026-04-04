@@ -14,9 +14,9 @@ public class AIResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ai_result_id")
-    private Integer aiResultId;
+    private Long aiResultId;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String transcript;
 
     @Column(columnDefinition = "TEXT")
@@ -25,6 +25,8 @@ public class AIResult {
     @Column(columnDefinition = "TEXT")
     private String keyPoints;
 
+    @Column(columnDefinition = "TEXT")
+    private String keywords;
     // One-to-one relationship with LearningSession.
     // Each record is associated with exactly one session.
     // LAZY fetch to avoid unnecessary join queries.

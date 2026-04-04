@@ -44,8 +44,8 @@ public class SecurityConfig {
     }
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/users/register",
-            "/api/v1/auth/login",
+            "/api/v1/users/**",
+            "api/v1/auth/**",
             "/oauth2/**",
             "/login/oauth2/**",
             "/v3/api-docs/**",
@@ -54,7 +54,6 @@ public class SecurityConfig {
             "/api/uploads/video",
             "/uploads/**",
             "/api/jobs/**",
-            "/api/v1/sessions/**",
             "/api/v1/sessions/**"
     };
 

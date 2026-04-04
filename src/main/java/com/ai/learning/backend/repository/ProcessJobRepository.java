@@ -8,4 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProcessJobRepository extends JpaRepository<ProcessJob,Long> {
-    Optional<ProcessJob> findByFileMetadata_FileMetadataId(Long fileMetadataId);}
+    Optional<ProcessJob> findByFileMetadata_FileMetadataId(Long fileMetadataId);
+    Optional<ProcessJob> findByLearningSession_LearningSessionId(Long learningSessionId);
+}
+

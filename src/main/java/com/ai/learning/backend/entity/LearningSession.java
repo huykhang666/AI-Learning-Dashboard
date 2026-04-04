@@ -18,13 +18,11 @@ public class LearningSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "learning_session_id")
-    private Integer learningSessionId;
+    private Long learningSessionId;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(name = "video_url")
-    private String videoUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -50,9 +48,15 @@ public class LearningSession {
         if (this.status == null) this.status = SessionStatus.PENDING;
     }
 
-    @OneToOne(mappedBy = "learningSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "learningSession", cascade = CascadeType.ALL)
     private AIResult aiResult;
 
-    @OneToOne(mappedBy = "learningSession", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "process_job_id")
     private ProcessJob processJob;
+
+    @OneToOne
+    @JoinColumn(name = "file_metadata_id")
+    private FileMetadata fileMetadata;
 }

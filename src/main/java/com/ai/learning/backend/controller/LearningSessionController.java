@@ -1,48 +1,74 @@
 package com.ai.learning.backend.controller;
 
+import com.ai.learning.backend.dto.request.FileMetadataRequest;
 import com.ai.learning.backend.dto.request.SessionRequest;
 import com.ai.learning.backend.dto.response.*;
-import com.ai.learning.backend.entity.AIResult;
+import com.ai.learning.backend.enums.StorageProvider;
 import com.ai.learning.backend.service.AIIntegrationService;
 import com.ai.learning.backend.service.AIResultService;
+import com.ai.learning.backend.service.FileStorageService;
 import com.ai.learning.backend.service.SessionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Controller
+
+@RestController
 @RequestMapping("/api/v1/sessions")
 @RequiredArgsConstructor
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LearningSessionController {
-    final AIIntegrationService aiIntegrationService;
-    final SessionService sessionService;
-    final AIResultService aiResultService;
+    AIIntegrationService aiIntegrationService;
+    SessionService sessionService;
+    AIResultService aiResultService;
+    FileStorageService fileStorageService;
 
+    //Create session, store video file, and trigger async AI analysis
     @PreAuthorize("hasRole('USER')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<SessionListResponse> create(
-            @RequestPart("data") SessionRequest request,
-            @RequestPart("file")MultipartFile file
-            ) {
-        log.info("Creating session: {}", request.getTitle());
-        SessionListResponse session = sessionService.create(request);
-        aiIntegrationService.processAndSaveAnalysis(file, session.getLearningSessionId().longValue());
+    public ApiResponse<Object> create(
+            @RequestParam("title") String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "videoUrl", required = false) String videoUrl,
+            @RequestPart("file") MultipartFile file
+    )  {
+        SessionRequest request = SessionRequest.builder()
+                .title(title)
+                .description(description)
+                .build();
 
-        return ApiResponse.<SessionListResponse>builder()
+        StorageProvider provider = (videoUrl != null && !videoUrl.isEmpty())
+                ? StorageProvider.YOUTUBE
+                : StorageProvider.LOCAL;
+
+        FileMetadataRequest fileMRequest = FileMetadataRequest.builder()
+                .title(title)
+                .description(description)
+                .storageProvider(provider)
+                .youtubeUrl(videoUrl)
+                .build();
+
+        FileMetadataResponse fileResponse = fileStorageService.storeFile(file,fileMRequest);
+
+        Long sessionId = fileResponse.getLearningSessionId();
+
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("sessionId", sessionId);
+        result.put("status", "PROCESSING");
+
+        return ApiResponse.builder()
                 .code(1000)
-                .result(session)
+                .result(result)
                 .build();
     }
+
+    //Get paginated list of sessions for current user
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping
@@ -55,6 +81,7 @@ public class LearningSessionController {
                 .build();
     }
 
+    //Get detail of a specific session
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
     public ApiResponse<SessionDetailResponse> getDetail(@PathVariable Long id) {
@@ -64,10 +91,11 @@ public class LearningSessionController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("{id}/result")
-    public ApiResponse<AIResultResponse> getAiResult(@PathVariable Long id) {
+    @GetMapping("{sessionId}/result")
+    public ApiResponse<AIResultResponse> getAiResult(@PathVariable Long sessionId) {
         return ApiResponse.<AIResultResponse>builder()
-                .result(aiResultService.getResultById(id))
+                .code(1000)
+                .result(aiResultService.getResultById(sessionId))
                 .build();
     }
 
@@ -83,6 +111,8 @@ public class LearningSessionController {
     @DeleteMapping("{id}")
     public ApiResponse<Void> delete(@PathVariable Long id) {
         sessionService.delete(id);
-        return ApiResponse.<Void>builder().build();
+        return ApiResponse.<Void>builder()
+                .code(1000)
+                .build();
     }
 }

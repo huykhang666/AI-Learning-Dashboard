@@ -8,10 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -26,6 +23,16 @@ public class ProcessJobController {
         return ApiResponse.<ProcessJobResponse>builder()
                 .code(1000)
                 .result(processJobService.getJobStatus(sessionId))
+                .build();
+    }
+
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PostMapping("/retry/{jobId}")
+    public ApiResponse<String> retryJob(@PathVariable Long jobId) {
+        processJobService.retryJob(jobId);
+        return ApiResponse.<String>builder()
+                .code(1000)
+                .result("Retry request submitted successfully")
                 .build();
     }
 }

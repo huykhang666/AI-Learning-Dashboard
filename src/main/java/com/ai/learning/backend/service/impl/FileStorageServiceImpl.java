@@ -3,6 +3,7 @@ package com.ai.learning.backend.service.impl;
 import com.ai.learning.backend.dto.request.FileMetadataRequest;
 import com.ai.learning.backend.dto.response.FileMetadataResponse;
 import com.ai.learning.backend.entity.FileMetadata;
+import com.ai.learning.backend.entity.LearningSession;
 import com.ai.learning.backend.entity.ProcessJob;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.enums.SessionStatus;
@@ -12,13 +13,17 @@ import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.FileMetadataMapper;
 import com.ai.learning.backend.repository.FileMetadataRepository;
 import com.ai.learning.backend.repository.ProcessJobRepository;
+import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.FileStorageService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,23 +41,30 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileStorageServiceImpl implements FileStorageService {
     FileMetadataRepository fileMetadataRepository;
-    FileMetadataMapper mapper;
     UserRepository userRepository;
-    private final FileMetadataMapper fileMetadataMapper;
+    FileMetadataMapper fileMetadataMapper;
     ProcessJobRepository processJobRepository;
+    SessionRepository sessionRepository;
+    @NonFinal
     ProcessJobImpl processJobService;
 
+    @Autowired
+    public void setProcessJobService(@Lazy ProcessJobImpl processJobService) {
+        this.processJobService = processJobService;
+    }
+
     @NonFinal
-    @Value("${app.upload.dir}")
+    @Value("${app.upload.dir:uploads}")
     String uploadDir;
 
     @Override
+    @Transactional
     public FileMetadataResponse storeFile(MultipartFile multipartFile, FileMetadataRequest request) {
         String identity = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser;
 
         try {
-            Integer userId = Integer.valueOf(identity);
+            Long userId = Long.valueOf(identity);
             currentUser = userRepository.findById(userId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         } catch (NumberFormatException e) {
@@ -61,7 +74,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         //Create temp entity
         FileMetadata entity = FileMetadata.builder()
-                .title(request.getTitle())
                 .storageProvider(request.getStorageProvider())
                 .user(currentUser)
                 .build();
@@ -70,9 +82,10 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         //Logic Hybrid
         if(request.getStorageProvider() == StorageProvider.YOUTUBE) {
-            entity.setUrl(request.getYoutubeUrl());
-            entity.setContentType("video/youtube");
+            entity.setFileUrl(request.getYoutubeUrl());
+            entity.setFileType("video/youtube");
             entity.setSize(0L);
+            entity.setFileName("YouTube Video");
         } else {
             if(multipartFile== null || multipartFile.isEmpty()) {
                 throw new AppException(ErrorCode.UPLOAD_FAILED);
@@ -84,37 +97,57 @@ public class FileStorageServiceImpl implements FileStorageService {
                 Files.createDirectories(targetPath.getParent());
                 Files.copy(multipartFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-                entity.setUrl((targetPath.toString()));
-                entity.setContentType(multipartFile.getContentType());
+                entity.setFileUrl((targetPath.toString()));
+                entity.setFileType(multipartFile.getContentType());
                 entity.setSize(multipartFile.getSize());
+                entity.setFileName(multipartFile.getOriginalFilename());
             } catch (IOException e) {
                 throw new AppException(ErrorCode.UPLOAD_FAILED);
             }
         }
 
-        FileMetadata saved = fileMetadataRepository.save(entity);
+        FileMetadata saved = fileMetadataRepository.saveAndFlush(entity);
+
+        LearningSession session = LearningSession.builder()
+                .user(currentUser)
+                .fileMetadata(saved)
+                .title(request.getTitle() != null ? request.getTitle() : saved.getFileName())
+                .description(request.getDescription() != null ? request.getDescription() : "Mô tả bài học")
+                .status(SessionStatus.PROCESSING)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        // Dùng saveAndFlush ở đây
+        LearningSession savedSession = sessionRepository.saveAndFlush(session);
+
+        saved.setLearningSession(savedSession);
+        fileMetadataRepository.saveAndFlush(saved);
 
         ProcessJob job = ProcessJob.builder()
                 .fileMetadata(saved)
+                .learningSession(savedSession)
                 .status(SessionStatus.PROCESSING)
                 .build();
 
         ProcessJob savedJob = processJobRepository.saveAndFlush(job);
 
-        System.out.println("Đã tạo Job với ID: " + savedJob.getProcessJobId());
+
+        savedSession.setProcessJob(savedJob);
+        sessionRepository.saveAndFlush(savedSession);
 
         processJobService.startProcessAsync(savedJob.getProcessJobId());
 
-        return mapper.toResponse(saved);
+        return fileMetadataMapper.toResponse(saved);
     }
 
+    //Retrieve all video metadata for the current user
     @Override
     public List<FileMetadataResponse> getMyVideos() {
         String identity = SecurityContextHolder.getContext().getAuthentication().getName();
-        Integer userId;
+        long userId;
 
         try {
-            userId = Integer.valueOf(identity);
+            userId = Long.parseLong(identity);
         } catch (NumberFormatException e) {
             userId = userRepository.findByUsername(identity)
                     .map(User::getUserId)

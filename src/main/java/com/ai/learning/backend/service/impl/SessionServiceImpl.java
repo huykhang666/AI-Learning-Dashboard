@@ -37,6 +37,7 @@ public class SessionServiceImpl implements SessionService {
     final SessionMapper sessionMapper;
     final UserRepository userRepository;
 
+    //Create a new learning session for current user
     @Override
     @Transactional
     public SessionListResponse create(SessionRequest request) {
@@ -54,13 +55,13 @@ public class SessionServiceImpl implements SessionService {
         return  sessionMapper.toListResponse(sessionRepository.save(session));
     }
 
+    //Retrieve session details including AI analysis results
     @Override
     public SessionDetailResponse getById(Long id) {
         LearningSession session = sessionRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        AIResult aiResult = aiResultRepository.findByLearningSession_LearningSessionId(id)
-                .orElse(null);
+        AIResult aiResult = session.getAiResult();
         return sessionMapper.toDetailResponse(session, aiResult);
     }
 
@@ -85,6 +86,7 @@ public class SessionServiceImpl implements SessionService {
                 .build();
     }
 
+    //Get current processing status of the session
     @Override
     public String getStatus(Long id) {
         LearningSession session = sessionRepository.findById(id)
@@ -100,6 +102,7 @@ public class SessionServiceImpl implements SessionService {
             throw new AppException(ErrorCode.LESSON_NOT_EXISTED);
         }
         sessionRepository.deleteById(id);
+        log.info("Deleted session ID: {}", id);
     }
 
 }

@@ -13,7 +13,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
-    Integer userId;
+    Long userId;
     String username;
     String firstname;
     String lastname;

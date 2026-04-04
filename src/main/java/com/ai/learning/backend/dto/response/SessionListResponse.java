@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SessionListResponse {
-    Integer learningSessionId;
+    Long learningSessionId;
     String title;
     String videoUrl;
     String description;
