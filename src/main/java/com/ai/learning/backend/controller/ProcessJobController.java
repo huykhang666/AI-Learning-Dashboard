@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/jobs")
+@RequestMapping("/api/v1/jobs")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProcessJobController {
@@ -33,6 +33,20 @@ public class ProcessJobController {
         return ApiResponse.<String>builder()
                 .code(1000)
                 .result("Retry request submitted successfully")
+                .build();
+    }
+
+
+    @PreAuthorize("permitAll()")
+    @PatchMapping("/update-progress/{JobId}")
+    public ApiResponse<String> updateProgress(
+            @PathVariable Long JobId,
+            @RequestParam("value") int value
+    ) {
+        processJobService.updateProgress(JobId,value);
+        return ApiResponse.<String>builder()
+                .code(1000)
+                .result("Update progress success")
                 .build();
     }
 }

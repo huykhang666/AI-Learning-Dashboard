@@ -12,5 +12,6 @@ public class ProcessJobResponse {
     Long processJobId;
     String status;
     String errorMessage;
+    int progress;
     LocalDateTime updateAt;
 }

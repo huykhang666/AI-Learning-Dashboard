@@ -57,13 +57,11 @@ public class ProcessJobImpl implements ProcessJobService {
     @Async("taskExecutor")
     @Transactional
     public void startProcessAsync(Long jobId) {
-        // Chỉ tìm Job và gán trạng thái bắt đầu
+
         ProcessJob job = processJobRepository.findById(jobId)
                 .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
 
-        // Kiểm tra an toàn để tránh lỗi Null khi gọi sang Integration
         if (job.getLearningSession() == null) {
-            log.error("❌ Job ID {} không có LearningSession gắn kèm!", jobId);
             return;
         }
 
@@ -92,5 +90,10 @@ public class ProcessJobImpl implements ProcessJobService {
     public void retryJob(Long jobId) {
         log.info("Retrying Job ID: {}", jobId);
         selfProvider.startProcessAsync(jobId);
+    }
+
+    @Override
+    public void updateProgress(Long jobId, int value) {
+        processJobRepository.updateProgressOnly(jobId,value);
     }
 }

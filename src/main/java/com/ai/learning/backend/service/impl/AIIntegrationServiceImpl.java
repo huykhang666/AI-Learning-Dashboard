@@ -55,7 +55,12 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
             bodyBuilder.part("file", new org.springframework.core.io.FileSystemResource(new java.io.File(filePath)));
 
             AiAnalysisResponse response = aiWebClient.post()
-                    .uri("/ai/process-video")
+                    .uri(
+                            uriBuilder -> uriBuilder
+                                    .path("/ai/process-video")
+                                    .queryParam("job_id",job.getProcessJobId())
+                                    .build()
+                    )
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                     .retrieve()

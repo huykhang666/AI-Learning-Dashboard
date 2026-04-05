@@ -34,6 +34,9 @@ public class ProcessJob {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "progress")
+    int progress = 0;
+
     @OneToOne
     @JoinColumn(name = "file_metadata_id")
     private FileMetadata fileMetadata;
