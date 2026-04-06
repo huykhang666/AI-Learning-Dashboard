@@ -11,6 +11,7 @@ import DashboardPage from "./pages/dashboard/Dashboard";
 import OAuth2RedirectHandler from "./pages/Auth/OAuth2RedirectHandler";
 import HistoryPage from "./pages/history/History";
 import PremiumPage from "./pages/Premium/Premium";
+import SettingPage from "./pages/Setting/Setting";
 
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,6 +35,7 @@ function AppLayout({ onLogout }) {
             <Route path="history" element={<HistoryPage />} />
             <Route path="premium" element={<PremiumPage />} />
             <Route path="courses" element={<MyCourses />} />
+            <Route path="settings" element={<SettingPage />} />
             <Route path="*" element={<Navigate to="dash" />} />
           </Routes>
         </main>
