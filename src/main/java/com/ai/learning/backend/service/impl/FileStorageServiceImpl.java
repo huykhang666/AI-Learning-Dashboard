@@ -82,7 +82,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         //Logic Hybrid
         if(request.getStorageProvider() == StorageProvider.YOUTUBE) {
-            entity.setFileUrl(request.getYoutubeUrl());
+            entity.setFileUrl(request.getVideoUrl());
             entity.setFileType("video/youtube");
             entity.setSize(0L);
             entity.setFileName("YouTube Video");
@@ -113,6 +113,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                 .fileMetadata(saved)
                 .title(request.getTitle() != null ? request.getTitle() : saved.getFileName())
                 .description(request.getDescription() != null ? request.getDescription() : "Mô tả bài học")
+                .videoUrl(request.getVideoUrl())
                 .status(SessionStatus.PROCESSING)
                 .createdAt(LocalDateTime.now())
                 .build();

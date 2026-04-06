@@ -41,6 +41,8 @@ public class LearningSession {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "video_url", columnDefinition = "TEXT")
+    String videoUrl;
 
     @PrePersist
     protected void onCreate() {

@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LearningSessionController {
-    AIIntegrationService aiIntegrationService;
     SessionService sessionService;
     AIResultService aiResultService;
     FileStorageService fileStorageService;
@@ -36,11 +35,12 @@ public class LearningSessionController {
             @RequestParam("title") String title,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "videoUrl", required = false) String videoUrl,
-            @RequestPart("file") MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file
     )  {
         SessionRequest request = SessionRequest.builder()
                 .title(title)
                 .description(description)
+                .videoUrl(videoUrl)
                 .build();
 
         StorageProvider provider = (videoUrl != null && !videoUrl.isEmpty())
@@ -51,7 +51,7 @@ public class LearningSessionController {
                 .title(title)
                 .description(description)
                 .storageProvider(provider)
-                .youtubeUrl(videoUrl)
+                .videoUrl(videoUrl)
                 .build();
 
         FileMetadataResponse fileResponse = fileStorageService.storeFile(file,fileMRequest);

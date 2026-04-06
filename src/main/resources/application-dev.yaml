@@ -47,8 +47,8 @@ springdoc:
   override-with-generic-response: false
 
 app:
-  upload:
-    dir: D:/ai-learning/uploads
+  dir:
+    uploads: uploads
   oauth2:
     authorizedRedirectUri: http://localhost:5173/oauth2/redirect
 

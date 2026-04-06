@@ -13,7 +13,9 @@ public class WebClientConfig {
     public WebClient aiWebClient(WebClient.Builder builder) {
         return builder
                 .baseUrl(aiBaseUrl)
-                .codecs(clientCodecConfigurer -> clientCodecConfigurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(64 * 1024 * 1024))
                 .build();
     }
 }

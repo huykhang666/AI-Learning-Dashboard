@@ -38,12 +38,12 @@ public class ProcessJobController {
 
 
     @PreAuthorize("permitAll()")
-    @PatchMapping("/update-progress/{JobId}")
+    @PatchMapping("/update-progress/{jobId}")
     public ApiResponse<String> updateProgress(
-            @PathVariable Long JobId,
+            @PathVariable Long jobId,
             @RequestParam("value") int value
     ) {
-        processJobService.updateProgress(JobId,value);
+        processJobService.updateProgress(jobId, value);
         return ApiResponse.<String>builder()
                 .code(1000)
                 .result("Update progress success")

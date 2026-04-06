@@ -49,6 +49,7 @@ public class SessionServiceImpl implements SessionService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         LearningSession session = sessionMapper.toEntity(request);
+        session.setVideoUrl(request.getVideoUrl());
         session.setUser(user);
         session.setStatus(SessionStatus.PENDING);
 

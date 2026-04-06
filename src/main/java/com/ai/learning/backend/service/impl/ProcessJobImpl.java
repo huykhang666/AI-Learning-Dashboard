@@ -67,7 +67,8 @@ public class ProcessJobImpl implements ProcessJobService {
 
         // Gọi sang AIIntegrationService để xử lý tập trung ở một chỗ
         aiIntegrationService.processAndSaveAnalysis(
-                job.getFileMetadata().getFileUrl(),
+                job.getFileMetadata() != null ? job.getFileMetadata().getFileUrl() : null,
+                job.getLearningSession().getVideoUrl(),
                 job.getLearningSession().getLearningSessionId()
         );
     }
@@ -93,7 +94,9 @@ public class ProcessJobImpl implements ProcessJobService {
     }
 
     @Override
+    @Transactional
     public void updateProgress(Long jobId, int value) {
-        processJobRepository.updateProgressOnly(jobId,value);
+        processJobRepository.updateProgressOnly(jobId, value);
     }
+
 }

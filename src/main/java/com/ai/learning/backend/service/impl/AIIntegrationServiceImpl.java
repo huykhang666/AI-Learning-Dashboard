@@ -21,7 +21,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import java.time.LocalDateTime;
 
 
 @Service
@@ -38,8 +37,8 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
     @Override
     @Async("taskExecutor")
     @Transactional
-    public void processAndSaveAnalysis(String filePath, Long sessionId) {
-        if (filePath == null || filePath.isEmpty()) {
+    public void processAndSaveAnalysis(String filePath,String videoUrl, Long sessionId) {
+        if ((filePath == null || filePath.isEmpty()) && (videoUrl == null || videoUrl.isEmpty())) {
             return;
         }
 
@@ -52,26 +51,32 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
             updateJobStatus(session, job, SessionStatus.PROCESSING, null);
 
             MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-            bodyBuilder.part("file", new org.springframework.core.io.FileSystemResource(new java.io.File(filePath)));
+
+            if (filePath != null && !filePath.isEmpty() && !filePath.startsWith("http")) {
+                bodyBuilder.part("file", new org.springframework.core.io.FileSystemResource(new java.io.File(filePath)));
+            }
 
             AiAnalysisResponse response = aiWebClient.post()
-                    .uri(
-                            uriBuilder -> uriBuilder
-                                    .path("/ai/process-video")
-                                    .queryParam("job_id",job.getProcessJobId())
-                                    .build()
-                    )
+                    .uri(uriBuilder -> {
+                        uriBuilder.path("/ai/process-video")
+                                .queryParam("job_id", job.getProcessJobId());
+
+                        if (videoUrl != null && !videoUrl.isEmpty()) {
+                            uriBuilder.queryParam("youtube_url", videoUrl);
+                        }
+
+                        return uriBuilder.build();
+                    })
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                     .retrieve()
                     .bodyToMono(AiAnalysisResponse.class)
                     .block();
 
+
             if (response != null && "success".equals(response.getStatus())) {
                 saveAiResult(session, response);
                 updateJobStatus(session, job, SessionStatus.COMPLETED, "Analysis successful");
-            } else {
-                throw new RuntimeException("AI Response status is not success");
             }
         } catch (Exception e) {
             log.error("AI Workflow Error for Session {}: {}", sessionId, e.getMessage());
@@ -87,7 +92,7 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
         if (analysis.getKeywords() != null && !analysis.getKeywords().isEmpty()) {
             keywordsStr = String.join(", ", analysis.getKeywords());
         } else {
-            keywordsStr = "No Keywords"; // Để debug xem Python có gửi gì về không
+            keywordsStr = "No Keywords";
         }
         AIResult aiResult = AIResult.builder()
                 .learningSession(session)
@@ -110,10 +115,11 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
     }
 
     private void updateJobStatus(LearningSession session, ProcessJob job, SessionStatus status, String error) {
-        job.setStatus(status);
-        job.setErrorMessage(error);
-        job.setUpdatedAt(LocalDateTime.now());
-        processJobRepository.save(job);
+        if (status == SessionStatus.COMPLETED) {
+            processJobRepository.markJobAsCompleted(job.getProcessJobId());
+        } else {
+            processJobRepository.updateStatusOnly(job.getProcessJobId(), status, error);
+        }
 
         session.setStatus(status);
         sessionRepository.save(session);

@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 public class FileMetadataRequest {
     @NotBlank(message = "TITLE_REQUIRED")
     String title;
-    String youtubeUrl;
+    String videoUrl;
     StorageProvider storageProvider;
     private String description;
 }
