@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,25 @@ public class AiClient {
         } catch (Exception e) {
             log.error("AI Service communication failed: {}", e.getMessage());
             throw  e;
+        }
+    }
+
+    public String chatWithAi(String context, String userQuery) {
+        Map<String,String> body = Map.of(
+                "context", context,
+                "query", userQuery
+        );
+
+        try {
+            return aiWebClient.post()
+                    .uri("/ai/chat")
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (Exception e) {
+            log.error("AI Chat communication failed: {}", e.getMessage());
+            throw e;
         }
     }
 }
