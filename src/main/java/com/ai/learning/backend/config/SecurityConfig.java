@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/jobs/update-progress/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRole.ADMIN.name())
+                        .requestMatchers("/api/messages/**").hasRole("USER")
                         .anyRequest().authenticated()
                 );
 

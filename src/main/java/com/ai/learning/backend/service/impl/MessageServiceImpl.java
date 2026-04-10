@@ -52,6 +52,8 @@ public class MessageServiceImpl implements MessageService {
                 .content("...")
                 .role(MessageRole.ASSISTANT)
                 .build();
+        messageRepository.save(aiPendingMessage);
+
 
         //Get the 5 recent message
         List<Map<String, String>> history = messageRepository
