@@ -12,8 +12,7 @@ class LLMService:
         )
 
     def get_answer(self, context: str, query: str, history: list = None):
-        # 1. Khởi tạo danh sách tin nhắn với System Prompt (Luôn ở đầu)
-        # Đảm bảo CHAT_PROMPT_TEMPLATE trong constants.py có biến {context}
+        # 1. Khởi tạo danh sách tin nhắn với System Prompt 
         messages = [
             SystemMessage(content=CHAT_PROMPT_TEMPLATE.format(context=context))
         ]
@@ -21,7 +20,7 @@ class LLMService:
         # 2. Thêm lịch sử hội thoại vào giữa (nếu có)
         if history:
             for msg in history:
-                if msg.get("role") == "user": # Dùng .get để tránh lỗi Key
+                if msg.get("role") == "user": 
                     messages.append(HumanMessage(content=msg["content"]))
                 elif msg.get("role") == "assistant" or msg.get("role") == "ai":
                     messages.append(AIMessage(content=msg["content"]))

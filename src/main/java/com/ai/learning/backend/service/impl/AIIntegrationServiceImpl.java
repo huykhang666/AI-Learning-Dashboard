@@ -31,7 +31,7 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
     WebClient aiWebClient;
     SessionRepository sessionRepository;
     ProcessJobRepository processJobRepository;
-    AIResultRepository aiResultRepository;
+    AIResultServiceImpl aiResultService;
 
     //Process video using AI and save analysis results
     @Override
@@ -75,7 +75,7 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
 
 
             if (response != null && "success".equals(response.getStatus())) {
-                saveAiResult(session, response);
+                aiResultService.saveResult(response,session);
                 updateJobStatus(session, job, SessionStatus.COMPLETED, "Analysis successful");
             }
         } catch (Exception e) {
@@ -84,25 +84,6 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
         }
     }
 
-    private void saveAiResult(LearningSession session, AiAnalysisResponse response) {
-        var analysis = response.getAnalysis();
-
-        String keyPointsStr = (analysis.getKey_points() != null) ? String.join("\n", analysis.getKey_points()) : "";
-        String keywordsStr = "";
-        if (analysis.getKeywords() != null && !analysis.getKeywords().isEmpty()) {
-            keywordsStr = String.join(", ", analysis.getKeywords());
-        } else {
-            keywordsStr = "No Keywords";
-        }
-        AIResult aiResult = AIResult.builder()
-                .learningSession(session)
-                .transcript(response.getTranscript())
-                .summary(analysis.getSummary())
-                .keyPoints(keyPointsStr)
-                .keywords(keywordsStr)
-                .build();
-        aiResultRepository.save(aiResult);
-    }
 
     private ProcessJob getJob(LearningSession session) {
         ProcessJob job = session.getProcessJob();

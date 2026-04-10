@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MessageResponse {
     Long messageId;
+    Long sessionId;
     MessageRole role;
     String content;
     LocalDateTime createdAt;
