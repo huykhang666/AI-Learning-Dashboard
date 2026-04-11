@@ -1,0 +1,22 @@
+# Sử dụng bản Python slim để dung lượng image nhẹ (tầm 100-200MB thay vì 1GB)
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Cài đặt các thư viện hệ thống cần thiết (đặc biệt nếu Khang dùng xử lý âm thanh/video)
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy file requirements trước để tận dụng Docker Cache (build nhanh hơn ở những lần sau)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy toàn bộ code AI vào container
+COPY . .
+
+# FastAPI mặc định chạy port 8000
+EXPOSE 8000
+
+# Lệnh khởi chạy server (Quan trọng: dùng --host 0.0.0.0 để các container khác truy cập được)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

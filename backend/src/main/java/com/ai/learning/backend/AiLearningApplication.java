@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 public class AiLearningApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AiLearningApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AiLearningApplication.class, args);
+    }
 
 }

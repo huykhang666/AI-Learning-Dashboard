@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/ai_learning_dashboard}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+jwt:
+  signerKey: ${JWT_SIGNER_KEY:3af58fafc186e3e97a499c70732004cbac3e58ca779189091e038c8a80a179ae}
+
+ai:
+  service:
+    url: ${AI_SERVICE_URL:http://ai-service:8000}
+
+app:
+  oauth2:
+    authorizedRedirectUri: ${OAUTH2_REDIRECT_URI:http://localhost/oauth2/redirect}

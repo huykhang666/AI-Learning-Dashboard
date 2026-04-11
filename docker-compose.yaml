@@ -1,7 +1,18 @@
+version: '3.8'
+
+networks:
+  ai-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
 services:
   db:
-    image: mirror.gcr.io/library/postgres:15-alpine
-    container_name: ai_learning_dashboard
+    image: postgres:15-alpine
+    container_name: ai-db
+    networks:
+      - ai-network
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
@@ -10,6 +21,58 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d ai_learning_dashboard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-volumes:
-  postgres_data:
+  ai-service:
+    build: ./ai-service
+    container_name: ai-fastapi
+    networks:
+      - ai-network
+    volumes:
+      - ./ai-service/storage:/app/storage
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: ai-backend
+    networks:
+      - ai-network
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ai_learning_dashboard
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      AI_SERVICE_URL: http://ai-service:8000
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: "http://localhost:8080/api/v1"
+    container_name: ai-frontend
+    networks:
+      - ai-network
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
