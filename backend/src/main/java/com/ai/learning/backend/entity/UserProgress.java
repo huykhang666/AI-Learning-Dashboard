@@ -30,13 +30,13 @@ public class UserProgress {
     private Double completionRate;
     private Long timeSpent;
     private boolean isCompleted;
-    private LocalDateTime lassAccess;
+    private LocalDateTime lastAccess;
 
     private Integer lastWatchedSecond;
 
     @PreUpdate
     @PrePersist
     public void updateTimestamp() {
-        this.lassAccess = LocalDateTime.now();
+        this.lastAccess = LocalDateTime.now();
     }
 }

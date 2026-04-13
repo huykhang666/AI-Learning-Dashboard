@@ -8,7 +8,7 @@
 		<version>3.3.5</version> <relativePath/>
 	</parent>
 	<groupId>com.ai.learning</groupId>
-	<artifactId>backend</artifactId>
+	<artifactId>AI-Learning-Dashboard</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>backend</name>
 	<description>Demo project for Spring Boot</description>

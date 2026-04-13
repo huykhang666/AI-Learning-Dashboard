@@ -12,4 +12,6 @@ public class TopKeywordResponse {
     String keyword;
     Integer searchCount;
     Double relevanceScore;
+    Long sessionId;
 }
+
