@@ -19,6 +19,7 @@ import HistoryPage from "./pages/history/History";
 import PremiumPage from "./pages/Premium/Premium";
 import SettingPage from "./pages/Setting/Setting";
 import AnalyticsPage from "./pages/analytics/Analytics";
+import HelpCenter from "./pages/HelpCenter/HelpCenter";
 
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -43,6 +44,7 @@ function AppLayout({ onLogout }) {
             <Route path="courses" element={<MyCourses />} />
             <Route path="settings" element={<SettingPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="help" element={<HelpCenter />} />
             <Route path="*" element={<Navigate to="dash" />} />
           </Routes>
         </main>
