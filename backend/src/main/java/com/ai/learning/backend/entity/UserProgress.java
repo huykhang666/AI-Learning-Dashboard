@@ -29,9 +29,8 @@ public class UserProgress {
 
     private Double completionRate;
     private Long timeSpent;
-    private boolean isCompleted;
+    private boolean completed;
     private LocalDateTime lastAccess;
-
     private Integer lastWatchedSecond;
 
     @PreUpdate

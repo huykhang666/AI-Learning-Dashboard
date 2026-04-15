@@ -2,6 +2,7 @@ package com.ai.learning.backend.service.impl;
 
 import com.ai.learning.backend.dto.request.UserProgressRequest;
 import com.ai.learning.backend.dto.response.UserProgressResponse;
+import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.entity.UserProgress;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
@@ -27,7 +28,12 @@ public class UserProgressServiceImpl implements UserProgressService {
 
     @Override
     @Transactional
-    public UserProgressResponse updateProgress(Long userId, UserProgressRequest request) {
+    public UserProgressResponse updateProgress(String username, UserProgressRequest request) {
+        //Lấy id từ username
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        Long userId = user.getUserId();
         // Tìm bản ghi cũ, nếu không có thì khởi tạo một đối tượng mới hoàn toàn
         UserProgress progress = repository.findByUser_UserIdAndSession_LearningSessionId(userId,request.getSessionId())
                 .orElseGet(() -> {

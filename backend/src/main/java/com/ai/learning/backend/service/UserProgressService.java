@@ -4,6 +4,6 @@ import com.ai.learning.backend.dto.request.UserProgressRequest;
 import com.ai.learning.backend.dto.response.UserProgressResponse;
 
 public interface UserProgressService {
-    UserProgressResponse updateProgress(Long userId,UserProgressRequest request);
+    UserProgressResponse updateProgress(String username,UserProgressRequest request);
 
 }

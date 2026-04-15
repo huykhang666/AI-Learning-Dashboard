@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +24,9 @@ public class UserProgressController {
 
     @PostMapping("/update")
     public ApiResponse<UserProgressResponse> updateProgress(@RequestBody UserProgressRequest request) {
-        Long currentUserId = 1L;
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        UserProgressResponse response = progressService.updateProgress(currentUserId, request);
+        UserProgressResponse response = progressService.updateProgress(currentUsername, request);
         return ApiResponse.<UserProgressResponse>builder()
                 .code(1000)
                 .result(response)

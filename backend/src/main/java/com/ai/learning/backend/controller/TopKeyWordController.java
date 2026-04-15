@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,10 +32,9 @@ public class TopKeyWordController {
 
     @GetMapping("/top-trending")
     public ApiResponse<List<TopKeywordResponse>> getTopTrending() {
-        Long currentUserId = 1L;
-
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return ApiResponse.<List<TopKeywordResponse>>builder()
-                .result(topKeywordService.getTopKeywords(currentUserId))
+                .result(topKeywordService.getTopKeywords(username))
                 .build();
     }
 }

@@ -7,5 +7,5 @@ import java.util.List;
 public interface TopKeywordService {
     void processAIKeywords(Long userId, Long sessionId, List<String> extractedKeywords);
     List<TopKeywordResponse> getKeywordsBySession(Long sessionId);
-    List<TopKeywordResponse> getTopKeywords(Long userId);
+    List<TopKeywordResponse> getTopKeywords(String username);
 }
