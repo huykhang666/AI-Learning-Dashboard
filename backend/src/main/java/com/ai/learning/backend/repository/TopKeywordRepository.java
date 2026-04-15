@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface TopKeywordRepository extends JpaRepository<TopKeyword,Long> {
     Optional<TopKeyword> findByUserAndSessionAndKeyword(User user, LearningSession session, String Keyword);
     List<TopKeyword> findBySession_LearningSessionId(Long sessionId);
-    List<TopKeyword> findTop10ByUserOrderBySearchCountDesc(User user);
+    List<TopKeyword> findTop10ByUserOrderBySearchCountDesc(Optional<User> user);
 }
