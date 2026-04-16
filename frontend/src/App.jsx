@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 
@@ -24,15 +25,19 @@ import CourseDetail from "./pages/CourseDetail/CourseDetail";
 
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const hideSidebar = location.pathname === "/app/course-detail";
 
   return (
     // overflow-hidden để chặn sidebar mobile tràn ngang
     <div className="flex h-screen overflow-hidden bg-slate-50">
-      <Sidebar
-        onLogout={onLogout}
-        mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
-      />
+      {!hideSidebar && (
+        <Sidebar
+          onLogout={onLogout}
+          mobileOpen={mobileOpen}
+          onMobileClose={() => setMobileOpen(false)}
+        />
+      )}
 
       {/* Cột phải: header + content, scroll dọc bình thường */}
       <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">

@@ -3,11 +3,13 @@ import {
   ArrowLeft, FileText, ChevronLeft, ChevronRight, 
   PlayCircle, Zap, X, Send 
 } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
 const CourseDetail = () => {
   const [leftTab, setLeftTab] = useState('Bóc băng');
   const [midTab, setMidTab] = useState('TRANSCRIPT');
   const [chatInput, setChatInput] = useState('');
+  const navigate = useNavigate();
 
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
@@ -15,7 +17,9 @@ const CourseDetail = () => {
       {/* HEADER */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors">
             <ArrowLeft size={18} />
             <span className="font-medium text-sm">Back</span>
           </button>
