@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import UploadWidget from '../../components/common/UpLoadWidget';
 import CourseCard from '../../components/common/CourseCard';
 import { fetchDashboardData } from '../../api/dashboardApi';
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,7 +56,7 @@ export default function DashboardPage() {
           <div className="flex-1">
             <UploadWidget
               hideHeader={true}
-              onProcessAction={() => alert("Gửi link lên Backend xử lý!")}
+              onProcessAction={() => navigate('/app/course-detail')}
             />
           </div>
         </div>
