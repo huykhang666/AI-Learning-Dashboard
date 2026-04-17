@@ -25,6 +25,6 @@ public class AiAnalysisResponse {
         @JsonProperty("key_points")
         List<String> key_points;
         @JsonProperty("keywords")
-        private List<String> keywords;
+        List<String> keywords;
     }
 }

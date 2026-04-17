@@ -10,6 +10,7 @@ import com.ai.learning.backend.repository.AIResultRepository;
 import com.ai.learning.backend.repository.ProcessJobRepository;
 import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.service.AIIntegrationService;
+import com.ai.learning.backend.service.TopKeywordService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
     SessionRepository sessionRepository;
     ProcessJobRepository processJobRepository;
     AIResultServiceImpl aiResultService;
+    TopKeywordService topKeywordService;
 
     //Process video using AI and save analysis results
     @Override
@@ -76,6 +78,10 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
 
             if (response != null && "success".equals(response.getStatus())) {
                 aiResultService.saveResult(response,session);
+                String username = session.getUser().getUsername();
+                if (response.getAnalysis().getKeywords() != null && !response.getAnalysis().getKeywords().isEmpty()) {
+                    topKeywordService.processAIKeywords(username, sessionId, response.getAnalysis().getKeywords());
+                }
                 updateJobStatus(session, job, SessionStatus.COMPLETED, "Analysis successful");
             }
         } catch (Exception e) {

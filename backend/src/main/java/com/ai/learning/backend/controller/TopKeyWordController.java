@@ -26,6 +26,7 @@ public class TopKeyWordController {
     @GetMapping("/session/{sessionId}")
     public ApiResponse<List<TopKeywordResponse>> getKeywordsBySession(@PathVariable Long sessionId) {
         return ApiResponse.<List<TopKeywordResponse>>builder()
+                .code(1000)
                 .result(topKeywordService.getKeywordsBySession(sessionId))
                 .build();
     }
@@ -34,6 +35,7 @@ public class TopKeyWordController {
     public ApiResponse<List<TopKeywordResponse>> getTopTrending() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return ApiResponse.<List<TopKeywordResponse>>builder()
+                .code(1000)
                 .result(topKeywordService.getTopKeywords(username))
                 .build();
     }
