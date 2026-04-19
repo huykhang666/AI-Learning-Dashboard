@@ -50,16 +50,12 @@ public class User {
     @Column(name = "role_name")
     private Set<String> roles;
 
-    //Phân loại tài khoản
     private boolean isPremium = false;
 
-    // Số video đã xử lý trong ngày hôm nay
     private int dailyUploadCount = 0;
 
-    // Ngày cuối cùng thực hiện upload (để biết khi nào cần reset dailyUploadCount về 0)
     private LocalDate lastUploadDate = LocalDate.now();
 
-    //Mã khách hàng trên hệ thống thanh toán nếu cần
     private String paymentCustomerId;
 
     @Column(name = "provider")
@@ -75,7 +71,8 @@ public class User {
     @Column(nullable = false, length = 20)
     private UserRole role;
 
-
+    @Column(name = "weekly_goal")
+    Integer weeklyGoal = 10;
 
     //Get time the automatically
     @PrePersist
