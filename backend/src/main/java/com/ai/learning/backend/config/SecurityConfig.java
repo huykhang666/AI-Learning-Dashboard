@@ -45,7 +45,7 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/users/**",
-            "api/v1/auth/**",
+            "/api/v1/auth/**",
             "/oauth2/**",
             "/login/oauth2/**",
             "/v3/api-docs/**",
@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/jobs/update-progress/**").permitAll()
+                        .requestMatchers("/api/v1/analytics/**").permitAll()
                         .requestMatchers("/api/v1/progress/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRole.ADMIN.name())
                         .requestMatchers("/api/messages/**").hasRole("USER")

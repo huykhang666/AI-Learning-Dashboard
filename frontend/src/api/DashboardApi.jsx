@@ -1,71 +1,43 @@
-// 1. Dữ liệu giả lập (Mock Data) đóng vai trò như Database của Backend
-const mockApiResponse = {
-    user: {
-      fullName: "Nguyễn Huy Khang",
-    },
-    overview: {
-      totalStudyTime: "1h 23m",
-      lecturesDone: 27,
-      goalProgress: 60
-    },
-    weeklyActivity: [
-      { day: 'Mo', hours: 1, active: false },
-      { day: 'Tu', hours: 1.5, active: false },
-      { day: 'We', hours: 0.5, active: false },
-      { day: 'Th', hours: 2, active: false },
-      { day: 'Fr', hours: 3, active: false },
-      { day: 'Sa', hours: 4.5, active: true },
-      { day: 'Su', hours: 1.2, active: false },
-    ],
-    topKeywords: [
-      "#Algorithms", "#GraphTheory", "#Dictions", "#GraphTheory"
-    ],
-    recentCourses: [
-      {
-        id: 1,
-        title: "Discrete Math - Complete Course",
-        lessons: 13,
-        progress: 75,
-        iconColor: "bg-[#3b82f6]",
-        iconText: "1234"
-      },
-      {
-        id: 2,
-        title: "AI Fundamental",
-        lessons: 5,
-        progress: 75,
-        iconColor: "bg-[#e9d5ff]", // purple-100 equivalent
-        iconText: "🤖"
-      },
-      {
-        id: 3,
-        title: "Discrete Math - Fundamental",
-        lessons: 10,
-        progress: 60,
-        iconColor: "bg-[#e2e8f0]", // slate-200 equivalent
-        iconText: "📐"
-      }
-    ]
-  };
-  
-  // 2. Hàm gọi API
-  export const fetchDashboardData = async () => {
-      // Giả lập thời gian chờ của mạng (0.5 giây)
-      return new Promise((resolve) => {
-          setTimeout(() => {
-              resolve(mockApiResponse);
-          }, 500);
-      });
-  
-      // --- HƯỚNG DẪN SAU NÀY KHI CÓ BACKEND ---
-      // Khi có API thật, bạn xóa hàm Promise ở trên và dùng đoạn code dưới đây:
-      /*
-      try {
-          const response = await axios.get('https://your-domain.com/api/dashboard');
-          return response.data;
-      } catch (error) {
-          console.error("Lỗi lấy dữ liệu Dashboard:", error);
-          throw error;
-      }
-      */
-  };
+import axios from 'axios';
+
+const BASE_URL = 'http://localhost:8080/api/v1';
+
+export const fetchDashboardData = async () => {
+    try {
+        const token = localStorage.getItem('token'); 
+        console.log("🚀 Đang gọi API với Token:", token);
+
+        const response = await axios.get(`${BASE_URL}/analytics/dashboard`, {
+            headers: {
+                Authorization: `Bearer ${token}` 
+            }
+        });
+
+        console.log("✅ Dữ liệu thật từ Java:", response.data);
+        const res = response.data.result;
+
+        const hours = Math.floor(res.totalHours || 0);
+        const minutes = Math.round(((res.totalHours || 0) - hours) * 60);
+        
+        return {
+            user: { 
+                fullName: res.fullname || res.fullName || "User" 
+            }, 
+            overview: {
+                totalStudyTime: `${hours}h ${minutes}m`,
+                lecturesDone: res.totalLectures || 0,
+                goalProgress: Math.min(Math.round(((res.totalHours || 0) / (res.weekGoal || 10)) * 100), 100)
+            },
+            weeklyActivity: (res.weeklyProgress || []).map(p => ({
+                day: p.day ? p.day.substring(0, 2) : "??", 
+                hours: p.hours || 0,
+                active: p.day === new Date().toLocaleDateString('en-US', { weekday: 'short' })
+            })),
+            topKeywords: res.topKeywords || [],
+            recentCourses: [] 
+        };
+    } catch (error) {
+        console.error("❌ Lỗi API thật:", error.response?.status, error.message);
+        throw error;
+    }
+};

@@ -33,7 +33,10 @@ export default function DashboardPage() {
     );
   }
 
-  const maxHours = Math.max(...data.weeklyActivity.map((item) => item.hours));
+  const maxHours = Math.max(...data.weeklyActivity.map((item) => item.hours), 1);
+  console.log("Dữ liệu tuần:", data.weeklyActivity);
+  console.log("Max Hours hiện tại:", maxHours);
+
 
   return (
     /* FIX: p-4 trên mobile → sm:p-6 → lg:p-8, tránh padding quá lớn trên màn nhỏ */
@@ -117,15 +120,29 @@ export default function DashboardPage() {
               <div className="overflow-x-auto">
                 <div className="flex items-end justify-between h-32 gap-1.5 mt-auto min-w-[200px]">
                   {data.weeklyActivity.map((item, index) => {
+                    // 1. Tính % chiều cao dựa trên maxHours (10h)
                     const heightPercent = (item.hours / maxHours) * 100;
+
                     return (
-                      <div key={index} className="flex flex-col items-center flex-1 gap-2 group">
-                        <div className="w-full bg-gray-50 rounded-t-sm flex items-end justify-center h-full group-hover:bg-gray-100 transition-colors">
+                      <div key={index} className="flex flex-col items-center flex-1 gap-2 group h-full">
+                        <div className="w-full bg-gray-50 rounded-t-sm flex items-end justify-center h-32 group-hover:bg-gray-100 transition-colors relative">
+
                           <div
-                            className={`w-full rounded-t-sm transition-all duration-700 ease-out ${item.active ? "bg-blue-600" : "bg-blue-200 group-hover:bg-blue-300"}`}
-                            style={{ height: `${heightPercent}%` }}
+                            className={`w-full rounded-t-sm transition-all duration-700 ease-out ${item.active
+                                ? "bg-blue-700 shadow-lg" 
+                                : "bg-blue-400 group-hover:bg-blue-500" 
+                              }`}
+                            style={{
+                              height: `${heightPercent}%`,
+                              minHeight: item.hours > 0 ? '2px' : '0px'
+                            }}
                           />
+
+                          <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                            {item.hours}h
+                          </div>
                         </div>
+
                         <span className="text-[10px] text-gray-400 font-medium">{item.day}</span>
                       </div>
                     );

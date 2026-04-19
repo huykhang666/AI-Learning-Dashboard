@@ -26,9 +26,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class AnalyticsServiceImpl implements AnalyticsService {
     UserRepository userRepository;
-    AnalyticsMapper analyticsMapper;
     SessionRepository sessionRepository;
     TopKeywordRepository keywordRepository;
+
 
     @Override
     public AnalyticsResponse getDashBoardStats() {
@@ -63,13 +63,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 ))
                 .toList();
 
-
+        String fullname = user.getFirstName() + " " + user.getLastName();
         return AnalyticsResponse.builder()
                 .weekGoal(user.getWeeklyGoal() != null ? user.getWeeklyGoal() : 10)
                 .totalHours(totalHours)
                 .totalLectures(totalLectures)
                 .weeklyProgress(weeklyProgress)
                 .topKeywords(keywords)
+                .fullname(fullname)
                 .build();
     }
 }
