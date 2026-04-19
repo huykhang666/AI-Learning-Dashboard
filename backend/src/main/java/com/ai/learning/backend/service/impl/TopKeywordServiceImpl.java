@@ -65,7 +65,7 @@ public class TopKeywordServiceImpl implements TopKeywordService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return topKeywordRepository.findTop10ByUserOrderBySearchCountDesc(Optional.of(user))
+        return topKeywordRepository.findTop5ByUser(user.getUserId())
                 .stream()
                 .map(topKeywordMapper::toResponse)
                 .toList();
