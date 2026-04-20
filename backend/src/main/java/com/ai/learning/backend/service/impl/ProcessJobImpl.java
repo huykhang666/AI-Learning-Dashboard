@@ -45,11 +45,12 @@ public class ProcessJobImpl implements ProcessJobService {
                 .status(SessionStatus.PENDING)
                 .fileMetadata(fileMetadata)
                 .learningSession(session)
+                .progress(0)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        processJobRepository.save(job);
-        selfProvider.startProcessAsync(job.getProcessJobId());
+        ProcessJob savedJob = processJobRepository.saveAndFlush(job);
+        selfProvider.startProcessAsync(savedJob.getProcessJobId());
     }
 
     //Run AI analysis and save result async
@@ -57,31 +58,40 @@ public class ProcessJobImpl implements ProcessJobService {
     @Async("taskExecutor")
     @Transactional
     public void startProcessAsync(Long jobId) {
+        try {
+            Thread.sleep(500);
 
-        ProcessJob job = processJobRepository.findById(jobId)
-                .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
+            ProcessJob job = processJobRepository.findById(jobId)
+                    .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
 
-        if (job.getLearningSession() == null) {
-            return;
+            if (job.getLearningSession() == null) {
+                log.error("Job ID {} has no associated learning session!", jobId);
+                return;
+            }
+
+            aiIntegrationService.processAndSaveAnalysis(
+                    job.getFileMetadata() != null ? job.getFileMetadata().getFileUrl() : null,
+                    job.getLearningSession().getVideoUrl(),
+                    job.getLearningSession().getLearningSessionId()
+            );
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Async process interrupted", e);
+        } catch (Exception e) {
+            log.error("Lỗi khi xử lý Async Job ID {}: {}", jobId, e.getMessage());
         }
-
-        // Gọi sang AIIntegrationService để xử lý tập trung ở một chỗ
-        aiIntegrationService.processAndSaveAnalysis(
-                job.getFileMetadata() != null ? job.getFileMetadata().getFileUrl() : null,
-                job.getLearningSession().getVideoUrl(),
-                job.getLearningSession().getLearningSessionId()
-        );
     }
 
     //Get job status by session ID
     @Override
-    public ProcessJobResponse getJobStatus(Long SessionId) {
-        return processJobRepository.findByFileMetadata_FileMetadataId(SessionId)
+    public ProcessJobResponse getJobStatus(Long sessionId) {
+        return processJobRepository.findByLearningSession_LearningSessionId(sessionId)
                 .map(job -> ProcessJobResponse.builder()
                         .processJobId(job.getProcessJobId())
                         .status(job.getStatus().name())
+                        .progress(job.getProgress())
                         .updateAt(job.getUpdatedAt())
-                        .errorMessage(job.getStatus() == SessionStatus.COMPLETED ? "Complete Video" : job.getErrorMessage())
                         .build())
                 .orElseThrow(() -> new AppException(ErrorCode.JOB_NOT_FOUND));
     }
@@ -97,6 +107,7 @@ public class ProcessJobImpl implements ProcessJobService {
     @Transactional
     public void updateProgress(Long jobId, int value) {
         processJobRepository.updateProgressOnly(jobId, value);
+        log.info("Job ID: {} updated progress to {}%", jobId, value);
     }
 
 }

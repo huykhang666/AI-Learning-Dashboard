@@ -1,0 +1,10 @@
+[Frontend: React + Tailwind]
+        │
+        ▼
+[Backend: Spring Boot API] ──► [Database: PostgreSQL/MySQL]
+        │
+        ├─► [AI Service: Python FastAPI / NodeJS]  ←→  [Gemini / OpenAI API]
+        │
+        └─► [Storage: Supabase / Firebase / Local File]
+
+Thêma async
