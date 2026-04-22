@@ -17,4 +17,5 @@ public class SessionDetailResponse {
     String summary;
     String keyPoints;
     SessionStatus status;
+    String summaryJson;
 }

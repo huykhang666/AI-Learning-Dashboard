@@ -18,4 +18,6 @@ public class AIResultResponse {
     List<String> keyPoints;
     @JsonProperty("keywords")
     List<String> keywords;
+    @JsonProperty("summary_json")
+    String summaryJson;
 }

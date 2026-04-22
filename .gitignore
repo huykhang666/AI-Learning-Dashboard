@@ -37,7 +37,5 @@ ai-service/venv/
 ai-service/__pycache__/
 ai-service/.env
 ai-service/ffmpeg.exe
+ai-service/storage/
 
-# .gitignore
-target/
-**/target/

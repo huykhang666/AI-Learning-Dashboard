@@ -27,6 +27,9 @@ public class AIResult {
 
     @Column(columnDefinition = "TEXT")
     private String keywords;
+
+    @Column(columnDefinition = "TEXT")
+    private String summaryJson;
     // One-to-one relationship with LearningSession.
     // Each record is associated with exactly one session.
     // LAZY fetch to avoid unnecessary join queries.

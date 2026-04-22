@@ -44,6 +44,7 @@ public class AIResultServiceImpl implements AIResultService {
                 .summary(response.getAnalysis().getSummary())
                 .keyPoints(keyPoints)
                 .keywords(keywords)
+                .summaryJson(analysis != null ? analysis.getSummary_json() : null)
                 .learningSession(session)
                 .build();
 
