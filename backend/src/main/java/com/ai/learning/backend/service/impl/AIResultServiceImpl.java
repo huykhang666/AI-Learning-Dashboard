@@ -44,7 +44,7 @@ public class AIResultServiceImpl implements AIResultService {
                 .summary(response.getAnalysis().getSummary())
                 .keyPoints(keyPoints)
                 .keywords(keywords)
-                .summaryJson(analysis != null ? analysis.getSummary_json() : null)
+                .summaryJson(analysis != null ? analysis.getSummaryJson() : null)
                 .learningSession(session)
                 .build();
 
@@ -61,13 +61,13 @@ public class AIResultServiceImpl implements AIResultService {
         return AIResultResponse.builder()
                 .transcript(aiResult.getTranscript())
                 .summary(aiResult.getSummary())
-
                 .keyPoints(aiResult.getKeyPoints() != null
                         ? Arrays.asList(aiResult.getKeyPoints().split("\n"))
                         : Collections.emptyList())
                 .keywords(aiResult.getKeywords() != null
                         ? Arrays.asList(aiResult.getKeywords().split(", "))
                         : Collections.emptyList())
+                .summaryJson(aiResult.getSummaryJson())
                 .build();
     }
 

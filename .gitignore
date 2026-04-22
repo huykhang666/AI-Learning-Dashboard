@@ -39,3 +39,10 @@ ai-service/.env
 ai-service/ffmpeg.exe
 ai-service/storage/
 
+.venv/
+venv/
+ai-service/.venv/
+
+__pycache__/
+**/__pycache__/
+*.pyc

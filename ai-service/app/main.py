@@ -33,11 +33,10 @@ app.include_router(chat_router.router)
 async def root():
     return {
         "status": "Online",
-        "message": "AI Service đang vít ga cực mạnh!",
+        "message": "AI Service đang chạy!",
         "docs": "/docs"
     }
 
 if __name__ == "__main__":
     import uvicorn
-    # Khang nhớ chạy file này từ folder ai-service nhé
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
