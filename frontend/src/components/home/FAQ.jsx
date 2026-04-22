@@ -29,7 +29,7 @@ function FAQ() {
     }
     ]
   return (
-    <section id="faq" className="bg-white py-20">
+    <section id="FAQ" className="bg-white py-20">
       <div className="max-w-3xl mx-auto px-4">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-700 to-cyan-500 bg-clip-text text-transparent font-medium text-2xl mb-4"> FAQ</div>

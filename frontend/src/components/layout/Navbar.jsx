@@ -7,8 +7,8 @@ function Navbar({ onLogin, onRegister }) {
     { label: " TRANG CHỦ", href: "#HeroSection"},
     { label: " TÍNH NĂNG", href: "#Feature" },
     { label: " BẢNG GIÁ", href: "#Pricing" },
-    { label: " VỀ CHÚNG TÔI", href: "#About" },
-    { label: " FAQ", href: "#" },
+    { label: " VỀ CHÚNG TÔI", href: "#About" }, 
+    { label: " FAQ", href: "#FAQ" },
   ];
 
   return (
