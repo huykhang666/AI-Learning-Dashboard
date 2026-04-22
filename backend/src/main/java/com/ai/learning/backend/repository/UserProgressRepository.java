@@ -1,5 +1,6 @@
 package com.ai.learning.backend.repository;
 
+import com.ai.learning.backend.entity.LearningSession;
 import com.ai.learning.backend.entity.UserProgress;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,5 @@ import java.util.Optional;
 public interface UserProgressRepository extends JpaRepository<UserProgress,Long> {
     Optional<UserProgress> findByUser_UserIdAndSession_LearningSessionId(Long userId, Long sessionId);
     List<UserProgress> findByUser_UserIdAndCompletedTrue(Long userId);
+    Optional<UserProgress> findBySession(LearningSession session);
 }
