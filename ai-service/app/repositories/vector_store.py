@@ -25,7 +25,7 @@ class VectorStoreRepository:
         
         # Nếu chưa có dữ liệu cho bài học này thì trả về list rỗng
         if not os.path.exists(persist_dir):
-            print(f"⚠️ Cảnh báo: Không tìm thấy folder lưu trữ tại {persist_dir}")
+            print(f"Cảnh báo: Không tìm thấy folder lưu trữ tại {persist_dir}")
             return []
 
         # Load DB lên để search kiến thức

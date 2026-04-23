@@ -2,27 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import UploadWidget from '../../components/common/UpLoadWidget';
 import CourseCard from '../../components/common/CourseCard';
-import { fetchDashboardData } from '../../api/dashboardApi';
-
+import { dashboardApi } from '../../api/DashboardApi';
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        const result = await fetchDashboardData();
-        setData(result);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu Dashboard:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadData();
-  }, []);
+
+useEffect(() => {
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      
+      const result = await dashboardApi.getAnalytics();
+      
+      setData(result);
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu Dashboard:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  loadData();
+}, []);
 
   if (isLoading || !data) {
     return (
