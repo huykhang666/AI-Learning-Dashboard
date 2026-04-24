@@ -1,15 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import LoadingScreen from '../../components/common/LoadingScreen';
 import { 
   ArrowLeft, FileText, ChevronLeft, ChevronRight, 
   PlayCircle, Zap, X, Send 
 } from 'lucide-react';
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
 const CourseDetail = () => {
+  const { id } = useParams(); 
+  const navigate = useNavigate();
+  
+  // Quản lý trạng thái chờ tải trang
+  const [loading, setLoading] = useState(true);
+  const [courseData, setCourseData] = useState(null);
   const [leftTab, setLeftTab] = useState('Bóc băng');
   const [midTab, setMidTab] = useState('TRANSCRIPT');
   const [chatInput, setChatInput] = useState('');
-  const navigate = useNavigate();
+
+  // [NEW] Hiệu ứng giả lập việc fetch dữ liệu từ Backend theo ID
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+          setCourseData({ title: "Discrete Math — Lecture 5", duration: "45:00" });
+        }, 300);
+      } catch (error) {
+        setLoading(false);
+      }
+    };
+    fetchDetail();
+  }, [id]); 
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
@@ -24,7 +48,7 @@ const CourseDetail = () => {
             <span className="font-medium text-sm">Back</span>
           </button>
           <h1 className="font-bold text-lg uppercase tracking-wide">
-            DISCRETE MATH — LECTURE 5: GRAPH THEORY
+             {id}: GRAPH THEORY (LECTURE DETAIL)
           </h1>
         </div>
         
@@ -53,8 +77,7 @@ const CourseDetail = () => {
             <button className="relative z-10 p-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all transform hover:scale-110">
               <PlayCircle size={48} className="text-white opacity-80" strokeWidth={1.5} />
             </button>
-            <span className="relative z-10 text-slate-400 mt-4 text-sm font-medium">Discrete Math — Lecture 5</span>
-            
+            <span className="relative z-10 text-slate-400 mt-4 text-sm font-medium">Session ID: {id}</span>            
             {/* Video Controls (Bottom Bar) */}
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
               <div className="flex items-center justify-between text-slate-300 text-xs font-mono mb-2">

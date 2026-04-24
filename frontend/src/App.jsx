@@ -26,8 +26,7 @@ import CourseDetail from "./pages/CourseDetail/CourseDetail";
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const hideSidebar = location.pathname === "/app/course-detail";
-
+  const hideSidebar = location.pathname.includes("/history/");
   return (
     // overflow-hidden để chặn sidebar mobile tràn ngang
     <div className="flex h-screen overflow-hidden bg-slate-50">
@@ -52,6 +51,7 @@ function AppLayout({ onLogout }) {
             <Route path="settings" element={<SettingPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
+            <Route path="history/:id" element={<CourseDetail />} />
           </Routes>
         </main>
       </div>

@@ -1,8 +1,9 @@
 import { Search, Layers, CheckCircle, Clock, Calendar, ChevronRight, ChevronLeft, Loader } from 'lucide-react';
 import { dashboardApi } from '../../api/DashboardApi';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import LoadingScreen from '../../components/common/LoadingScreen';
 
-// Cuộn mượt có kiểm soát thời gian (ms), easing ease-in-out
 const smoothScrollTo = (element, to, duration) => {
   const start = element.scrollTop;
   const change = to - start;
@@ -30,8 +31,12 @@ const StudyHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const containerRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Tải toàn bộ lịch sử học tập, sắp xếp mới nhất lên đầu
+  const handleItemClick = (id) => {
+    navigate(`/app/history/${id}`);
+  };
+
   useEffect(() => {
     const loadHistory = async () => {
       try {
@@ -49,7 +54,6 @@ const StudyHistory = () => {
     loadHistory();
   }, []);
 
-  // Reset về trang 1 khi người dùng thay đổi từ khóa tìm kiếm
   useEffect(() => { setCurrentPage(1); }, [searchTerm]);
 
   const filteredData = useMemo(() => {
@@ -71,18 +75,16 @@ const StudyHistory = () => {
     { label: 'Hoàn thành', value: lectures.filter(l => l.progress >= 100).length, icon: CheckCircle, color: 'text-green-500', bgColor: 'bg-green-50' },
   ], [lectures]);
 
-  // Chuyển trang: hiển thị spinner, cuộn lên đầu, sau 500ms tắt spinner
   const handlePageChange = (newPage) => {
     if (isSwitchingPage) return;
     setIsSwitchingPage(true);
     setCurrentPage(newPage);
 
     requestAnimationFrame(() => {
-      // Leo lên cây DOM để tìm container đang thực sự scroll
       let el = containerRef.current?.parentElement;
       while (el) {
         if (el.scrollTop > 0) {
-          smoothScrollTo(el, 0, 500);
+          smoothScrollTo(el, 0, 1000);
           break;
         }
         el = el.parentElement;
@@ -92,9 +94,7 @@ const StudyHistory = () => {
     setTimeout(() => setIsSwitchingPage(false), 500);
   };
 
-  if (loading) return (
-    <div className="flex justify-center items-center min-h-screen text-slate-400">Loading...</div>
-  );
+  if (loading) return <LoadingScreen />;
 
   return (
     <div ref={containerRef} className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-slate-800">
@@ -103,7 +103,7 @@ const StudyHistory = () => {
         {/* Overlay spinner khi chuyển trang */}
         {isSwitchingPage && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/5 backdrop-blur-[1px]">
-            <Loader className="w-10 h-10 text-slate-400 animate-spin opacity-40" strokeWidth={1} />
+            <Loader className="w-8 h-8 text-slate-400 animate-spin opacity-40" strokeWidth={1} />
           </div>
         )}
 
@@ -125,7 +125,7 @@ const StudyHistory = () => {
           </div>
         </div>
 
-        {/* Thống kê tổng quan */}
+        {/* Thống kê */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {stats.map((stat, idx) => (
             <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
@@ -140,24 +140,38 @@ const StudyHistory = () => {
           ))}
         </div>
 
-        {/* Danh sách bài giảng — mờ dần khi đang chuyển trang */}
-        <div className={`space-y-4 mb-8 transition-all duration-300 ${isSwitchingPage ? 'opacity-30' : 'opacity-100'}`}>
+        {/* Danh sách bài giảng */}
+        <div className={`space-y-4 mb-8 transition-opacity duration-300 ${isSwitchingPage ? 'opacity-30' : 'opacity-100'}`}>
           {currentItems.map((item) => (
-            <div key={item.id} className="group bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+            <div
+              key={item.id}
+              onClick={() => handleItemClick(item.id)}
+              className="group bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex items-center gap-4 cursor-pointer"
+            >
               <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">
                 <Layers className={`w-6 h-6 ${item.progress >= 100 ? 'text-green-500' : 'text-slate-400'}`} />
               </div>
+
               <div className="flex-grow">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-sm">{item.title}</h3>
+                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-sm">
+                      {item.title}
+                    </h3>
                     <div className="flex items-center gap-x-4 mt-2 text-[11px] text-slate-400">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(item.createdAt).toLocaleDateString('vi-VN')}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {item.duration ? `${Math.floor(item.duration / 60)}m` : '0m'}</span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> {new Date(item.createdAt).toLocaleDateString('vi-VN')}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> {item.duration ? `${Math.floor(item.duration / 60)}m` : '0m'}
+                      </span>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-500 text-[10px] rounded-md font-medium">{item.type}</span>
+                  <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-500 text-[10px] rounded-md font-medium">
+                    {item.type}
+                  </span>
                 </div>
+
                 {/* Thanh tiến độ */}
                 <div className="mt-4 flex items-center gap-3">
                   <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
@@ -196,6 +210,7 @@ const StudyHistory = () => {
             </button>
           </div>
         )}
+
       </div>
     </div>
   );
