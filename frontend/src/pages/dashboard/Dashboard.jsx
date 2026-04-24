@@ -9,22 +9,22 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
 
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      
-      const result = await dashboardApi.getAnalytics();
-      
-      setData(result);
-    } catch (error) {
-      console.error("Lỗi khi tải dữ liệu Dashboard:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  loadData();
-}, []);
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+
+        const result = await dashboardApi.getAnalytics();
+
+        setData(result);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu Dashboard:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   if (isLoading || !data) {
     return (
@@ -61,7 +61,7 @@ useEffect(() => {
           <div className="flex-1">
             <UploadWidget
               hideHeader={true}
-              onProcessAction={() => navigate('/app/course-detail')}
+              onProcessAction={(sessionId) => navigate(`/app/history/${sessionId}`)}
             />
           </div>
         </div>
@@ -131,8 +131,8 @@ useEffect(() => {
 
                           <div
                             className={`w-full rounded-t-sm transition-all duration-700 ease-out ${item.active
-                                ? "bg-blue-700 shadow-lg" 
-                                : "bg-blue-400 group-hover:bg-blue-500" 
+                              ? "bg-blue-700 shadow-lg"
+                              : "bg-blue-400 group-hover:bg-blue-500"
                               }`}
                             style={{
                               height: `${heightPercent}%`,

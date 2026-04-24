@@ -26,31 +26,47 @@ import CourseDetail from "./pages/CourseDetail/CourseDetail";
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const hideSidebar = location.pathname.includes("/history/");
-  return (
-    // overflow-hidden để chặn sidebar mobile tràn ngang
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      {!hideSidebar && (
-        <Sidebar
-          onLogout={onLogout}
-          mobileOpen={mobileOpen}
-          onMobileClose={() => setMobileOpen(false)}
-        />
-      )}
+  
+  // Kiểm tra chính xác xem có phải đang ở trang chi tiết không
+  // Dùng regex để đảm bảo đúng định dạng /app/history/123
+  const isCourseDetail = location.pathname.includes("/history/") && location.pathname.split("/").length > 3;
 
-      {/* Cột phải: header + content, scroll dọc bình thường */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-y-auto">
+  // Nếu là trang chi tiết, render một layout đơn giản nhất (không Sidebar, không Header chung)
+  if (isCourseDetail) {
+    return (
+      <div className="h-screen w-full overflow-hidden bg-white">
+        <main className="h-full w-full">
+          <Routes>
+            <Route path="history/:id" element={<CourseDetail />} />
+          </Routes>
+        </main>
+      </div>
+    );
+  }
+
+  // Ngược lại, render Layout Dashboard bình thường có Sidebar và Header
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-50">
+      <Sidebar
+        onLogout={onLogout}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
+
+      <div className="flex flex-col flex-1 min-w-0">
         <Header onMenuOpen={() => setMobileOpen(true)} />
-        <main className="flex-1">
+        
+        {/* Khu vực nội dung có scroll dọc cho Dashboard, History... */}
+        <main className="flex-1 overflow-y-auto">
           <Routes>
             <Route path="dash" element={<DashboardPage />} />
-            <Route path="course-detail" element={<CourseDetail />} />
             <Route path="history" element={<HistoryPage />} />
             <Route path="premium" element={<PremiumPage />} />
             <Route path="courses" element={<MyCourses />} />
             <Route path="settings" element={<SettingPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
+            {/* Dự phòng để không bị lỗi nếu path có /history/:id nhưng logic trên lọt lưới */}
             <Route path="history/:id" element={<CourseDetail />} />
           </Routes>
         </main>
