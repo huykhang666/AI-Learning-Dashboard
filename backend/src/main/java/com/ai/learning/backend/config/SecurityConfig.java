@@ -70,6 +70,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/progress/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRole.ADMIN.name())
                         .requestMatchers("/api/messages/**").hasRole("USER")
+                        .requestMatchers("/api/payment/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
