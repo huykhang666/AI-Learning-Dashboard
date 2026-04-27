@@ -27,3 +27,8 @@ ai:
 app:
   dir:
     uploads: "uploads"
+vnpay:
+  tmn-code: ${VNPAY_TMN_CODE}
+  secret-key: ${VNPAY_SECRET_KEY}
+  pay-url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  return-url: "http://localhost:3000/payment/result"
