@@ -23,10 +23,9 @@ const CourseDetail = () => {
   // Ref để tính toán thời gian xem video (Progress Tracking)
   const startTimeRef = useRef(Date.now());
 
-  // Hàm xử lý tách ID từ link YouTube (hỗ trợ cả link rút gọn và link có list)
+  // Hàm xử lý tách ID từ link YouTube 
   const getYoutubeID = (url) => {
     if (!url) return null;
-    // Regex này cân hết link: watch?v=, link shorts, link mobile, link có list...
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)\??v?=?([^#&?]*)).*/;
     const match = url.match(regExp);
     return (match && match[7].length === 11) ? match[7] : null;
@@ -38,14 +37,15 @@ const CourseDetail = () => {
         setLoading(true);
         const res = await courseDetailApi.getById(id);
 
-        if (res.code === 1000) {
-          const data = res.result;
+        if (res.code === 1000 || res) {
+          const data = res.result || res;
+
           setCourseData({
             title: data.title,
             videoUrl: data.videoUrl,
-            // Tách Key Points thành mảng nếu lưu dạng chuỗi có dấu xuống dòng
+            summary: data.summary,
+
             keyPoints: data.keyPoints ? data.keyPoints.split('\n').filter(p => p.trim() !== '') : [],
-            // Parse transcript từ JSON String
             transcript: data.summaryJson ? JSON.parse(data.summaryJson) : []
           });
         }
@@ -58,7 +58,6 @@ const CourseDetail = () => {
 
     fetchDetail();
 
-    // Cleanup function: Tính toán thời gian xem khi thoát trang
     return () => {
       const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
       if (timeSpent > 5) {
@@ -72,6 +71,16 @@ const CourseDetail = () => {
 
   const videoId = getYoutubeID(courseData?.videoUrl);
 
+  const formatTime = (seconds) => {
+    if (seconds === null || seconds === undefined) return "[00:00]";
+
+    const totalSeconds = Math.floor(Number(seconds));
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+
+    return `[${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}]`;
+  };
+
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
 
@@ -79,8 +88,8 @@ const CourseDetail = () => {
       <header className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors">
-            <ArrowLeft size={18} />
-            <span className="font-medium text-sm">Quay lại</span>
+            <ArrowLeft size={18} className="text-blue-600 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium text-sm text-blue-600">Quay lại</span>
           </button>
           <h1 className="font-bold text-lg uppercase tracking-wide">
             {courseData?.title || "LECTURE DETAIL"}
@@ -127,24 +136,98 @@ const CourseDetail = () => {
           </div>
         </div>
 
-        {/* CỘT PHẢI: TRANSCRIPT*/}
-        <div className="flex-[3] min-w-[350px] flex flex-col bg-white">
-          <div className="flex items-center gap-6 px-6 pt-6 border-b border-slate-100 uppercase text-xs font-bold">
-            <button className="text-blue-600 border-b-2 border-blue-600 pb-4">Transcript</button>
-            <button className="text-slate-400 pb-4">Summary</button>
+        {/* CỘT PHẢI: TRANSCRIPT & SUMMARY */}
+        <div className="flex-[3] min-w-[350px] flex flex-col bg-white border-l border-slate-100">
+
+          {/* Tab Headers - Font Black, Tracking Tighter */}
+          <div className="flex items-center gap-8 px-8 pt-8 border-b border-slate-100">
+            <button
+              onClick={() => setMidTab('TRANSCRIPT')}
+              className={`pb-4 text-sm transition-all uppercase tracking-tighter ${midTab === 'TRANSCRIPT'
+                ? 'text-blue-600 font-black border-b-4 border-blue-600'
+                : 'text-slate-300 font-bold hover:text-slate-500'
+                }`}
+            >
+              Transcript
+            </button>
+            <button
+              onClick={() => setMidTab('SUMMARY')}
+              className={`pb-4 text-sm transition-all uppercase tracking-tighter ${midTab === 'SUMMARY'
+                ? 'text-blue-600 font-black border-b-4 border-blue-600'
+                : 'text-slate-300 font-bold hover:text-slate-500'
+                }`}
+            >
+              Summary
+            </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {courseData?.transcript?.map((item, idx) => (
-              <div key={idx} className="group cursor-pointer">
-                <span className="inline-block bg-blue-600 text-white text-[10px] font-mono font-bold px-2 py-0.5 rounded mb-1">
-                  [{item.time || '00:00'}]
-                </span>
-                <p className="text-sm text-slate-600 leading-relaxed group-hover:text-slate-900 transition-colors">
-                  {item.text || item.content}
-                </p>
+          {/* Content Area */}
+          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+
+            {midTab === 'TRANSCRIPT' ? (
+              /* --- RENDER TRANSCRIPT --- */
+              <div className="space-y-6 animate-in fade-in duration-300">
+                {courseData?.transcript?.map((item, idx) => (
+                  <div key={idx} className="group cursor-pointer p-2 rounded-xl hover:bg-blue-50/50 transition-all">
+                    <span className="inline-block bg-blue-600 text-white text-[10px] font-mono font-black px-2 py-1 rounded-md mb-2 shadow-md shadow-blue-200">
+                      {formatTime(item.time)}
+                    </span>
+                    <p className="text-[15px] text-slate-600 leading-relaxed font-medium group-hover:text-slate-900 transition-colors">
+                      {item.text || item.content}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              /* --- RENDER AI SUMMARY  --- */
+              <div className="animate-in slide-in-from-right-4 duration-300 space-y-6">
+
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1 h-4 bg-blue-600 rounded-full"></div>
+                  <h2 className="text-sm font-medium text-blue-600 tracking-tight">
+                    Executive Summary
+                  </h2>
+                </div>
+
+                <div className="relative p-8 bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden">
+                  {/* Decor icon Zap mờ ở góc */}
+                  <Zap size={60} className="absolute -bottom-2 -right-2 text-slate-50" fill="currentColor" />
+
+                  <div className="relative z-10">
+                    <ul className="space-y-4">
+                      {courseData?.summary ? (
+                        /* Logic xử lý: Tách dòng theo dấu chấm */
+                        (Array.isArray(courseData.summary) ? courseData.summary.join('. ') : courseData.summary)
+                          .split('.')
+                          .map(item => item.trim())
+                          .filter(item => item.length > 0)
+                          .map((sentence, index) => (
+                            <li key={index} className="flex items-start gap-3 group/item">
+                              {/* Dấu chấm đầu dòng nhỏ gọn, màu xanh dương nhạt */}
+                              <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 shrink-0 group-hover:bg-blue-600 transition-colors"></div>
+
+                              <p className="text-[15px] text-slate-600 leading-relaxed font-normal">
+                                {sentence}
+                              </p>
+                            </li>
+                          ))
+                      ) : (
+                        <p className="text-[15px] text-slate-400 italic">Đang cập nhật tóm tắt chuyên sâu...</p>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Footer Label */}
+                <div className="flex items-center justify-center gap-3 pt-2 opacity-20">
+                  <div className="h-[1px] flex-1 bg-slate-200"></div>
+                  <p className="text-[10px] font-medium text-slate-400 tracking-wide">
+                    AI Learning System Analysis
+                  </p>
+                  <div className="h-[1px] flex-1 bg-slate-200"></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -173,7 +256,7 @@ const CourseDetail = () => {
                     <Zap size={16} fill="currentColor" />
                   </div>
                   <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm text-sm text-slate-600 leading-relaxed">
-                    Chào Bạn! Mình đã sẵn sàng hỗ trợ bạn bóc tách bài học này 🎓
+                    Chào Bạn! Mình đã sẵn sàng hỗ trợ bạn bài học này 🎓
                   </div>
                 </div>
               </div>

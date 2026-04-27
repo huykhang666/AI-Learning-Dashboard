@@ -11,7 +11,10 @@ from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, Tran
 
 router = APIRouter(prefix="/ai", tags=["Video"])
 
-# Khởi tạo một lần ở module level để tái sử dụng, tránh tốn chi phí mỗi request
+# ---------------------------------------------------------------------------
+# Khởi tạo singleton clients ở module-level để tái sử dụng giữa các request,
+# tránh overhead khi load model / tạo kết nối mỗi lần gọi API.
+# ---------------------------------------------------------------------------
 groq_client = Groq(api_key=settings.GROQ_API_KEY)
 model_whisper = whisper.load_model(settings.WHISPER_MODEL)
 rag_service = RAGService()
@@ -23,72 +26,81 @@ _yta = YouTubeTranscriptApi()
 _PREFERRED_LANGS = ["vi", "en", "en-US"]
 
 
+# ---------------------------------------------------------------------------
+# Utility helpers
+# ---------------------------------------------------------------------------
+
 def _extract_video_id(url: str) -> str | None:
-    """Trích xuất video ID từ URL YouTube."""
+    """Trích xuất video ID (11 ký tự) từ các dạng URL YouTube phổ biến."""
     match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
     return match.group(1) if match else None
 
 
 def _format_timestamp(seconds: int) -> str:
-    """Chuyển số giây thành chuỗi [mm:ss]."""
+    """Chuyển đổi số giây thành chuỗi [mm:ss] để hiển thị trên tab Transcript."""
     m, s = divmod(seconds, 60)
     return f"[{m:02d}:{s:02d}]"
 
 
+# ---------------------------------------------------------------------------
+# Transcript extraction
+# ---------------------------------------------------------------------------
+
 def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
     """
-    Lấy transcript từ YouTube, ưu tiên tiếng Việt rồi đến tiếng Anh.
+    Lấy transcript từ video YouTube theo thứ tự ưu tiên ngôn ngữ đã định sẵn.
+
+    Returns:
+        (formatted_text, timeline_data):
+            - formatted_text: chuỗi transcript kèm nhãn thời gian [mm:ss], dùng cho RAG.
+            - timeline_data : danh sách dict {"time": int, "content": str}, gửi về Java.
+        Trả về (None, None) nếu không thể lấy transcript.
     """
     video_id = _extract_video_id(url)
     if not video_id:
         return None, None
 
     try:
-        # CỐ GẮNG LẤY DỮ LIỆU THÔ
+        # Ưu tiên fetch trực tiếp; fallback sang list() nếu ngôn ngữ không khớp
         try:
             raw_transcript = _yta.fetch(video_id, languages=_PREFERRED_LANGS)
         except Exception:
-            # Fallback nếu không tìm thấy ngôn ngữ ưu tiên
             raw_transcript = _yta.list(video_id).find_transcript(_PREFERRED_LANGS).fetch()
 
-        formatted_parts = []
-        timeline_data = []
+        formatted_parts: list[str] = []
+        timeline_data:   list[dict] = []
 
-        # DUYỆT QUA TỪNG SNIPPET
         for snippet in raw_transcript:
-            # DÙNG TRY-EXCEPT ĐỂ TỰ ĐỘNG NHẬN DIỆN OBJECT HOẶC DICT
+            # Tương thích cả dict (API mới) lẫn object (API cũ)
             try:
-                # 1. Thử dùng ngoặc vuông (Dictionary) - Thường gặp ở bản mới
-                start_sec = int(snippet['start'])
-                text_val = snippet['text']
+                start_sec = int(snippet["start"])
+                text_val  = snippet["text"]
             except (TypeError, KeyError):
-                # 2. Nếu lỗi thì dùng dấu chấm (Object)
                 start_sec = int(snippet.start)
-                text_val = snippet.text
+                text_val  = snippet.text
 
             clean_text = text_val.replace("\n", " ")
-
-            # Format cho tab Transcript [mm:ss]
             formatted_parts.append(f"{_format_timestamp(start_sec)} {clean_text}")
-            
-            # Lưu vào mảng Timeline cho Java
             timeline_data.append({"time": start_sec, "content": clean_text})
 
-        # Log ra terminal để Khang dễ nhìn khi test
-        print(f"✅ [SUCCESS] Đã trích xuất {len(timeline_data)} mốc thời gian cho video {video_id}")
-        
+        print(f"[SUCCESS] Đã trích xuất {len(timeline_data)} mốc thời gian cho video {video_id}")
         return "\n".join(formatted_parts), timeline_data
 
     except Exception as e:
-        # Nếu vào đây thì timeline_data sẽ là None -> dẫn đến null ở JSON
-        print(f"❌ Lỗi nghiêm trọng khi lấy transcript YouTube [{video_id}]: {e}")
+        print(f"[ERROR] Không thể lấy transcript cho video [{video_id}]: {e}")
         return None, None
 
 
+# ---------------------------------------------------------------------------
+# Progress reporting
+# ---------------------------------------------------------------------------
+
 async def _report_progress(job_id: int | None, percent: int) -> None:
     """
-    Gửi cập nhật tiến trình về Java backend.
-    Dùng timeout 5s để tránh treo request khi Java chậm hoặc chưa khởi động.
+    Gửi cập nhật tiến trình về Java backend qua PATCH request.
+
+    Timeout cứng 5 s để tránh treo pipeline khi Java backend phản hồi chậm.
+    Mọi lỗi đều được bắt và ghi log, không để exception lan ra ngoài.
     """
     if not job_id:
         return
@@ -100,41 +112,57 @@ async def _report_progress(job_id: int | None, percent: int) -> None:
                 params={"value": percent},
             )
     except httpx.TimeoutException:
-        print(f"⚠️ Timeout khi gọi Java progress API (job_id={job_id}, {percent}%)")
+        print(f"[WARN] Timeout khi gọi Java progress API (job_id={job_id}, {percent}%)")
     except Exception as e:
-        print(f"⚠️ Không thể cập nhật tiến trình (job_id={job_id}): {e}")
+        print(f"[WARN] Không thể cập nhật tiến trình (job_id={job_id}): {e}")
 
+
+# ---------------------------------------------------------------------------
+# Whisper transcription
+# ---------------------------------------------------------------------------
 
 def _transcribe_with_whisper(file_path: str) -> tuple[str, list]:
     """
-    Phiên âm file audio/video bằng Whisper, trả về văn bản có mốc thời gian.
+    Phiên âm file audio/video cục bộ bằng OpenAI Whisper.
+
+    Args:
+        file_path: Đường dẫn tới file tạm đã lưu trên disk.
 
     Returns:
-        (formatted_text, timeline_data)
+        (formatted_text, timeline_data) — cùng cấu trúc với get_youtube_transcript().
     """
     result = model_whisper.transcribe(file_path, fp16=False, language="vi")
 
-    formatted_parts = []
-    timeline_data = []
+    formatted_parts: list[str] = []
+    timeline_data:   list[dict] = []
 
-    # Duyệt qua từng đoạn phiên âm, lấy thời gian bắt đầu và nội dung
     for segment in result.get("segments", []):
         start_sec = int(segment["start"])
-        text = segment["text"].strip()
+        text      = segment["text"].strip()
 
-        # Format hiển thị dạng [mm:ss] cho tab Transcript
         formatted_parts.append(f"{_format_timestamp(start_sec)} {text}")
-
-        # Lưu dữ liệu timeline để gửi về Java
         timeline_data.append({"time": start_sec, "content": text})
 
     return "\n".join(formatted_parts), timeline_data
 
 
+# ---------------------------------------------------------------------------
+# AI analysis
+# ---------------------------------------------------------------------------
+
 def _analyse_transcript(transcript: str) -> dict:
     """
-    Dùng Groq LLM phân tích nội dung transcript, trả về JSON gồm
-    summary, key_points và keywords bằng tiếng Việt.
+    Gửi transcript lên Groq LLM để tổng hợp nội dung bài giảng.
+
+    Tên các field trong JSON response được giữ đúng theo convention snake_case
+    để khớp với @JsonProperty trong Java DTO (AiAnalysisResponse.AnalysisData):
+        - summary    → String
+        - key_points → List<String>
+        - keywords   → List<String>
+
+    Returns:
+        dict chứa summary, key_points, keywords.
+        Trả về dict với các giá trị mặc định nếu LLM response không hợp lệ.
     """
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
@@ -143,19 +171,44 @@ def _analyse_transcript(transcript: str) -> dict:
             {
                 "role": "system",
                 "content": (
-                    "Bạn là trợ lý học tập chuyên nghiệp. "
-                    "Phân tích nội dung bài giảng và trả về JSON với các key: "
-                    "'summary' (tóm tắt tổng quan), "
-                    "'key_points' (danh sách ý chính quan trọng), "
-                    "'keywords' (danh sách từ khóa chuyên môn). "
-                    "Tất cả giá trị phải bằng tiếng Việt."
+                    "Bạn là một chuyên gia phân tích bài giảng cao cấp.\n"
+                    "NHIỆM VỤ: Phân tích transcript và trả về kết quả dưới dạng JSON hợp lệ.\n\n"
+                    "YÊU CẦU OUTPUT (JSON):\n"
+                    "{\n"
+                    '  "summary": "Đoạn văn tóm tắt toàn bộ nội dung bài giảng...",\n'
+                    '  "key_points": ["Điểm chính 1", "Điểm chính 2", "Điểm chính 3"],\n'
+                    '  "keywords": ["từ khóa 1", "từ khóa 2", "từ khóa 3"]\n'
+                    "}\n\n"
+                    "QUY TẮC:\n"
+                    "1. Chỉ trả về JSON, không giải thích thêm.\n"
+                    "2. 'summary' là một đoạn văn 8–10 câu tóm tắt toàn bộ nội dung bài giảng.\n"
+                    "3. 'key_points' là mảng 5–7 điểm chính quan trọng nhất của bài giảng.\n"
+                    "4. 'keywords' là mảng 5–10 từ khóa chuyên môn xuất hiện trong bài.\n"
+                    "5. Viết tiếng Việt, viết hoa đầu câu.\n"
+                    "6. BẮT BUỘC trả về đúng định dạng JSON với đủ 3 field."
                 ),
             },
-            {"role": "user", "content": f"Nội dung bài học:\n{transcript}"},
+            {
+                "role": "user",
+                "content": f"Hãy phân tích transcript sau và trả về JSON:\n{transcript}",
+            },
         ],
     )
-    return json.loads(response.choices[0].message.content)
 
+    raw = response.choices[0].message.content
+
+    # Guard: đảm bảo caller luôn nhận được dict hợp lệ dù LLM trả về nội dung lỗi.
+    # key_points và keywords giữ nguyên kiểu List[str] để Java deserialize đúng kiểu.
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError) as e:
+        print(f"[WARN] Không thể parse JSON từ Groq response: {e}")
+        return {"summary": "", "key_points": [], "keywords": []}
+
+
+# ---------------------------------------------------------------------------
+# Route handler
+# ---------------------------------------------------------------------------
 
 @router.post("/process-video")
 async def process_video(
@@ -164,16 +217,24 @@ async def process_video(
     job_id: int = Query(None),
 ):
     """
-    Xử lý video từ YouTube URL hoặc file upload.
-    Pipeline: lấy transcript → phân tích AI → lưu RAG → cập nhật tiến trình.
+    Endpoint xử lý video từ YouTube URL hoặc file upload.
+
+    Pipeline:
+        1. Lấy transcript (YouTube API hoặc Whisper).
+        2. Phân tích nội dung bằng Groq LLM → trả về summary, key_points, keywords.
+        3. Nạp transcript vào RAG để phục vụ hỏi đáp sau này.
+        4. Báo cáo tiến trình về Java backend theo từng bước.
     """
     temp_file: str | None = None
-    transcript = ""
-    timeline_data = []
+    transcript:    str  = ""
+    timeline_data: list = []
 
     try:
         await _report_progress(job_id, 5)
 
+        # ------------------------------------------------------------------
+        # Bước 1: Lấy transcript
+        # ------------------------------------------------------------------
         if youtube_url:
             transcript, timeline_data = get_youtube_transcript(youtube_url)
             if not transcript:
@@ -181,7 +242,7 @@ async def process_video(
             await _report_progress(job_id, 40)
 
         elif file and file.filename:
-            # Lưu file tạm, tránh ký tự đặc biệt trong tên file
+            # Chuẩn hoá tên file để tránh path-traversal và ký tự đặc biệt
             safe_name = re.sub(r"[^\w.\-]", "_", file.filename)
             temp_file = f"temp_{safe_name}"
 
@@ -194,25 +255,30 @@ async def process_video(
         else:
             return {"error": "Cần cung cấp youtube_url hoặc file upload."}
 
-        # --- Bước 2: Phân tích nội dung bằng AI ---
+        # ------------------------------------------------------------------
+        # Bước 2: Phân tích nội dung bằng AI
+        # ------------------------------------------------------------------
         await _report_progress(job_id, 70)
         analysis = _analyse_transcript(transcript)
 
-        # Đính kèm timeline vào payload gửi về Java
+        # Đính kèm timeline (dạng JSON string) vào payload trả về Java.
+        # Field này map sang @JsonProperty("summary_json") trong AnalysisData.
         analysis["summary_json"] = json.dumps(timeline_data, ensure_ascii=False)
 
-        # --- Bước 3: Lưu transcript vào RAG để phục vụ hỏi đáp ---
+        # ------------------------------------------------------------------
+        # Bước 3: Nạp transcript vào vector store để phục vụ RAG Q&A
+        # ------------------------------------------------------------------
         rag_service.ingest_transcript(str(job_id), transcript)
 
         await _report_progress(job_id, 100)
 
         return {
-            "status": "success",
+            "status":     "success",
             "transcript": transcript,
-            "analysis": analysis,
+            "analysis":   analysis,
         }
 
     finally:
-        # Dọn dẹp file tạm dù xử lý thành công hay thất bại
+        # Dọn dẹp file tạm dù pipeline thành công hay thất bại
         if temp_file and os.path.exists(temp_file):
             os.remove(temp_file)
