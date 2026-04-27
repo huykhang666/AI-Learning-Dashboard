@@ -8,13 +8,18 @@ router = APIRouter(prefix="/ai", tags=["Chatbot"])
 rag_service = RAGService()
 llm_service = LLMService()
 
-@router.post("/ingest")
-async def ingest(request: IngestRequest):
-    rag_service.ingest_transcript(request.session_id, request.transcript)
-    return {"message": "Success"}
-
 @router.post("/chat")
 async def chat(request: ChatRequest):
     context = rag_service.search_context(request.session_id, request.query)
+    print("DEBUG context:", context)
+
+    if not context:
+        return {"answer": "Không tìm thấy dữ liệu liên quan"}
+
     answer = llm_service.get_answer(context, request.query, request.history)
+    print("DEBUG answer:", answer)
+
+    if not answer:
+        return {"answer": "AI không trả lời được"}
+
     return {"answer": answer}

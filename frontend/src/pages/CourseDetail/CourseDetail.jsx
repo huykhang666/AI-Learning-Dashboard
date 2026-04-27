@@ -1,24 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LoadingScreen from '../../components/common/LoadingScreen';
-import { courseDetailApi } from '../../api/CourseDetailApi';
+import { courseDetailApi, aiApi } from '../../api/CourseDetailApi';
 import {
   ArrowLeft, FileText, ChevronLeft, ChevronRight,
-  PlayCircle, Zap, X, Send
+  PlayCircle, Zap, X, Send, MessageCircle
 } from 'lucide-react';
 import { useNavigate, useParams } from "react-router-dom";
+import AIChatBox from '../../components/common/AIChatBox';
 
 const CourseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [isChatOpen, setIsChatOpen] = useState(false);
-
   // State quản lý dữ liệu và UI
   const [loading, setLoading] = useState(true);
   const [courseData, setCourseData] = useState(null);
   const [leftTab, setLeftTab] = useState('VIDEO PLAYER');
   const [midTab, setMidTab] = useState('TRANSCRIPT');
   const [chatInput, setChatInput] = useState('');
+
 
   // Ref để tính toán thời gian xem video (Progress Tracking)
   const startTimeRef = useRef(Date.now());
@@ -233,46 +234,23 @@ const CourseDetail = () => {
 
         {/*  CHATBOT */}
         <div className="fixed bottom-6 right-6 z-50">
-          {!isChatOpen ? (
+          {!isChatOpen && (
             <button
               onClick={() => setIsChatOpen(true)}
-              className="w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all active:scale-95"
+              className="w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110"
             >
               <Zap size={24} fill="currentColor" />
             </button>
-          ) : (
-            /* Cửa sổ Chat  */
-            <div className="w-[400px] h-[550px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col border border-slate-100 overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
-                <h2 className="font-bold text-sm tracking-wide uppercase italic">AI Learning DashBoard</h2>
-                <button onClick={() => setIsChatOpen(false)} className="text-slate-400 hover:text-slate-600">
-                  <X size={18} />
-                </button>
-              </div>
+          )}
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-md">
-                    <Zap size={16} fill="currentColor" />
-                  </div>
-                  <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-slate-100 shadow-sm text-sm text-slate-600 leading-relaxed">
-                    Chào Bạn! Mình đã sẵn sàng hỗ trợ bạn bài học này 🎓
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white border-t border-slate-100">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Hỏi AI bất cứ điều gì..."
-                    className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                  />
-                  <button className="bg-blue-600 text-white p-2.5 rounded-xl shadow-md active:scale-95 flex items-center justify-center">
-                    <Send size={18} />
-                  </button>
-                </div>
-              </div>
+          {isChatOpen && (
+            <div className="fixed bottom-24 right-8 z-50 animate-in slide-in-from-bottom-5 duration-300">
+              <AIChatBox
+                sessionId={id}
+                courseDetailApi={courseDetailApi}
+                aiApi={aiApi}
+                onClose={() => setIsChatOpen(false)}
+              />
             </div>
           )}
         </div>
