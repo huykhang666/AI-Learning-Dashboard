@@ -46,22 +46,17 @@ def _format_timestamp(seconds: int) -> str:
 # Transcript extraction
 # ---------------------------------------------------------------------------
 
-def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
-    """
-    Lấy transcript từ video YouTube theo thứ tự ưu tiên ngôn ngữ đã định sẵn.
+FILLER_WORDS = {
+    "à", "à à", "ờ", "ừm", "ừ", "hmmm", "vâng", "dạ",
+    "uh", "um", "ừ ừ", "hmm", "hm", "ừ à", "à ừm", "ờ ờ"
+}
 
-    Returns:
-        (formatted_text, timeline_data):
-            - formatted_text: chuỗi transcript kèm nhãn thời gian [mm:ss], dùng cho RAG.
-            - timeline_data : danh sách dict {"time": int, "content": str}, gửi về Java.
-        Trả về (None, None) nếu không thể lấy transcript.
-    """
+def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
     video_id = _extract_video_id(url)
     if not video_id:
         return None, None
 
     try:
-        # Ưu tiên fetch trực tiếp; fallback sang list() nếu ngôn ngữ không khớp
         try:
             raw_transcript = _yta.fetch(video_id, languages=_PREFERRED_LANGS)
         except Exception:
@@ -71,7 +66,6 @@ def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
         timeline_data:   list[dict] = []
 
         for snippet in raw_transcript:
-            # Tương thích cả dict (API mới) lẫn object (API cũ)
             try:
                 start_sec = int(snippet["start"])
                 text_val  = snippet["text"]
@@ -79,7 +73,20 @@ def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
                 start_sec = int(snippet.start)
                 text_val  = snippet.text
 
-            clean_text = text_val.replace("\n", " ")
+            clean_text = text_val.replace("\n", " ").strip()
+
+            # Lọc filler words
+            normalized = (
+                clean_text.lower()
+                    .replace(".", "")
+                    .replace(",", "")
+                    .replace("!", "")
+                    .replace("?", "")
+                    .strip()
+            )
+            if normalized in FILLER_WORDS or len(normalized) < 2:
+                continue
+
             formatted_parts.append(f"{_format_timestamp(start_sec)} {clean_text}")
             timeline_data.append({"time": start_sec, "content": clean_text})
 
@@ -120,31 +127,55 @@ async def _report_progress(job_id: int | None, percent: int) -> None:
 # ---------------------------------------------------------------------------
 # Whisper transcription
 # ---------------------------------------------------------------------------
-
 def _transcribe_with_whisper(file_path: str) -> tuple[str, list]:
-    """
-    Phiên âm file audio/video cục bộ bằng OpenAI Whisper.
-
-    Args:
-        file_path: Đường dẫn tới file tạm đã lưu trên disk.
-
-    Returns:
-        (formatted_text, timeline_data) — cùng cấu trúc với get_youtube_transcript().
-    """
-    result = model_whisper.transcribe(file_path, fp16=False, language="vi")
+    result = model_whisper.transcribe(
+        file_path, 
+        fp16=False, 
+        language="vi",
+        initial_prompt="Chào mừng các bạn đến với bài giảng hôm nay." 
+    )
 
     formatted_parts: list[str] = []
     timeline_data:   list[dict] = []
+    
+    FILLER_WORDS = {
+        "à", "à à", "ờ", "ừm", "ừ", "hmmm", "vâng", "dạ",
+        "uh", "um", "ừ ừ", "à ừ", "ờ ừ", "hmm", "hm",
+        "ừ à", "à ừm", "ờ ờ"
+    }
 
     for segment in result.get("segments", []):
         start_sec = int(segment["start"])
         text      = segment["text"].strip()
 
+        # Chuẩn hoá để so sánh
+        clean_text = (
+            text.lower()
+                .replace(".", "")
+                .replace(",", "")
+                .replace("!", "")
+                .replace("?", "")
+                .strip()
+        )
+        
+        if start_sec < 10:
+            print(f"DEBUG raw: {repr(text)}")
+            print(f"DEBUG clean: {repr(clean_text)}")
+            print(f"DEBUG in set: {clean_text in FILLER_WORDS}")
+
+        # Lọc toàn bộ video, không chỉ 5 giây đầu
+        if clean_text in FILLER_WORDS:
+            print(f"DEBUG: Lọc filler word: '{text}' lúc {start_sec}s")
+            continue
+
+        # Lọc segment quá ngắn (dưới 2 ký tự)
+        if len(clean_text) < 2:
+            continue
+
         formatted_parts.append(f"{_format_timestamp(start_sec)} {text}")
         timeline_data.append({"time": start_sec, "content": text})
 
     return "\n".join(formatted_parts), timeline_data
-
 
 # ---------------------------------------------------------------------------
 # AI analysis

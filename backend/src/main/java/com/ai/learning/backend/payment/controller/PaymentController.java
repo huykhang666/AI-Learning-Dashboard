@@ -1,57 +1,76 @@
 package com.ai.learning.backend.payment.controller;
 
-import com.ai.learning.backend.payment.service.PaymentService;
+import com.ai.learning.backend.payment.dto.request.PaymentRequest;
+import com.ai.learning.backend.payment.dto.response.IpnResponse;
+import com.ai.learning.backend.payment.dto.response.MomoResponse;
+import com.ai.learning.backend.payment.dto.response.VNPayResponse;
+import com.ai.learning.backend.payment.entity.PaymentGateway;
+import com.ai.learning.backend.payment.service.Impl.*;
+import com.ai.learning.backend.payment.constant.VNPayParams;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    PaymentServiceImpl paymentService;
+    VNPayIpnHandlerImpl vnPayIpnHandler;
+    MomoIpnHandlerImpl momoIpnHandler;
 
-    // Sử dụng Java Record để định nghĩa nhanh dữ liệu Frontend gửi lên (cho Java 14+)
-    public record PaymentRequest(Long userId, Integer amount) {}
-
+    // Tạo URL thanh toán — FE gửi lên gateway (VNPAY hoặc MOMO)
     @PostMapping("/create-url")
-    public ResponseEntity<Map<String, String>> createPaymentUrl(
-            @RequestBody PaymentRequest requestBody,
-            HttpServletRequest request) {
+    public ResponseEntity<?> createPaymentUrl(
+            @RequestBody PaymentRequest request,
+            HttpServletRequest httpRequest) {
 
-        try {
-            // 1. Gọi Service để sinh ra URL thanh toán VNPay
-            String paymentUrl = paymentService.createPaymentUrl(
-                    requestBody.userId(),
-                    requestBody.amount(),
-                    request
-            );
-
-            // 2. Đóng gói kết quả thành JSON trả về cho Frontend
-            Map<String, String> response = new HashMap<>();
-            response.put("code", "00");
-            response.put("message", "Tạo URL thành công");
-            response.put("paymentUrl", paymentUrl);
-
+        if (request.gateway() == PaymentGateway.MOMO) {
+            MomoResponse response = paymentService.initiateMoMo(request);
             return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("code", "99");
-            errorResponse.put("message", "Lỗi hệ thống: " + e.getMessage());
-            return ResponseEntity.badRequest().body(errorResponse);
         }
+
+        VNPayResponse response = paymentService.initiateVNPay(request, httpRequest);
+        return ResponseEntity.ok(response);
     }
 
+    // VNPay redirect trình duyệt về đây sau khi thanh toán xong
+    @GetMapping("/vnpay-return")
+    public void vnpayReturn(
+            @RequestParam Map<String, String> params,
+            HttpServletResponse response) throws IOException {
+
+        String code = params.get(VNPayParams.RESPONSE_CODE);
+        response.sendRedirect("00".equals(code)
+                ? "http://localhost:3000/payment/success"
+                : "http://localhost:3000/payment/failed");
+    }
+
+    // VNPay gọi server-to-server để xác nhận giao dịch
     @GetMapping("/vnpay-ipn")
-    public ResponseEntity<Map<String, String>> vnpayIPN(@RequestParam Map<String, String> params) {
-        // Chuyển toàn bộ dữ liệu VNPay gửi về sang Service xử lý
-        Map<String, String> response = paymentService.processIpn(params);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<IpnResponse> vnpayIPN(@RequestParam Map<String, String> params) {
+        return ResponseEntity.ok(vnPayIpnHandler.handle(params));
+    }
+
+    // MoMo gọi server-to-server để xác nhận giao dịch
+    @PostMapping("/momo-ipn")
+    public ResponseEntity<IpnResponse> momoIPN(@RequestBody Map<String, String> params) {
+        return ResponseEntity.ok(momoIpnHandler.handle(params));
+    }
+
+    @GetMapping("/subscriptions/me") 
+    public ResponseEntity<?> getMySubscription(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(paymentService.getMySubscription(userDetails.getUsername()));
     }
 }

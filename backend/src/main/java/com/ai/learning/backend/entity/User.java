@@ -52,6 +52,8 @@ public class User {
 
     private boolean isPremium = false;
 
+    private LocalDateTime premiumExpiredAt;
+
     private int dailyUploadCount = 0;
 
     private LocalDate lastUploadDate = LocalDate.now();
