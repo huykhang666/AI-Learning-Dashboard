@@ -52,7 +52,8 @@ public enum ErrorCode {
     SESSION_NOT_FOUND(1027,"Learning session not found", HttpStatus.NOT_FOUND),
 
     RESULT_NOT_FOUND(1028,"AI Result not found",HttpStatus.NOT_FOUND),
-    NOTIFICATION_NOT_FOUND(1029, "Notification not found", HttpStatus.NOT_FOUND);
+    NOTIFICATION_NOT_FOUND(1029, "Notification not found", HttpStatus.NOT_FOUND),
+    UPLOAD_LIMIT_EXCEEDED(1030, "Daily upload limit reached. Please upgrade to Premium for unlimited access.", HttpStatus.FORBIDDEN);
 
     private final int code;
     private final String message;

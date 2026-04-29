@@ -16,6 +16,7 @@ import com.ai.learning.backend.repository.ProcessJobRepository;
 import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.FileStorageService;
+import com.ai.learning.backend.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     FileMetadataMapper fileMetadataMapper;
     ProcessJobRepository processJobRepository;
     SessionRepository sessionRepository;
+    UserService userService;
+
     @NonFinal
     ProcessJobImpl processJobService;
 
@@ -71,6 +74,8 @@ public class FileStorageServiceImpl implements FileStorageService {
             currentUser = userRepository.findByUsername(identity)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         }
+
+        userService.canUpload(currentUser.getUserId());
 
         //Create temp entity
         FileMetadata entity = FileMetadata.builder()
@@ -137,6 +142,8 @@ public class FileStorageServiceImpl implements FileStorageService {
         sessionRepository.saveAndFlush(savedSession);
 
         processJobService.startProcessAsync(savedJob.getProcessJobId());
+
+        userService.updateUsage(currentUser.getUserId());
 
         return fileMetadataMapper.toResponse(saved);
     }

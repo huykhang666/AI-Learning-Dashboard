@@ -10,11 +10,17 @@ import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.UserMapper;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.UserService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.FetchProfile;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,10 +29,12 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
+    UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
+    UserMapper userMapper;
+
 
     @Override
     public UserResponse register(RegisterRequest request) {
@@ -84,7 +92,19 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND)) ;
         if(user.isPremium())
             return true;
-        return user.getDailyUploadCount() < 10;
+
+        LocalDate today = LocalDate.now();
+
+        if(user.getLastUploadDate() == null || !user.getLastUploadDate().equals(today)) {
+            user.setDailyUploadCount(0);
+            user.setLastUploadDate(today);
+            userRepository.save(user);
+        }
+
+        if(user.getDailyUploadCount() >= 5) {
+            throw new AppException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+        }
+        return true;
     }
 
     @Override
@@ -93,6 +113,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         user.setDailyUploadCount(user.getDailyUploadCount() + 1);
+        user.setLastUploadDate(java.time.LocalDate.now());
         userRepository.save(user);
     }
 

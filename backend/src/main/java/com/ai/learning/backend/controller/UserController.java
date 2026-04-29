@@ -31,6 +31,7 @@ public class UserController {
     //Register
     @PostMapping("/register")
     public ApiResponse<UserResponse> register(@RequestBody @Valid RegisterRequest request) {
+        System.out.println("EMAIL = " + request.getEmail());
         return ApiResponse.<UserResponse>builder()
                .code(1000)
                 .message("User has been registered successfully")

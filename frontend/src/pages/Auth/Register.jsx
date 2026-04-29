@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
-
+import { authService } from "../../api/authService";
+import SuccessModal from "../../components/common/SuccessModal";
 const T = {
   primary: "#2563EB",
   primaryHover: "#1D4ED8",
@@ -270,6 +271,7 @@ export default function PageRegister({ onRegister, onGoLogin }) {
   const [agree, setAgree] = useState(false);
   const [done, setDone] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     setTimeout(() => setVisible(true), 20);
@@ -308,97 +310,38 @@ export default function PageRegister({ onRegister, onGoLogin }) {
 
     setLoading(true);
     try {
-      const delay = new Promise((r) => setTimeout(r, 1500));
-      const apiCall = fetch("http://localhost:8080/api/v1/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: form.firstName,
-          lastName: form.lastName,
-          username: form.username,
-          email: form.email,
-          dob: form.dob,
-          password: form.pass
-        })
+      const data = await authService.register({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        username: form.username,
+        email: form.email,
+        password: form.pass,
+        dateOfBirth: form.dob
+        
       });
-      const [response] = await Promise.all([apiCall, delay]);
-      const data = await response.json();
-      if (response.ok && data.code === 1000) {
-        setDone(true);
+
+      await new Promise((r) => setTimeout(r, 800));
+
+      if (data.code === 1000) {
+        setShowSuccess(true);
+
       } else {
+        console.log(error.response?.data);
         setErrors({
-          apiError: data.message || "Tài khoản này đã tồn tại trên hệ thống!"
+          apiError: data.message || "Tài khoản đã tồn tại"
         });
       }
+
     } catch (error) {
-      setErrors({ username: "Lỗi kết nối Server." });
+      setErrors({
+        apiError: "Không thể kết nối server"
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  if (done)
-    return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          fontFamily: F
-        }}
-      >
-        <LeftPanel />
-        <div
-          style={{
-            flex: 1,
-            background: T.bg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <div style={{ width: "100%", maxWidth: 380, textAlign: "center" }}>
-            <div
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: "50%",
-                background: "#DCFCE7",
-                border: "3px solid #06C16A",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 32,
-                margin: "0 auto 20px"
-              }}
-            >
-              ✅
-            </div>
-            <h2 style={{ fontSize: 24, fontWeight: 800 }}>
-              Chào mừng {form.lastName}! 🎉
-            </h2>
-            <p style={{ color: T.textMid, fontSize: 13, marginBottom: 28 }}>
-              Tài khoản <strong>{form.username}</strong> đã sẵn sàng.
-            </p>
-            <button
-              onClick={() => onGoLogin()}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: 11,
-                border: "none",
-                background: T.primary,
-                color: "#fff",
-                fontWeight: 700,
-                cursor: "pointer"
-              }}
-            >
-              Đăng nhập ngay →
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+
 
   return (
     <>
@@ -712,6 +655,14 @@ export default function PageRegister({ onRegister, onGoLogin }) {
           </div>
         </div>
       </div>
+      <SuccessModal
+        open={showSuccess}
+        username={form.username}
+        onClose={() => {
+          setShowSuccess(false);
+          onGoLogin();
+        }}
+      />
     </>
   );
 }
