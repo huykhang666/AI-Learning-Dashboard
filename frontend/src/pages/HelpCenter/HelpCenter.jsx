@@ -1,29 +1,29 @@
 import { useState } from "react";
-
+import { useTranslation } from "react-i18next";
 
 const topics = [
-  { icon: "🚀", label: "Getting Started", bg: "#fff3e0" },
-  { icon: "📤", label: "Upload & AI Processing", bg: "#e3f2fd" },
-  { icon: "💬", label: "Chatbot Assistance", bg: "#f3e5f5" },
-  { icon: "💳", label: "Account & Billing", bg: "#e8f5e9" },
+  { icon: "🚀", labelKey: "help_center.topics.getting_started", bg: "#fff3e0" },
+  { icon: "📤", labelKey: "help_center.topics.upload", bg: "#e3f2fd" },
+  { icon: "💬", labelKey: "help_center.topics.chatbot", bg: "#f3e5f5" },
+  { icon: "💳", labelKey: "help_center.topics.account_billing", bg: "#e8f5e9" },
 ];
 
 const faqs = [
   {
-    q: "How to upload a file?",
-    a: "Click the upload button on the dashboard or drag and drop your file. Supported formats include PDF, MP4, and YouTube links.",
+    qKey: "help_center.faqs.upload.q",
+    aKey: "help_center.faqs.upload.a",
   },
   {
-    q: "What is Premium?",
-    a: "Premium gives you unlimited uploads, faster AI processing, and access to advanced chatbot features.",
+    qKey: "help_center.faqs.premium.q",
+    aKey: "help_center.faqs.premium.a",
   },
   {
-    q: "How long does AI processing take?",
-    a: "Most files are processed within 1–3 minutes depending on size and server load.",
+    qKey: "help_center.faqs.processing.q",
+    aKey: "help_center.faqs.processing.a",
   },
   {
-    q: "Can I upload YouTube links?",
-    a: "Yes! Paste a YouTube URL in the upload box and the system will automatically fetch and process the video.",
+    qKey: "help_center.faqs.youtube.q",
+    aKey: "help_center.faqs.youtube.a",
   },
 ];
 
@@ -91,6 +91,7 @@ function FAQItem({ q, a }) {
 }
 
 export default function HelpCenter() {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -108,7 +109,7 @@ export default function HelpCenter() {
             marginBottom: 28,
           }}
         >
-          How Can We Help?
+          {t("help_center.title")}
         </h1>
 
         {/* Search bar */}
@@ -126,7 +127,7 @@ export default function HelpCenter() {
         >
           <SearchIcon color="#9ca3af" size={16} />
           <input
-            placeholder="Search for help, tutorials, FAQs..."
+            placeholder={t("help_center.search_placeholder")}
             style={{
               border: "none",
               background: "transparent",
@@ -140,7 +141,7 @@ export default function HelpCenter() {
 
         {/* Popular topics */}
         <p style={{ fontSize: 25, color: "#0a0a0a", marginBottom: 14 }}>
-          Popular help topic
+          {t("help_center.popular_topics")}
         </p>
         <div
           style={{
@@ -150,9 +151,9 @@ export default function HelpCenter() {
             marginBottom: 36,
           }}
         >
-          {topics.map((t) => (
+          {topics.map((topic) => (
             <div
-              key={t.label}
+              key={topic.labelKey}
               style={{
                 background: "#fff",
                 border: "1px solid #e5e7eb",
@@ -175,14 +176,14 @@ export default function HelpCenter() {
                   width: 52,
                   height: 52,
                   borderRadius: 12,
-                  background: t.bg,
+                  background: topic.bg,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 26,
                 }}
               >
-                {t.icon}
+                {topic.icon}
               </div>
               <span
                 style={{
@@ -192,7 +193,7 @@ export default function HelpCenter() {
                   lineHeight: 1.4,
                 }}
               >
-                {t.label}
+                {t(topic.labelKey)}
               </span>
             </div>
           ))}
@@ -201,10 +202,10 @@ export default function HelpCenter() {
         {/* FAQs */}
         <div style={{ marginBottom: 32 }}>
           <p style={{ fontSize: 25, color: "#0a0a0a", marginBottom: 14 }}>
-            Popular FAQs
+            {t("help_center.popular_faqs")}
           </p>
           {faqs.map((faq) => (
-            <FAQItem key={faq.q} q={faq.q} a={faq.a} />
+            <FAQItem key={faq.qKey} q={t(faq.qKey)} a={t(faq.aKey)} />
           ))}
         </div>
 
@@ -225,7 +226,7 @@ export default function HelpCenter() {
               marginBottom: 6,
             }}
           >
-            Contact Support
+            {t("help_center.contact_support")}
           </h3>
           <p
             style={{
@@ -234,7 +235,7 @@ export default function HelpCenter() {
               marginBottom: 20,
             }}
           >
-            Link you or with a live chat
+            {t("help_center.contact_description")}
           </p>
           <button
             style={{
@@ -248,7 +249,7 @@ export default function HelpCenter() {
               fontWeight: 500,
             }}
           >
-            Start Live Chat
+            {t("help_center.start_live_chat")}
           </button>
         </div>
       </div>

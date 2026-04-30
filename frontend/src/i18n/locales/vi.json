@@ -1,0 +1,419 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "features": "Tính năng",
+    "pricing": "Bảng giá",
+    "about": "Về chúng tôi",
+    "faq": "FAQ",
+    "contact": "Liên hệ",
+    "login": "Đăng nhập",
+    "sign_up": "Sign Up Free",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ"
+  },
+  "header": {
+    "title": "Nền tảng học tập",
+    "subtitle": "Học mọi lúc, mọi nơi",
+    "search_placeholder": "Tìm kiếm khóa học...",
+    "upgrade": "Nâng cấp"
+  },
+  "hero": {
+    "made_for": "Dành cho sinh viên Việt Nam",
+    "title_line1": "Biến video bài giảng",
+    "title_line2": "thành kiến thức",
+    "title_span": "dễ nắm bắt",
+    "description": "Upload video bài giảng - AI tự động bóc băng, tóm tắt và trả lời mọi câu hỏi. Học hiệu quả hơn gấp 3 lần!",
+    "cta_free": "Bắt đầu miễn phí",
+    "cta_feature": "Xem tính năng"
+  },
+  "sidebar": {
+    "dashboard": "Tổng quan",
+    "my_courses": "Khóa học của tôi",
+    "history": "Lịch sử",
+    "analytics": "Phân tích",
+    "premium": "Premium",
+    "help": "Trung tâm trợ giúp",
+    "usage": "Dùng {{used}}/{{total}} video",
+    "upgrade": "Nâng cấp Premium",
+    "progress": "Tiến độ",
+    "settings": "Cài đặt",
+    "plan": {
+      "free": "Gói Miễn Phí"
+    },
+    "badge": {
+      "free": "MIỄN PHÍ"
+    }
+  },
+  "history": {
+    "title": "Lịch sử",
+    "lectures_count": "Tìm thấy {{count}} bài giảng",
+    "search_placeholder": "Tìm kiếm lịch sử bài giảng",
+    "stats": {
+      "total_lectures": "Tổng số bài giảng",
+      "completed": "Hoàn thành"
+    },
+    "duration_minutes": "phút",
+    "duration_seconds": "giây",
+    "duration_missing": "Chưa có dữ liệu thời lượng",
+    "status": {
+      "completed": "✓ Hoàn thành",
+      "in_progress": "Đang học",
+      "started": "Mới bắt đầu",
+      "not_started": "Chưa xem"
+    },
+    "no_results": "Không tìm thấy kết quả phù hợp."
+  },
+  "dashboard": {
+    "welcome": "Chào mừng trở lại, {{name}}!",
+    "subtitle": "Tăng cường hành trình học tập của bạn.",
+    "upload_widget": "Tiện ích tải lên",
+    "learning_overview": "Tổng quan học tập",
+    "total_study_time": "Tổng thời gian học",
+    "total_all_time": "Tổng thời gian",
+    "lectures_done": "Bài giảng hoàn thành",
+    "lectures": "Bài giảng",
+    "goal_progress": "Tiến độ mục tiêu",
+    "goal_label": "Mục tiêu 100%",
+    "weekly_activity": "Hoạt động tuần (Giờ)",
+    "top_keywords": "Từ khóa hàng đầu",
+    "recent_courses": "Khóa học gần đây",
+    "view_all": "Xem tất cả →",
+    "loading": "Đang tải dashboard...",
+    "error_loading": "Không thể tải dữ liệu dashboard.",
+    "no_data": "Không có dữ liệu dashboard.",
+    "retry": "Thử lại"
+  },
+  "my_courses": {
+    "title": "Khóa học của tôi",
+    "subtitle": "Quản lý các khóa học và tiến độ của bạn.",
+    "search_placeholder": "Tìm kiếm trong khóa học",
+    "tabs": {
+      "all": "Tất cả",
+      "in_progress": "Đang học",
+      "completed": "Hoàn thành"
+    },
+    "lessons": "{{count}} Bài học",
+    "progress_complete": "{{percent}}% Hoàn thành",
+    "button": {
+      "view_course": "Xem khóa học",
+      "latest_lesson": "Bài học mới nhất"
+    },
+    "badge": {
+      "done": "Đã hoàn thành"
+    }
+  },
+  "help_center": {
+    "title": "Chúng tôi có thể trợ giúp gì?",
+    "search_placeholder": "Tìm kiếm trợ giúp, hướng dẫn, FAQ...",
+    "popular_topics": "Chủ đề phổ biến",
+    "popular_faqs": "Câu hỏi thường gặp",
+    "contact_support": "Liên hệ hỗ trợ",
+    "contact_description": "Kết nối với đội ngũ của chúng tôi hoặc bắt đầu chat trực tiếp.",
+    "start_live_chat": "Bắt đầu chat trực tiếp",
+    "topics": {
+      "getting_started": "Bắt đầu",
+      "upload": "Tải lên & xử lý AI",
+      "chatbot": "Hỗ trợ chatbot",
+      "account_billing": "Tài khoản & thanh toán"
+    },
+    "faqs": {
+      "upload": {
+        "q": "Làm sao để tải lên file?",
+        "a": "Nhấp nút tải lên trên dashboard hoặc kéo thả file. Hỗ trợ định dạng PDF, MP4 và link YouTube."
+      },
+      "premium": {
+        "q": "Premium là gì?",
+        "a": "Premium cho phép bạn tải lên không giới hạn, xử lý AI nhanh hơn và sử dụng các tính năng chatbot nâng cao."
+      },
+      "processing": {
+        "q": "AI xử lý mất bao lâu?",
+        "a": "Hầu hết file được xử lý trong 1–3 phút tùy kích thước và tải máy chủ."
+      },
+      "youtube": {
+        "q": "Tôi có thể tải link YouTube không?",
+        "a": "Có! Dán URL YouTube vào ô tải lên và hệ thống sẽ tự động lấy và xử lý video."
+      }
+    }
+  },
+  "settings": {
+    "title": "Tài khoản",
+    "subtitle": "Cài đặt tài khoản",
+    "tabs": {
+      "account": "Tài khoản",
+      "preferences": "Tùy chọn"
+    },
+    "form": {
+      "name": "Tên",
+      "email": "Email",
+      "avatar": "Avatar",
+      "change": "Thay đổi",
+      "save_changes": "Lưu thay đổi"
+    },
+    "preferences_unavailable": "Tùy chọn đang được phát triển."
+  },
+  "analytics": {
+    "title": "Phân tích học tập & nhận định",
+    "subtitle": "Hiệu suất học tập của bạn trong nháy mắt.",
+    "study_time_trend": "Xu hướng thời gian học (30 ngày qua)",
+    "learning_focus": "Tập trung học theo môn",
+    "top_keywords": "Từ khóa hàng đầu tháng này",
+    "goal_tracking": "Theo dõi mục tiêu",
+    "goals": {
+      "weekly": "Mục tiêu tuần",
+      "monthly": "Mục tiêu tháng"
+    },
+    "percentage_min": "0%",
+    "percentage_max": "100%"
+  },
+  "course": {
+    "enroll": "Đăng ký ngay",
+    "continue": "Tiếp tục học",
+    "completed": "Đã hoàn thành",
+    "lessons": "Bài học",
+    "duration": "Thời lượng",
+    "level": "Cấp độ",
+    "level_beginner": "Cơ bản",
+    "level_intermediate": "Trung cấp",
+    "level_advanced": "Nâng cao",
+    "free": "Miễn phí",
+    "students": "{{count}} học viên"
+  },
+  "upload": {
+    "title": "Tải lên tệp",
+    "drag_drop": "Kéo và thả tệp vào đây",
+    "or": "hoặc",
+    "browse": "Chọn tệp",
+    "uploading": "Đang tải lên...",
+    "success": "Tải lên thành công!",
+    "error": "Tải lên thất bại. Vui lòng thử lại."
+  },
+  "ai_chat": {
+    "title": "Trợ lý AI",
+    "placeholder": "Hỏi tôi bất cứ điều gì...",
+    "send": "Gửi",
+    "thinking": "Đang suy nghĩ...",
+    "clear": "Xóa hội thoại",
+    "welcome": "Chào bạn! Mình đã sẵn sàng hỗ trợ bạn bài học này 🎓",
+    "not_answer": "AI không trả lời. Vui lòng thử lại.",
+    "error_message": "Xin lỗi, có lỗi xảy ra khi kết nối AI.",
+    "analysis": "AI đang phân tích..."
+  },
+  "course_detail": {
+    "back": "Quay lại",
+    "export_pdf": "Xuất PDF",
+    "transcript": "Bản ghi",
+    "summary": "Tóm tắt",
+    "key_points": "Điểm chính",
+    "loading_video": "Đang tải video...",
+    "executive_summary": "Tổng quan điều hành",
+    "updating_summary": "Đang cập nhật tóm tắt...",
+    "ai_system_analysis": "Phân tích hệ thống AI học tập"
+  },
+  "loading": {
+    "message": "Đang tải, vui lòng chờ...",
+    "courses": "Đang tải khóa học..."
+  },
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "confirm": "Xác nhận",
+    "close": "Đóng",
+    "language": "Ngôn ngữ"
+  },
+  "pricing": {
+    "title": "Bảng giá",
+    "heading": "Chọn gói phù hợp với bạn",
+    "description": "Miễn phí để bắt đầu. Nâng cấp bất kỳ lúc nào khi bạn cần nhiều hơn.",
+    "plans": {
+      "free": {
+        "label": "Miễn phí",
+        "features": [
+          "4 video/ngày",
+          "Transcript cơ bản",
+          "Chat AI: 10 tin/ngày",
+          "Lưu tối đa 10 bài",
+          "Hỗ trợ email"
+        ],
+        "button": "Bắt đầu miễn phí"
+      },
+      "premium": {
+        "label": "Premium",
+        "badge": "PHỔ BIẾN NHẤT 🔥",
+        "features": [
+          "Không giới hạn video/ngày",
+          "Transcript độ chính xác cao",
+          "Chat AI không giới hạn",
+          "Lưu không giới hạn",
+          "Export PDF",
+          "Ưu tiên xử lý hàng đầu",
+          "Hỗ trợ 24/7"
+        ],
+        "button": "Dùng thử 7 ngày miễn phí"
+      },
+      "yearly": {
+        "label": "Premium Năm",
+        "badge": "TIẾT KIỆM 26% 🎉",
+        "features": [
+          "Tất cả tính năng Premium",
+          "Tiết kiệm ~179.000đ/năm",
+          "Ưu tiên hàng đầu",
+          "Tính năng Beta sớm nhất",
+          "Badge VIP trên profile",
+          "Hỗ trợ riêng VIP"
+        ],
+        "button": "Chọn gói năm"
+      }
+    },
+    "payment_supported": "Phương thức thanh toán được hỗ trợ",
+    "payment_methods": {
+      "momo": "MoMo",
+      "vnpay": "VNPay",
+      "visa": "Visa / MasterCard",
+      "atm": "ATM nội địa"
+    }
+  },
+  "about": {
+    "title": "Về chúng tôi",
+    "heading": "Chúng tôi xây dựng tương lai giáo dục",
+    "description": {
+      "line1": "AI-Learning DashBoard được thành lập năm 2024 bởi những kỹ sư đam mê giáo dục và AI.",
+      "line2": "Sứ mệnh của chúng tôi là giúp sinh viên Việt Nam tiếp cận nội dung bài giảng một cách hiệu quả hơn, tiết kiệm thời gian và nâng cao chất lượng học tập thông qua công nghệ AI tiên tiến nhất."
+    },
+    "stats": {
+      "students": "Sinh viên",
+      "videos": "Video xử lý",
+      "accuracy": "Độ chính xác AI",
+      "rating": "Đánh giá TB"
+    },
+    "vision": {
+      "tag": "TẦM NHÌN",
+      "heading": "Mỗi bài giảng đều có thể trở thành tài nguyên học tập không giới hạn.",
+      "description": "Chúng tôi hướng đến việc xóa bỏ rào cản trong việc tiếp cận và ôn tập nội dung học tập. Không còn phải tua đi tua lại video — chỉ cần hỏi AI và nhận câu trả lời ngay lập tức."
+    },
+    "badges": {
+      "edtech": "Top EdTech 2024",
+      "vietnam": "Made in Vietnam",
+      "gdpr": "GDPR Compliant"
+    },
+    "team": {
+      "title": "Đội ngũ sáng lập",
+      "roles": {
+        "backend": "Backend",
+        "frontend": "Frontend"
+      },
+      "description": "Sinh viên UTC2"
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "section_title": "Câu hỏi thường gặp",
+    "items": [
+      {
+        "question": "AI-Learning DashBoard hoạt động như thế nào?",
+        "answer": "Bạn upload video bài giảng (MP4) hoặc dán link YouTube. Hệ thống dùng AI Whisper để chuyển giọng nói thành văn bản, sau đó dùng mô hình ViT5 để tóm tắt nội dung. Toàn bộ quá trình chỉ mất 2-5 phút."
+      },
+      {
+        "question": "Tôi có thể dùng miễn phí không?",
+        "answer": "Có! Gói Free cho phép xử lý 4 video/ngày, lưu tối đa 10 bài, chat AI 10 tin/ngày. Không cần thẻ tín dụng."
+      },
+      {
+        "question": "Hỗ trợ những ngôn ngữ nào?",
+        "answer": "AI Whisper hỗ trợ 50+ ngôn ngữ bao gồm tiếng Việt, tiếng Anh, tiếng Nhật với độ chính xác cao."
+      },
+      {
+        "question": "Dữ liệu video có được bảo mật không?",
+        "answer": "Hoàn toàn. Video được mã hóa khi upload và chỉ bạn mới có quyền truy cập. Chúng tôi tuân thủ GDPR."
+      },
+      {
+        "question": "Tôi có thể hủy Premium bất kỳ lúc nào không?",
+        "answer": "Có, bạn có thể hủy bất kỳ lúc nào từ trang Cài đặt. Không có phí hủy."
+      },
+      {
+        "question": "Thanh toán qua những hình thức nào?",
+        "answer": "Hỗ trợ MoMo, VNPay, Visa/MasterCard và ATM nội địa. Tất cả được bảo mật SSL."
+      }
+    ]
+  },
+  "feature": {
+    "title": "Tính năng chính",
+    "heading": "Thiết kế để giúp bạn học thông minh hơn",
+    "description": "Xử lý bài giảng bằng AI, tóm tắt thông minh và trả lời ngay giúp sinh viên học nhanh hơn.",
+    "process": {
+      "title": "Cách hoạt động",
+      "heading": "Quy trình 3 bước đơn giản"
+    },
+    "cards": {
+      "whisper": {
+        "title": "Chuyển giọng nói thành văn bản",
+        "description": "Tự động chuyển giọng nói bài giảng thành văn bản bằng AI Whisper với độ chính xác cao."
+      },
+      "summary": {
+        "title": "Tạo tóm tắt thông minh",
+        "description": "Nhận ghi chú và điểm nổi bật ngắn gọn từ mỗi video bài giảng."
+      },
+      "chat": {
+        "title": "Chat AI tương tác",
+        "description": "Hỏi câu hỏi về nội dung video và nhận câu trả lời ngay lập tức từ AI."
+      },
+      "progress": {
+        "title": "Phân tích tiến độ",
+        "description": "Theo dõi tiến trình học tập và duy trì động lực với thông tin rõ ràng."
+      },
+      "youtube": {
+        "title": "Hỗ trợ YouTube",
+        "description": "Phân tích video bài giảng từ link YouTube mà không cần tải thủ công."
+      },
+      "export": {
+        "title": "Xuất ghi chú",
+        "description": "Lưu transcript và tóm tắt thành PDF để học ngoại tuyến."
+      },
+      "tags": {
+        "title": "Gắn thẻ chủ đề",
+        "description": "Tổ chức các khái niệm chính với thẻ và quay lại phần quan trọng nhanh hơn."
+      },
+      "security": {
+        "title": "Bảo mật an toàn",
+        "description": "Tệp tải lên được bảo vệ và chỉ bạn có quyền truy cập, tuân thủ quy định GDPR."
+      }
+    },
+    "steps": {
+      "upload": {
+        "title": "Tải lên bài giảng",
+        "description": "Gửi video hoặc link YouTube để bắt đầu xử lý AI."
+      },
+      "process": {
+        "title": "AI xử lý",
+        "description": "Hệ thống tự động chuyển mã, tóm tắt và lập chỉ mục nội dung."
+      },
+      "learn": {
+        "title": "Học với AI",
+        "description": "Tương tác với nội dung bài giảng và ôn tập hiệu quả hơn cùng AI."
+      }
+    }
+  },
+  "premium": {
+    "banner": "Nâng cấp tài khoản Premium",
+    "heading_line1": "Mở khóa toàn bộ sức mạnh của AI Learning để",
+    "heading_line2": "tăng tốc học tập",
+    "benefit": {
+      "focus": "Học tập tập trung",
+      "save_time": "Tiết kiệm thời gian"
+    },
+    "cta": "Nâng cấp ngay"
+  },
+  "footer": {
+    "ready_title": "Sẵn sàng bắt đầu chưa?",
+    "description": "Tham gia AI-Learning DashBoard và biến đổi cách bạn học.",
+    "cta_register": "Đăng ký ngay",
+    "cta_feature": "Xem tính năng",
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách bảo mật",
+    "copyright": "© {{year}} AI-Learning DashBoard.",
+    "made_with": "Làm với",
+    "in_vietnam": "tại Việt Nam"
+  }
+}

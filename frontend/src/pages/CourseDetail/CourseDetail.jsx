@@ -1,35 +1,40 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import LoadingScreen from '../../components/common/LoadingScreen';
-import { courseDetailApi, aiApi } from '../../api/CourseDetailApi';
-import { ArrowLeft, FileText, Zap } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import LoadingScreen from "../../components/common/LoadingScreen";
+import { courseDetailApi, aiApi } from "../../api/CourseDetailApi";
+import { ArrowLeft, FileText, Zap } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import AIChatBox from '../../components/common/AIChatBox';
+import { useTranslation } from "react-i18next";
+import AIChatBox from "../../components/common/AIChatBox";
 
 // Tách YouTube Video ID từ URL
 const getYoutubeID = (url) => {
   if (!url) return null;
-  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)\??v?=?([^#&?]*)).*/;
+  const regExp =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)\??v?=?([^#&?]*)).*/;
   const match = url.match(regExp);
   return match && match[7]?.length === 11 ? match[7] : null;
 };
 
 // Format giây → [MM:SS]
 const formatTime = (seconds) => {
-  if (seconds == null) return '[00:00]';
+  if (seconds == null) return "[00:00]";
   const total = Math.floor(Number(seconds));
-  const mins = Math.floor(total / 60).toString().padStart(2, '0');
-  const secs = (total % 60).toString().padStart(2, '0');
+  const mins = Math.floor(total / 60)
+    .toString()
+    .padStart(2, "0");
+  const secs = (total % 60).toString().padStart(2, "0");
   return `[${mins}:${secs}]`;
 };
 
 const CourseDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [courseData, setCourseData] = useState(null);
-  const [midTab, setMidTab] = useState('TRANSCRIPT');
+  const [midTab, setMidTab] = useState("TRANSCRIPT");
 
   const playerRef = useRef(null);
   const playerInstance = useRef(null);
@@ -59,8 +64,8 @@ const CourseDetail = () => {
   // Inject YouTube IFrame API script (1 lần)
   useEffect(() => {
     if (window.YT) return;
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
   }, []);
 
@@ -77,12 +82,12 @@ const CourseDetail = () => {
           videoId: getYoutubeID(data.videoUrl),
           summary: data.summary,
           keyPoints: data.keyPoints
-            ? data.keyPoints.split('\n').filter((p) => p.trim() !== '')
+            ? data.keyPoints.split("\n").filter((p) => p.trim() !== "")
             : [],
           transcript: data.summaryJson ? JSON.parse(data.summaryJson) : [],
         });
       } catch (error) {
-        console.error('[CourseDetail] fetchDetail error:', error);
+        console.error("[CourseDetail] fetchDetail error:", error);
       } finally {
         setLoading(false);
       }
@@ -92,7 +97,8 @@ const CourseDetail = () => {
 
     return () => {
       const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      if (timeSpent > 5) console.info(`[CourseDetail] Session ${id} — ${timeSpent}s`);
+      if (timeSpent > 5)
+        console.info(`[CourseDetail] Session ${id} — ${timeSpent}s`);
     };
   }, [id]);
 
@@ -104,8 +110,8 @@ const CourseDetail = () => {
       if (!playerRef.current) return;
       playerInstance.current = new window.YT.Player(playerRef.current, {
         videoId: courseData.videoId,
-        width: '100%',
-        height: '100%',
+        width: "100%",
+        height: "100%",
         events: {
           // Thay onReady cũ bằng cái này
           onReady: async (event) => {
@@ -125,7 +131,10 @@ const CourseDetail = () => {
       initPlayer();
     } else {
       const prev = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => { if (prev) prev(); initPlayer(); };
+      window.onYouTubeIframeAPIReady = () => {
+        if (prev) prev();
+        initPlayer();
+      };
     }
   }, [courseData?.videoId]);
 
@@ -134,12 +143,17 @@ const CourseDetail = () => {
     if (!courseData?.videoId) return;
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(updateProgress, 5000);
-    return () => { clearInterval(intervalRef.current); intervalRef.current = null; };
+    return () => {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
   }, [courseData?.videoId, updateProgress]);
 
   // Gửi progress lần cuối khi rời trang
   useEffect(() => {
-    return () => { if (isReadyRef.current) updateProgress(); };
+    return () => {
+      if (isReadyRef.current) updateProgress();
+    };
   }, [updateProgress]);
 
   // Destroy player khi unmount
@@ -151,51 +165,56 @@ const CourseDetail = () => {
     };
   }, []);
 
-
-
   if (loading) return <LoadingScreen />;
 
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
-
       {/* HEADER */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors"
+          >
             <ArrowLeft size={18} className="text-blue-600" />
-            <span className="font-medium text-sm text-blue-600">Quay lại</span>
+            <span className="font-medium text-sm text-blue-600">
+              {t("course_detail.back")}
+            </span>
           </button>
           <h1 className="font-bold text-lg uppercase tracking-wide">
-            {courseData?.title || "LECTURE DETAIL"}
+            {courseData?.title || t("course_detail.summary")}
           </h1>
         </div>
         <button className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors">
-          <FileText size={16} /> Export PDF
+          <FileText size={16} /> {t("course_detail.export_pdf")}
         </button>
       </header>
 
       <main className="flex-1 flex overflow-hidden">
-
         {/* CỘT TRÁI: VIDEO + KEY POINTS */}
         <div className="flex-[7] flex flex-col p-6 overflow-y-auto border-r border-slate-100">
-
           {/* Video Player */}
           <div className="w-full h-[600px] bg-[#0B0A1A] rounded-2xl relative shadow-lg overflow-hidden mb-6">
             {courseData?.videoId ? (
               <div ref={playerRef} className="w-full h-full" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-500">
-                Đang tải video...
+                {t("course_detail.loading_video")}
               </div>
             )}
           </div>
 
           {/* Key Points */}
           <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm max-h-[200px] overflow-y-auto">
-            <h3 className="font-bold text-slate-900 mb-2 text-sm uppercase">Key points</h3>
+            <h3 className="font-bold text-slate-900 mb-2 text-sm uppercase">
+              {t("course_detail.key_points")}
+            </h3>
             <ul className="space-y-2">
               {courseData?.keyPoints?.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-sm text-slate-600">
+                <li
+                  key={idx}
+                  className="flex items-start gap-3 text-sm text-slate-600"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
                   <span className="leading-relaxed">{point}</span>
                 </li>
@@ -206,29 +225,34 @@ const CourseDetail = () => {
 
         {/* CỘT PHẢI: TRANSCRIPT & SUMMARY */}
         <div className="flex-[3] min-w-[350px] flex flex-col bg-white border-l border-slate-100">
-
           {/* Tab */}
           <div className="flex items-center gap-8 px-8 pt-8 border-b border-slate-100">
-            {['TRANSCRIPT', 'SUMMARY'].map((tab) => (
+            {["TRANSCRIPT", "SUMMARY"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setMidTab(tab)}
-                className={`pb-4 text-sm transition-all uppercase tracking-tighter ${midTab === tab
-                    ? 'text-blue-600 font-black border-b-4 border-blue-600'
-                    : 'text-slate-300 font-bold hover:text-slate-500'
-                  }`}
+                className={`pb-4 text-sm transition-all uppercase tracking-tighter ${
+                  midTab === tab
+                    ? "text-blue-600 font-black border-b-4 border-blue-600"
+                    : "text-slate-300 font-bold hover:text-slate-500"
+                }`}
               >
-                {tab === 'TRANSCRIPT' ? 'Transcript' : 'Summary'}
+                {tab === "TRANSCRIPT"
+                  ? t("course_detail.transcript")
+                  : t("course_detail.summary")}
               </button>
             ))}
           </div>
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            {midTab === 'TRANSCRIPT' ? (
+            {midTab === "TRANSCRIPT" ? (
               <div className="space-y-6 animate-in fade-in duration-300">
                 {courseData?.transcript?.map((item, idx) => (
-                  <div key={idx} className="group cursor-pointer p-2 rounded-xl hover:bg-blue-50/50 transition-all">
+                  <div
+                    key={idx}
+                    className="group cursor-pointer p-2 rounded-xl hover:bg-blue-50/50 transition-all"
+                  >
                     <span className="inline-block bg-blue-600 text-white text-[10px] font-mono font-black px-2 py-1 rounded-md mb-2 shadow-md shadow-blue-200">
                       {formatTime(item.time)}
                     </span>
@@ -242,28 +266,39 @@ const CourseDetail = () => {
               <div className="animate-in slide-in-from-right-4 duration-300 space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-1 h-4 bg-blue-600 rounded-full" />
-                  <h2 className="text-sm font-medium text-blue-600 tracking-tight">Executive Summary</h2>
+                  <h2 className="text-sm font-medium text-blue-600 tracking-tight">
+                    {t("course_detail.executive_summary")}
+                  </h2>
                 </div>
 
                 <div className="relative p-8 bg-white border border-slate-200 rounded-[2rem] shadow-sm overflow-hidden">
-                  <Zap size={60} className="absolute -bottom-2 -right-2 text-slate-50" fill="currentColor" />
+                  <Zap
+                    size={60}
+                    className="absolute -bottom-2 -right-2 text-slate-50"
+                    fill="currentColor"
+                  />
                   <div className="relative z-10">
                     <ul className="space-y-4">
                       {courseData?.summary ? (
                         (Array.isArray(courseData.summary)
-                          ? courseData.summary.join('. ')
-                          : courseData.summary)
-                          .split('.')
+                          ? courseData.summary.join(". ")
+                          : courseData.summary
+                        )
+                          .split(".")
                           .map((s) => s.trim())
                           .filter((s) => s.length > 0)
                           .map((sentence, idx) => (
                             <li key={idx} className="flex items-start gap-3">
                               <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 shrink-0" />
-                              <p className="text-[15px] text-slate-600 leading-relaxed">{sentence}</p>
+                              <p className="text-[15px] text-slate-600 leading-relaxed">
+                                {sentence}
+                              </p>
                             </li>
                           ))
                       ) : (
-                        <p className="text-[15px] text-slate-400 italic">Đang cập nhật tóm tắt...</p>
+                        <p className="text-[15px] text-slate-400 italic">
+                          {t("course_detail.updating_summary")}
+                        </p>
                       )}
                     </ul>
                   </div>
@@ -271,7 +306,9 @@ const CourseDetail = () => {
 
                 <div className="flex items-center justify-center gap-3 pt-2 opacity-20">
                   <div className="h-[1px] flex-1 bg-slate-200" />
-                  <p className="text-[10px] font-medium text-slate-400 tracking-wide">AI Learning System Analysis</p>
+                  <p className="text-[10px] font-medium text-slate-400 tracking-wide">
+                    {t("course_detail.ai_system_analysis")}
+                  </p>
                   <div className="h-[1px] flex-1 bg-slate-200" />
                 </div>
               </div>
@@ -299,7 +336,6 @@ const CourseDetail = () => {
             </div>
           )}
         </div>
-
       </main>
     </div>
   );

@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 
 import Sidebar from "./components/layout/Sidebar";
-import Header from "./components/layout/header";
+import Header from "./components/layout/Header";
 import LandingPage from "./pages/Home";
 import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
@@ -26,10 +26,12 @@ import CourseDetail from "./pages/CourseDetail/CourseDetail";
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  
+
   // Kiểm tra chính xác xem có phải đang ở trang chi tiết không
   // Dùng regex để đảm bảo đúng định dạng /app/history/123
-  const isCourseDetail = location.pathname.includes("/history/") && location.pathname.split("/").length > 3;
+  const isCourseDetail =
+    location.pathname.includes("/history/") &&
+    location.pathname.split("/").length > 3;
 
   // Nếu là trang chi tiết, render một layout đơn giản nhất (không Sidebar, không Header chung)
   if (isCourseDetail) {
@@ -55,7 +57,7 @@ function AppLayout({ onLogout }) {
 
       <div className="flex flex-col flex-1 min-w-0">
         <Header onMenuOpen={() => setMobileOpen(true)} />
-        
+
         {/* Khu vực nội dung có scroll dọc cho Dashboard, History... */}
         <main className="flex-1 overflow-y-auto">
           <Routes>

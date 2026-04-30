@@ -38,7 +38,7 @@ export const COURSES = [
     color: "blue",
     bg: "#FFF0F5",
     icon: "🧠",
-    badge: "Done",
+    badge: "done",
   },
   {
     id: 5,
@@ -59,12 +59,12 @@ export const COURSES = [
     color: "blue",
     bg: "#fff7eea5",
     icon: "📊",
-    badge: "Done",
+    badge: "done",
   },
 ];
 
 export const TABS = [
-  { key: "all", label: "All" },
-  { key: "in-progress", label: "In Progress" },
-  { key: "completed", label: "Completed" },
+  { key: "all", labelKey: "my_courses.tabs.all" },
+  { key: "in-progress", labelKey: "my_courses.tabs.in_progress" },
+  { key: "completed", labelKey: "my_courses.tabs.completed" },
 ];
