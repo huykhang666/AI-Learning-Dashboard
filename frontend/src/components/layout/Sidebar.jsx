@@ -108,9 +108,6 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
     const fetchInfo = async () => {
       try {
         const res = await userService.getMyInfo();
-        console.log("Full API response:", res);
-        console.log("dailyUploadCount:", res.dailyUploadCount, typeof res.dailyUploadCount);
-
         setUserData({
           name: res.fullName || "USER",
           plan: res.premium ? "Premium Plan" : "Free Plan",

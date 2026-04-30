@@ -97,12 +97,10 @@ function Pricing({ onRegister }) {
 
   return (
     <section id="Pricing" className="bg-gray-50 py-24 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full opacity-40 blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 relative">
 
-        {/* Header */}
         <div className="text-center mb-14">
           <span className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold px-4 py-1.5 rounded-full mb-4 tracking-widest uppercase">
             <FaStar size={11} /> Bảng Giá
@@ -119,7 +117,6 @@ function Pricing({ onRegister }) {
           </p>
         </div>
 
-        {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
           {plans.map((plan) => (
             <div
@@ -130,7 +127,6 @@ function Pricing({ onRegister }) {
                   : "bg-white text-gray-900 shadow-sm border border-gray-100 hover:shadow-md"
               }`}
             >
-              {/* Badge */}
               {plan.badge && (
                 <div
                   className={`absolute -top-3.5 left-1/2 -translate-x-1/2 text-xs font-extrabold px-4 py-1.5 rounded-full whitespace-nowrap tracking-wide ${
@@ -144,7 +140,6 @@ function Pricing({ onRegister }) {
               )}
 
               <div className="p-8 flex flex-col gap-5 flex-1">
-                {/* Icon + Plan Name */}
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -164,7 +159,6 @@ function Pricing({ onRegister }) {
                   </div>
                 </div>
 
-                {/* Price */}
                 <div className="flex items-end gap-1">
                   <span className="text-4xl font-black tracking-tight">{plan.price}</span>
                   <span
@@ -176,10 +170,8 @@ function Pricing({ onRegister }) {
                   </span>
                 </div>
 
-                {/* Divider */}
                 <div className={`h-px w-full ${plan.highlight ? "bg-white/20" : "bg-gray-100"}`} />
 
-                {/* Features */}
                 <ul className="flex flex-col gap-2.5 flex-1">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2.5 text-sm">
@@ -199,7 +191,6 @@ function Pricing({ onRegister }) {
                   ))}
                 </ul>
 
-                {/* Button */}
                 <button
                   className={`w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 mt-2 ${plan.buttonStyle}`}
                   onClick={onRegister}
@@ -211,7 +202,6 @@ function Pricing({ onRegister }) {
           ))}
         </div>
 
-        {/* Payment Methods */}
         <div className="text-center mt-14">
           <p className="text-gray-400 text-xs font-semibold uppercase tracking-widest mb-5">
             Phương thức thanh toán được hỗ trợ

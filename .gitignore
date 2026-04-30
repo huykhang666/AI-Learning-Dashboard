@@ -1,3 +1,4 @@
+### JAVA ###
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -13,7 +14,7 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
+### IntelliJ ###
 .idea
 *.iws
 *.iml
@@ -32,18 +33,28 @@ build/
 ### VS Code ###
 .vscode/
 
-# Python environment
-ai-service/venv/
-ai-service/__pycache__/
-ai-service/.env
-ai-service/ffmpeg.exe
-ai-service/storage/
+# =====================
+# FRONTEND (React/Vite)
+# =====================
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.env
 
+# =====================
+# PYTHON
+# =====================
+ai-service/venv/
+ai-service/.venv/
 .venv/
 venv/
-ai-service/.venv/
 
 __pycache__/
 **/__pycache__/
 *.pyc
-.env/
+
+ai-service/.env
+ai-service/storage/
+ai-service/ffmpeg.exe
