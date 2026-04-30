@@ -15,7 +15,7 @@ public class UserProgressResponse {
     Double completionRate;
     Long timeSpent;
     Integer lastWatchedSecond;
-    Boolean isCompleted;
+    Boolean completed;
     LocalDateTime lastAccessed;
 
 }

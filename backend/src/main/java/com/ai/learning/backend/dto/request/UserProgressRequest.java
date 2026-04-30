@@ -1,5 +1,6 @@
 package com.ai.learning.backend.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +10,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserProgressRequest {
+    @NotNull
     Long sessionId;
-    Long additionalTime;
+    
+    Long timeSpent;
+
+    @NotNull
     Integer currentSecond;
 }

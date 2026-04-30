@@ -148,43 +148,90 @@ const StudyHistory = () => {
               onClick={() => handleItemClick(item.id)}
               className="group bg-white rounded-2xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex items-center gap-4 cursor-pointer"
             >
+              {/* Icon trái */}
               <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0">
                 <Layers className={`w-6 h-6 ${item.progress >= 100 ? 'text-green-500' : 'text-slate-400'}`} />
               </div>
 
               <div className="flex-grow">
+                {/* Row 1: Title + Badge type */}
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-sm">
-                      {item.title}
-                    </h3>
-                    <div className="flex items-center gap-x-4 mt-2 text-[11px] text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {new Date(item.createdAt).toLocaleDateString('vi-VN')}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {item.duration ? `${Math.floor(item.duration / 60)}m` : '0m'}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-500 text-[10px] rounded-md font-medium">
+                  <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors uppercase text-sm">
+                    {item.title}
+                  </h3>
+                  <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-500 text-[10px] rounded-md font-medium flex-shrink-0 ml-2">
                     {item.type}
                   </span>
                 </div>
 
-                {/* Thanh tiến độ */}
-                <div className="mt-4 flex items-center gap-3">
+                {/* Row 2: Meta info — ngày + thời lượng video */}
+                <div className="flex items-center gap-x-4 mt-1.5 text-[11px] text-slate-400">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {new Date(item.createdAt).toLocaleDateString('vi-VN')}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {item.duration
+                      ? `${Math.floor(item.duration / 60)} phút ${item.duration % 60 > 0 ? `${item.duration % 60}s` : ''}`
+                      : 'Chưa có dữ liệu'}
+                  </span>
+                </div>
+
+                {/* Row 3: Progress bar + % + trạng thái */}
+                <div className="mt-3 flex items-center gap-3">
+                  {/* Progress bar */}
                   <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full transition-all duration-700 ${item.progress >= 100 ? 'bg-green-500' : 'bg-blue-500'}`}
-                      style={{ width: `${item.progress || 0}%` }}
+                      className={`h-full rounded-full transition-all duration-700 ${item.progress >= 100
+                        ? 'bg-green-500'
+                        : item.progress >= 50
+                          ? 'bg-blue-500'
+                          : 'bg-orange-400'
+                        }`}
+                      style={{ width: `${Math.min(item.progress || 0, 100)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] font-bold text-blue-500">{Math.round(item.progress || 0)}%</span>
+
+                  {/* % số */}
+                  <span className={`text-[10px] font-bold w-8 text-right ${item.progress >= 100
+                    ? 'text-green-500'
+                    : item.progress >= 50
+                      ? 'text-blue-500'
+                      : 'text-orange-400'
+                    }`}>
+                    {Math.round(Math.min(item.progress || 0, 100))}%
+                  </span>
+
+                  {/* Badge trạng thái */}
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${item.progress >= 70
+                      ? 'bg-green-50 text-green-600'
+                      : item.progress >= 50
+                        ? 'bg-blue-50 text-blue-600'
+                        : item.progress > 0
+                          ? 'bg-orange-50 text-orange-500'
+                          : 'bg-slate-100 text-slate-400'
+                    }`}>
+                    {item.progress >= 70
+                      ? '✓ Hoàn thành'
+                      : item.progress >= 50
+                        ? 'Đang học'
+                        : item.progress > 0
+                          ? 'Mới bắt đầu'
+                          : 'Chưa xem'}
+                  </span>
                 </div>
               </div>
             </div>
           ))}
+
+          {/* Empty state */}
+          {currentItems.length === 0 && (
+            <div className="text-center py-16 text-slate-400">
+              <Layers className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p className="text-sm">Không tìm thấy bài giảng nào</p>
+            </div>
+          )}
         </div>
 
         {/* Phân trang */}

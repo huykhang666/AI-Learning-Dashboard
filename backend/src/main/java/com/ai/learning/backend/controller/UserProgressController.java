@@ -4,6 +4,7 @@ import com.ai.learning.backend.dto.request.UserProgressRequest;
 import com.ai.learning.backend.dto.response.ApiResponse;
 import com.ai.learning.backend.dto.response.UserProgressResponse;
 import com.ai.learning.backend.service.UserProgressService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +24,8 @@ public class UserProgressController {
     UserProgressService progressService;
 
     @PostMapping("/update")
-    public ApiResponse<UserProgressResponse> updateProgress(@RequestBody UserProgressRequest request) {
+    public ApiResponse<UserProgressResponse> updateProgress(
+            @Valid @RequestBody UserProgressRequest request) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserProgressResponse response = progressService.updateProgress(currentUsername, request);

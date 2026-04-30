@@ -31,58 +31,67 @@ const aiClient = axios.create({
    3. COURSE / MESSAGE API (JAVA)
 ======================== */
 export const courseDetailApi = {
-  // Lấy chi tiết khóa học
+  // Lấy chi tiết bài học theo session ID
   getById: async (id) => {
     try {
       const response = await axiosClient.get(`/history/${id}`);
-
-      if (response.data && response.data.result) {
-        return response.data.result;
-      }
-
+      if (response.data?.result) return response.data.result;
       return response.data;
     } catch (error) {
-      console.error("CourseDetailApi Error:", error);
+      console.error("[CourseDetailApi] getById error:", error);
       throw error;
     }
   },
 
-  // Lấy lịch sử chat
+  // Lấy lịch sử chat theo session
   getChatHistory: async (sessionId, page = 1) => {
     try {
       const response = await axiosClient.get(
         `/messages/${sessionId}?page=${page}&size=20`
       );
-
       return response.data.result;
     } catch (error) {
-      console.error("GetChatHistory Error:", error);
+      console.error("[CourseDetailApi] getChatHistory error:", error);
       throw error;
     }
   },
 
-  // Lưu message user vào Java
+  // Lưu tin nhắn user lên Java backend
   sendMessage: async (sessionId, content) => {
     try {
-      const response = await axiosClient.post(
-        `/messages`,
-        {
-          sessionId: sessionId,
-          content: content,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await axiosClient.post("/messages", {
+        sessionId,
+        content,
+      });
       return response.data.result;
     } catch (error) {
-      console.error("SendMessage Error:", error);
+      console.error("[CourseDetailApi] sendMessage error:", error);
       throw error;
     }
   },
+
+  // Cập nhật tiến độ xem video — gọi POST /progress/update
+  // Backend nhận: { sessionId, currentSecond }
+  updateProgress: async (sessionId, currentSecond) => {
+    try {
+      const response = await axiosClient.post("/progress/update", {
+        sessionId: Number(sessionId),
+        currentSecond: Math.floor(currentSecond),
+      });
+      return response.data;
+    } catch (error) {
+      // Không throw — lỗi tracking không được ảnh hưởng UX
+      console.warn("[CourseDetailApi] updateProgress failed silently:", error);
+    }
+  },
+  saveDuration: async (id, data) => {
+  try {
+    const response = await axiosClient.patch(`/history/${id}/duration`, data);
+    return response.data;
+  } catch (error) {
+    console.warn('[CourseDetailApi] saveDuration failed:', error);
+  }
+},
 };
 
 /* ========================
@@ -91,23 +100,14 @@ export const courseDetailApi = {
 export const aiApi = {
   chat: async (sessionId, query, history = []) => {
     try {
-      const response = await aiClient.post(
-        `/chat`,
-        {
-          session_id: sessionId,
-          query: query,
-          history: history,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      return response.data; // { answer: "..." }
+      const response = await aiClient.post("/chat", {
+        session_id: sessionId,
+        query,
+        history,
+      });
+      return response.data;
     } catch (error) {
-      console.error("AI Chat Error:", error);
+      console.error("[aiApi] chat error:", error);
       throw error;
     }
   },

@@ -29,43 +29,49 @@ public class UserProgressServiceImpl implements UserProgressService {
     @Override
     @Transactional
     public UserProgressResponse updateProgress(String username, UserProgressRequest request) {
-        //Lấy id từ username
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        Long userId = user.getUserId();
-        // Tìm bản ghi cũ, nếu không có thì khởi tạo một đối tượng mới hoàn toàn
-        UserProgress progress = repository.findByUser_UserIdAndSession_LearningSessionId(userId,request.getSessionId())
+        UserProgress progress = repository
+                .findByUser_UserIdAndSession_LearningSessionId(user.getUserId(), request.getSessionId())
                 .orElseGet(() -> {
                     UserProgress newProgress = new UserProgress();
-                    newProgress.setUser(userRepository.findById(userId)
-                            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
-
+                    newProgress.setUser(user);
                     newProgress.setSession(sessionRepository.findById(request.getSessionId())
                             .orElseThrow(() -> new AppException(ErrorCode.SESSION_NOT_FOUND)));
                     newProgress.setTimeSpent(0L);
-                    return  newProgress;
+                    newProgress.setLastWatchedSecond(0);
+                    newProgress.setCompletionRate(0.0);
+                    newProgress.setCompleted(false);
+                    return newProgress;
                 });
-        //Cập nhật dữ liệu
-        progress.setLastWatchedSecond(request.getCurrentSecond());
 
-        //Cộng dồn thời gian học
-        long updatedTimeSpent = (progress.getTimeSpent() != null ? progress.getTimeSpent() : 0)
-                + request.getAdditionalTime();
+        Integer current = request.getCurrentSecond();
+        Integer last = progress.getLastWatchedSecond();
+
+        if (current != null) {
+            progress.setLastWatchedSecond(current);
+        }
+
+        long delta = 0;
+        if (last != null && current != null && current > last) {
+            delta = current - last;
+        }
+
+        long updatedTimeSpent = (progress.getTimeSpent() == null ? 0 : progress.getTimeSpent()) + delta;
         progress.setTimeSpent(updatedTimeSpent);
 
-        //Tính toán tiến độ
         Integer duration = progress.getSession().getDuration();
-        if(duration != null && duration > 0) {
-            double rate = ((double) request.getCurrentSecond() / duration) * 100;
-            progress.setCompletionRate(Math.min(rate,100.0));
+        if (duration != null && duration > 0 && current != null) {
+            double rate = ((double) current / duration) * 100;
+            progress.setCompletionRate(Math.min(rate, 100.0));
 
-            if(progress.getCompletionRate() >= 90) {
+            if (rate >= 70) {
                 progress.setCompleted(true);
             }
-        } else {
-            progress.setCompletionRate(0.0);
         }
+
         return mapper.toResponse(repository.save(progress));
     }
 }

@@ -6,8 +6,10 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserProgressMapper {
+
     @Mapping(source = "session.learningSessionId", target = "sessionId")
-    @Mapping(source = "completed", target = "isCompleted")
+    @Mapping(source = "completed", target = "completed")
     @Mapping(source = "lastAccess", target = "lastAccessed")
+
     UserProgressResponse toResponse(UserProgress entity);
 }
