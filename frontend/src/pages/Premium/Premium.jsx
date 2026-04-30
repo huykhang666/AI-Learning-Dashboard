@@ -1,13 +1,13 @@
 import React from 'react';
 import { Target, Clock, Zap } from 'lucide-react';
-// NHÚNG COMPONENT PRICING VÀO ĐÂY
 import Pricing from '../../components/home/Pricing';
 
 const PremiumPage = () => {
   return (
     <div className="bg-slate-50 min-h-screen pt-12 pb-24">
       
-      <div className="flex flex-col items-center text-center mb-4 px-4">
+      {/* Thêm relative và z-10 ở đây để nội dung này nằm trên Pricing */}
+      <div className="relative z-10 flex flex-col items-center text-center mb-4 px-4">
         
         <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-5 py-2 rounded-full font-bold text-sm mb-6 border border-orange-200 shadow-sm">
           <Zap size={16} className="fill-orange-500" />
@@ -32,8 +32,8 @@ const PremiumPage = () => {
         </button>
       </div>
 
-      <div className="-mt-8">
-          {/* Sử dụng lại Pricing của Hiểu */}
+      {/* Phần Pricing có margin âm nên nó lấn lên trên, z-0 sẽ đảm bảo nó nằm dưới */}
+      <div className="-mt-8 relative z-0">
         <Pricing />
       </div>
 

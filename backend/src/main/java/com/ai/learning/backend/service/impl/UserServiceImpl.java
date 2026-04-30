@@ -10,6 +10,7 @@ import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.UserMapper;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -64,13 +65,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getMyInfo() {
-        //Retrieve the username of the currently logged-in user from the security system
         var context = org.springframework.security.core.context.SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-
-        //Find a user in the database by username.
         User user = userRepository.findByUsername(name)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        try {
+            this.canUpload(user.getUserId());
+        } catch (AppException e) {
+            log.info("User {} đã hết lượt upload hôm nay", name);
+        }
+
         return userMapper.toUserResponse(user);
     }
 
@@ -101,19 +106,27 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
 
-        if(user.getDailyUploadCount() >= 5) {
+        if(user.getDailyUploadCount() >= 4) {
             throw new AppException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
         }
         return true;
     }
 
     @Override
+    @Transactional
     public void updateUsage(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        user.setDailyUploadCount(user.getDailyUploadCount() + 1);
-        user.setLastUploadDate(java.time.LocalDate.now());
+        LocalDate today = LocalDate.now();
+
+        if(user.getLastUploadDate() == null || !user.getLastUploadDate().equals(today)) {
+            user.setDailyUploadCount(1);
+            user.setLastUploadDate(today);
+        } else {
+            user.setDailyUploadCount(user.getDailyUploadCount() + 1);
+        }
+
         userRepository.save(user);
     }
 
