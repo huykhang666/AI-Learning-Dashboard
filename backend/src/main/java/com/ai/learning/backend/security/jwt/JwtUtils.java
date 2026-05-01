@@ -27,9 +27,7 @@ public class JwtUtils {
     @NonFinal
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
-
-
-
+    private static final long REFRESHABLE_DURATION = 604800;
     public String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -37,32 +35,33 @@ public class JwtUtils {
                 .subject(user.getUsername())
                 .issuer("AI-Learning-DashBoard")
                 .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
-                .claim("scope",buildScope(user))
+                .expirationTime(new Date(
+                        Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()
+                ))
+                .claim("userId", user.getUserId())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-
-        JWSObject jwsObject = new JWSObject(header,payload);
+        JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            log.error("Cannot create token",e);
             throw new RuntimeException(e);
         }
-
     }
-    public String generateRefreshToken(String email) {
+    public String generateRefreshToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(email)
+                .subject(user.getUsername())
                 .issuer("AI-Learning-DashBoard")
+                .claim("userId", user.getUserId())
                 .issueTime(new Date())
-                // Set 7 ngày (168 giờ)
-                .expirationTime(new Date(Instant.now().plus(168, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(new Date(
+                        Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()
+                ))
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

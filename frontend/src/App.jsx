@@ -22,18 +22,18 @@ import SettingPage from "./pages/Setting/Setting";
 import AnalyticsPage from "./pages/analytics/Analytics";
 import HelpCenter from "./pages/HelpCenter/HelpCenter";
 import CourseDetail from "./pages/CourseDetail/CourseDetail";
+import PaymentSuccessPage from "./pages/Payment/PaymentSuccess.jsx";
+import PaymentFailedPage from "./pages/Payment/PaymentFailed.jsx";
 
+// 1. AppLayout: Chỉ chứa các Route cần Sidebar và Header
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
-  // Kiểm tra chính xác xem có phải đang ở trang chi tiết không
-  // Dùng regex để đảm bảo đúng định dạng /app/history/123
   const isCourseDetail =
     location.pathname.includes("/history/") &&
     location.pathname.split("/").length > 3;
 
-  // Nếu là trang chi tiết, render một layout đơn giản nhất (không Sidebar, không Header chung)
   if (isCourseDetail) {
     return (
       <div className="h-screen w-full overflow-hidden bg-white">
@@ -46,9 +46,9 @@ function AppLayout({ onLogout }) {
     );
   }
 
-  // Ngược lại, render Layout Dashboard bình thường có Sidebar và Header
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
+      {/* Sidebar dùng onLogout nhận từ props */}
       <Sidebar
         onLogout={onLogout}
         mobileOpen={mobileOpen}
@@ -58,7 +58,6 @@ function AppLayout({ onLogout }) {
       <div className="flex flex-col flex-1 min-w-0">
         <Header onMenuOpen={() => setMobileOpen(true)} />
 
-        {/* Khu vực nội dung có scroll dọc cho Dashboard, History... */}
         <main className="flex-1 overflow-y-auto">
           <Routes>
             <Route path="dash" element={<DashboardPage />} />
@@ -68,7 +67,7 @@ function AppLayout({ onLogout }) {
             <Route path="settings" element={<SettingPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
-            {/* Dự phòng để không bị lỗi nếu path có /history/:id nhưng logic trên lọt lưới */}
+            {/* Route này để hỗ trợ điều hướng trong nội bộ main */}
             <Route path="history/:id" element={<CourseDetail />} />
           </Routes>
         </main>
@@ -77,8 +76,10 @@ function AppLayout({ onLogout }) {
   );
 }
 
+// 2. AppRoutes: Chứa các Route chính của ứng dụng
 function AppRoutes() {
   const navigate = useNavigate();
+  
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     navigate("/");
@@ -113,10 +114,17 @@ function AppRoutes() {
           />
         }
       />
+
+      {/* Các Route thanh toán nằm ở ngoài AppLayout để hiển thị Full màn hình */}
+      <Route path="/payment/success" element={<PaymentSuccessPage />} />
+      <Route path="/payment/failed" element={<PaymentFailedPage />} />
+      
       <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
+      
+      {/* Route chính dẫn vào Dashboard Layout */}
       <Route path="/app/*" element={<AppLayout onLogout={handleLogout} />} />
+      
       <Route path="*" element={<Navigate to="/" />} />
-      <Route path="analytics" element={<AnalyticsPage />} />
     </Routes>
   );
 }

@@ -4,8 +4,7 @@ import { NavLink } from "react-router-dom";
 import { FaBolt, FaSignOutAlt, FaTimes } from "react-icons/fa";
 import { userService } from "../../api/UserService";
 
-// FIX: Tách SidebarInner ra ngoài component Sidebar để tránh re-render
-// không nhận được state mới (đây là nguyên nhân thanh progress không cập nhật)
+
 const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData }) => (
   <div className="flex flex-col h-full px-3 py-4 overflow-y-auto relative">
     {showClose && (
@@ -53,26 +52,31 @@ const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData 
     </nav>
 
     {/* Sidebar.jsx */}
+    {/* Trong SidebarInner */}
     <div className="bg-indigo-50 border border-indigo-100 rounded-xl py-3 px-4 flex flex-col gap-3 mb-4 mt-4">
       <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm">
         <FaBolt size={14} color="orange" />
-        {/* Đảm bảo dùng usageData.used đã được set từ API */}
+        {/* Hiển thị số lượng thực tế từ backend */}
         <span>Dùng {usageData.used}/{usageData.total} video</span>
       </div>
 
       <div className="w-full bg-indigo-200 h-2 rounded-full overflow-hidden">
         <div
-          className="bg-blue-600 h-full rounded-full transition-all duration-700 ease-in-out"
+          className={`h-full rounded-full transition-all duration-700 ease-in-out ${usageData.used >= usageData.total ? "bg-red-500" : "bg-blue-600"
+            }`}
           style={{
-            // FIX: Dùng Number() để đảm bảo không bị lỗi nếu API trả về string
             width: `${Math.min((Number(usageData.used) / Number(usageData.total)) * 100, 100)}%`
           }}
         />
       </div>
 
-      <button className="w-full bg-blue-600 text-white rounded-lg py-2 font-bold text-sm">
+      {/* Khi click vào đây nên dẫn tới trang Premium */}
+      <NavLink
+        to="/app/premium"
+        className="w-full bg-blue-600 text-white rounded-lg py-2 font-bold text-sm text-center hover:bg-blue-700 transition-colors"
+      >
         Nâng cấp Premium
-      </button>
+      </NavLink>
     </div>
 
     <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
@@ -114,9 +118,8 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
           avatar: (res.fullName || "U").substring(0, 2).toUpperCase()
         });
         setUsageData({
-          // FIX: Dùng Number() để ép kiểu phòng trường hợp API trả về string thay vì number
           used: Number(res.dailyUploadCount) || 0,
-          total: 4 // Giới hạn mặc định
+          total: 4
         });
       } catch (err) {
         console.error("Lỗi sidebar:", err);

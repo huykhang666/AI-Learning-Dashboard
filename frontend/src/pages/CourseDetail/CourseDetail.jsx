@@ -113,7 +113,6 @@ const CourseDetail = () => {
         width: "100%",
         height: "100%",
         events: {
-          // Thay onReady cũ bằng cái này
           onReady: async (event) => {
             isReadyRef.current = true;
 

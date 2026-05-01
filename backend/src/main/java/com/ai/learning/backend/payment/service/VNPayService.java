@@ -8,6 +8,6 @@ import java.util.Map;
 
 public interface VNPayService {
 
-    String createPaymentUrl(VNPayRequest request, HttpServletRequest httpRequest);
-    IpnResponse processIpn(Map<String, String> params);
+        String createPaymentUrl(VNPayRequest request, HttpServletRequest httpRequest);
+        IpnResponse processIpn(Map<String, String> params);
 }
