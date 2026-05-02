@@ -27,13 +27,13 @@ const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData 
 
     <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
       {[
-        { label: "Dashboard", key: "dashboard", path: "/app/dash" },
-        { label: "MyCourses", key: "courses", path: "/app/courses" },
+        { label: "Tổng quan", key: "dashboard", path: "/app/dash" },
+        { label: "Khóa học", key: "courses", path: "/app/courses" },
         { label: "Lịch sử", key: "History", path: "/app/history" },
-        { label: "Analytics", key: "analytics", path: "/app/analytics" },
+        { label: "Phân tích", key: "analytics", path: "/app/analytics" },
         { label: "Premium", key: "premium", badge: "FREE", path: "/app/premium" },
-        { label: "Settings", key: "settings", path: "/app/settings" },
-        { label: "Help Center", key: "help", path: "/app/help" },
+        { label: "Cài đặt", key: "settings", path: "/app/settings" },
+        { label: "Hỗ trợ", key: "help", path: "/app/help" },
       ].map((item) => (
         <NavLink
           key={item.key}
