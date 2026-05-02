@@ -32,7 +32,6 @@ const PremiumPage = () => {
         </button>
       </div>
 
-      {/* Bỏ z-0 và relative ở đây nếu không cần thiết */}
       <div className="-mt-8">
         <Pricing />
       </div>

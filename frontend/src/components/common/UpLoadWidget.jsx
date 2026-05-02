@@ -75,7 +75,9 @@ function UploadWidget({ onProcessAction, hideHeader }) {
         }, 400);
 
         try {
-            const token = localStorage.getItem('token');
+           const token = localStorage.getItem('accessToken'); 
+
+
             const formData = new FormData();
 
             if (activeTab === "youtube") {
