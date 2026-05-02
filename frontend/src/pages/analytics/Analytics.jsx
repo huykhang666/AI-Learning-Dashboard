@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const studyData = [
   1.5, 2, 1, 3, 2.5, 1.8, 0.5, 2, 3.5, 2, 1, 2.8, 3, 1.5, 2.5, 1, 3, 2.2, 1.8,
   2, 0.8, 3, 2.5, 1.5, 2, 3.2, 2.8, 1, 2, 1.5,
@@ -6,14 +8,15 @@ const studyData = [
 const maxHours = Math.max(...studyData);
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation();
   return (
     <div className="p-6">
       {/* Title */}
       <h1 className="text-2xl font-bold text-gray-800">
-        Learning Analytics & Insights
+        {t("analytics.title")}
       </h1>
       <p className="text-sm text-gray-400 mt-1 mb-6">
-        Phân tích học tập của bạn
+        {t("analytics.subtitle")}
       </p>
 
       {/* Row 1 */}
@@ -21,7 +24,7 @@ export default function AnalyticsPage() {
         {/* Study Time Trend */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-semibold text-gray-700 mb-4">
-            Study Time Trend (Last 30 Days)
+            {t("analytics.study_time_trend")}
           </p>
           <div className="flex items-end gap-[3px] h-24">
             {studyData.map((h, i) => (
@@ -77,7 +80,7 @@ export default function AnalyticsPage() {
         {/* Learning Focus */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-semibold text-gray-700 mb-4">
-            Learning Focus by Subject
+            {t("analytics.learning_focus")}
           </p>
           <div className="flex items-center gap-6">
             <svg width="90" height="90" viewBox="0 0 90 90">
@@ -147,7 +150,7 @@ export default function AnalyticsPage() {
         {/* Keywords */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-semibold text-gray-700 mb-4">
-            Top Keywords this Month
+            {t("analytics.top_keywords")}
           </p>
           <div className="flex flex-wrap gap-2 items-center">
             {[
@@ -178,11 +181,11 @@ export default function AnalyticsPage() {
         {/* Goal Tracking */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm font-semibold text-gray-700 mb-4">
-            Goal Tracking
+            {t("analytics.goal_tracking")}
           </p>
           {[
-            { label: "Weekly goal", value: 65 },
-            { label: "Monthly goal", value: 40 },
+            { label: t("analytics.goals.weekly"), value: 65 },
+            { label: t("analytics.goals.monthly"), value: 40 },
           ].map((g) => (
             <div key={g.label} className="mb-4">
               <div className="flex justify-between text-xs text-gray-600 font-medium mb-1">
@@ -196,8 +199,8 @@ export default function AnalyticsPage() {
                 />
               </div>
               <div className="flex justify-between text-[10px] text-gray-300 mt-1">
-                <span>0%</span>
-                <span>100%</span>
+                <span>{t("analytics.percentage_min")}</span>
+                <span>{t("analytics.percentage_max")}</span>
               </div>
             </div>
           ))}

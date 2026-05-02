@@ -21,5 +21,6 @@ public class UserResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate dateOfBirth;
     Set<String> roles;
-
+    int dailyUploadCount;
+    boolean premium;
 }

@@ -1,0 +1,419 @@
+{
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "about": "About",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "login": "Login",
+    "sign_up": "Sign Up Free",
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "header": {
+    "title": "Learning Platform",
+    "subtitle": "Learn anytime, anywhere",
+    "search_placeholder": "Search courses...",
+    "upgrade": "Upgrade"
+  },
+  "hero": {
+    "made_for": "Made for Vietnamese Students",
+    "title_line1": "Turn lecture videos",
+    "title_line2": "into knowledge",
+    "title_span": "easy to absorb",
+    "description": "Upload lecture videos - AI automatically transcribes, summarizes and answers questions. Learn more effectively with 3x better results!",
+    "cta_free": "Start free",
+    "cta_feature": "See features"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "my_courses": "My Courses",
+    "history": "History",
+    "analytics": "Analytics",
+    "premium": "Premium",
+    "help": "Help Center",
+    "usage": "Used {{used}}/{{total}} videos",
+    "upgrade": "Upgrade Premium",
+    "progress": "Progress",
+    "settings": "Settings",
+    "plan": {
+      "free": "Free Plan"
+    },
+    "badge": {
+      "free": "FREE"
+    }
+  },
+  "history": {
+    "title": "History",
+    "lectures_count": "{{count}} lectures found",
+    "search_placeholder": "Search lecture history",
+    "stats": {
+      "total_lectures": "Total lectures",
+      "completed": "Completed"
+    },
+    "duration_minutes": "minutes",
+    "duration_seconds": "seconds",
+    "duration_missing": "No duration available",
+    "status": {
+      "completed": "✓ Completed",
+      "in_progress": "In progress",
+      "started": "Just started",
+      "not_started": "Not viewed"
+    },
+    "no_results": "No matching results found."
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {{name}}!",
+    "subtitle": "Supercharge your learning.",
+    "upload_widget": "Upload Widget",
+    "learning_overview": "Learning Overview",
+    "total_study_time": "Total Study Time",
+    "total_all_time": "Total All Time",
+    "lectures_done": "Lectures Done",
+    "lectures": "Lectures",
+    "goal_progress": "Goal Progress",
+    "goal_label": "100% goal",
+    "weekly_activity": "Weekly Activity (Hours)",
+    "top_keywords": "Top Keywords",
+    "recent_courses": "Recent Courses",
+    "view_all": "View All →",
+    "loading": "Loading dashboard...",
+    "error_loading": "Unable to load dashboard data.",
+    "no_data": "No dashboard data available.",
+    "retry": "Retry"
+  },
+  "my_courses": {
+    "title": "My Courses",
+    "subtitle": "Manage your enrolled lectures and progress.",
+    "search_placeholder": "Search within courses",
+    "tabs": {
+      "all": "All",
+      "in_progress": "In Progress",
+      "completed": "Completed"
+    },
+    "lessons": "{{count}} Lessons",
+    "progress_complete": "{{percent}}% Complete",
+    "button": {
+      "view_course": "View Course",
+      "latest_lesson": "Latest Lesson"
+    },
+    "badge": {
+      "done": "Done"
+    }
+  },
+  "help_center": {
+    "title": "How Can We Help?",
+    "search_placeholder": "Search for help, tutorials, FAQs...",
+    "popular_topics": "Popular help topics",
+    "popular_faqs": "Popular FAQs",
+    "contact_support": "Contact Support",
+    "contact_description": "Connect with our team or start a live chat.",
+    "start_live_chat": "Start Live Chat",
+    "topics": {
+      "getting_started": "Getting Started",
+      "upload": "Upload & AI Processing",
+      "chatbot": "Chatbot Assistance",
+      "account_billing": "Account & Billing"
+    },
+    "faqs": {
+      "upload": {
+        "q": "How to upload a file?",
+        "a": "Click the upload button on the dashboard or drag and drop your file. Supported formats include PDF, MP4, and YouTube links."
+      },
+      "premium": {
+        "q": "What is Premium?",
+        "a": "Premium gives you unlimited uploads, faster AI processing, and access to advanced chatbot features."
+      },
+      "processing": {
+        "q": "How long does AI processing take?",
+        "a": "Most files are processed within 1–3 minutes depending on size and server load."
+      },
+      "youtube": {
+        "q": "Can I upload YouTube links?",
+        "a": "Yes! Paste a YouTube URL in the upload box and the system will automatically fetch and process the video."
+      }
+    }
+  },
+  "settings": {
+    "title": "Account",
+    "subtitle": "Account settings",
+    "tabs": {
+      "account": "Account",
+      "preferences": "Preferences"
+    },
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "avatar": "Avatar",
+      "change": "Change",
+      "save_changes": "Save Changes"
+    },
+    "preferences_unavailable": "Preferences is under development."
+  },
+  "analytics": {
+    "title": "Learning Analytics & Insights",
+    "subtitle": "Your study performance at a glance.",
+    "study_time_trend": "Study Time Trend (Last 30 Days)",
+    "learning_focus": "Learning Focus by Subject",
+    "top_keywords": "Top Keywords this Month",
+    "goal_tracking": "Goal Tracking",
+    "goals": {
+      "weekly": "Weekly goal",
+      "monthly": "Monthly goal"
+    },
+    "percentage_min": "0%",
+    "percentage_max": "100%"
+  },
+  "course": {
+    "enroll": "Enroll Now",
+    "continue": "Continue Learning",
+    "completed": "Completed",
+    "lessons": "Lessons",
+    "duration": "Duration",
+    "level": "Level",
+    "level_beginner": "Beginner",
+    "level_intermediate": "Intermediate",
+    "level_advanced": "Advanced",
+    "free": "Free",
+    "students": "{{count}} students"
+  },
+  "upload": {
+    "title": "Upload File",
+    "drag_drop": "Drag and drop files here",
+    "or": "or",
+    "browse": "Browse Files",
+    "uploading": "Uploading...",
+    "success": "Upload successful!",
+    "error": "Upload failed. Please try again."
+  },
+  "ai_chat": {
+    "title": "AI Assistant",
+    "placeholder": "Ask me anything...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "clear": "Clear chat",
+    "welcome": "Hello! I'm ready to support your learning.",
+    "not_answer": "AI did not respond. Please try again.",
+    "error_message": "Sorry, something went wrong while contacting AI.",
+    "analysis": "AI is analyzing..."
+  },
+  "course_detail": {
+    "back": "Back",
+    "export_pdf": "Export PDF",
+    "transcript": "Transcript",
+    "summary": "Summary",
+    "key_points": "Key Points",
+    "loading_video": "Loading video...",
+    "executive_summary": "Executive Summary",
+    "updating_summary": "Updating summary...",
+    "ai_system_analysis": "AI Learning System Analysis"
+  },
+  "loading": {
+    "message": "Loading, please wait...",
+    "courses": "Loading courses..."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "close": "Close",
+    "language": "Language"
+  },
+  "pricing": {
+    "title": "Pricing",
+    "heading": "Pick the plan that fits your goals",
+    "description": "Start free and upgrade when you need more features.",
+    "plans": {
+      "free": {
+        "label": "Free",
+        "features": [
+          "4 videos per day",
+          "Basic transcript",
+          "AI chat: 10 messages/day",
+          "Save up to 10 items",
+          "Email support"
+        ],
+        "button": "Start free"
+      },
+      "premium": {
+        "label": "Premium",
+        "badge": "MOST POPULAR 🔥",
+        "features": [
+          "Unlimited videos per day",
+          "High accuracy transcript",
+          "Unlimited AI chat",
+          "Unlimited saves",
+          "PDF export",
+          "Priority processing",
+          "24/7 support"
+        ],
+        "button": "Try 7 days free"
+      },
+      "yearly": {
+        "label": "Premium Yearly",
+        "badge": "SAVE 26% 🎉",
+        "features": [
+          "All Premium features",
+          "Save ~179.000đ/year",
+          "Top priority support",
+          "Early beta access",
+          "VIP profile badge",
+          "VIP support"
+        ],
+        "button": "Choose yearly"
+      }
+    },
+    "payment_supported": "Supported payment methods",
+    "payment_methods": {
+      "momo": "MoMo",
+      "vnpay": "VNPay",
+      "visa": "Visa / MasterCard",
+      "atm": "Domestic ATM"
+    }
+  },
+  "about": {
+    "title": "About us",
+    "heading": "We build the future of education",
+    "description": {
+      "line1": "AI-Learning DashBoard was founded in 2024 by engineers passionate about education and AI.",
+      "line2": "Our mission is to help Vietnamese students access lecture content more effectively, save time, and improve learning quality with advanced AI technology."
+    },
+    "stats": {
+      "students": "Students",
+      "videos": "Processed videos",
+      "accuracy": "AI accuracy",
+      "rating": "Average rating"
+    },
+    "vision": {
+      "tag": "VISION",
+      "heading": "Every lecture can become limitless learning content.",
+      "description": "We aim to remove barriers to accessing and reviewing study content. No more rewinding videos — just ask AI and get instant answers."
+    },
+    "badges": {
+      "edtech": "Top EdTech 2024",
+      "vietnam": "Made in Vietnam",
+      "gdpr": "GDPR Compliant"
+    },
+    "team": {
+      "title": "Founding team",
+      "roles": {
+        "backend": "Backend",
+        "frontend": "Frontend"
+      },
+      "description": "UTC2 student"
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "section_title": "Frequently asked questions",
+    "items": [
+      {
+        "question": "How does AI-Learning DashBoard work?",
+        "answer": "Upload lecture videos (MP4) or paste a YouTube link. The system uses AI Whisper for speech-to-text and ViT5 for summarization. The whole process takes 2-5 minutes."
+      },
+      {
+        "question": "Can I use it for free?",
+        "answer": "Yes! The Free plan allows 4 videos/day, up to 10 saved items, and 10 AI chat messages/day. No credit card required."
+      },
+      {
+        "question": "Which languages are supported?",
+        "answer": "AI Whisper supports 50+ languages including Vietnamese, English, and Japanese with high accuracy."
+      },
+      {
+        "question": "Is my video data secure?",
+        "answer": "Yes. Videos are encrypted during upload and only you have access. We comply with GDPR."
+      },
+      {
+        "question": "Can I cancel Premium anytime?",
+        "answer": "Yes, you can cancel anytime from the Settings page with no cancellation fees."
+      },
+      {
+        "question": "What payment options are available?",
+        "answer": "We support MoMo, VNPay, Visa/MasterCard, and domestic ATM payments. All transactions are SSL secured."
+      }
+    ]
+  },
+  "feature": {
+    "title": "Core Features",
+    "heading": "Built to help you learn smarter",
+    "description": "AI-powered lecture processing, smart summaries, and instant answers to help students learn faster.",
+    "process": {
+      "title": "How it works",
+      "heading": "A simple 3-step workflow"
+    },
+    "cards": {
+      "whisper": {
+        "title": "Speech-to-text transcription",
+        "description": "Automatically transcribe lecture audio using AI Whisper for accurate captions."
+      },
+      "summary": {
+        "title": "Smart summary generation",
+        "description": "Get concise notes and topic highlights from every lecture video."
+      },
+      "chat": {
+        "title": "Interactive AI chat",
+        "description": "Ask questions about your video content and get instant answers from AI."
+      },
+      "progress": {
+        "title": "Learning analytics",
+        "description": "Track your study progress and stay motivated with clear performance insights."
+      },
+      "youtube": {
+        "title": "YouTube support",
+        "description": "Analyze lecture videos from YouTube links without manually downloading files."
+      },
+      "export": {
+        "title": "Export notes",
+        "description": "Save transcripts and summaries as PDF for offline studying and review."
+      },
+      "tags": {
+        "title": "Topic tagging",
+        "description": "Organize key concepts with tags and jump back to the most important sections."
+      },
+      "security": {
+        "title": "Secure privacy",
+        "description": "Your uploads are protected and only accessible to you, with GDPR-aware handling."
+      }
+    },
+    "steps": {
+      "upload": {
+        "title": "Upload your lecture",
+        "description": "Submit video files or YouTube links to start the AI processing."
+      },
+      "process": {
+        "title": "AI processing",
+        "description": "The system transcribes, summarizes, and indexes the content automatically."
+      },
+      "learn": {
+        "title": "Learn with AI",
+        "description": "Interact with your lecture content and review smarter with AI guidance."
+      }
+    }
+  },
+  "premium": {
+    "banner": "Upgrade to Premium account",
+    "heading_line1": "Unlock the full power of AI Learning to",
+    "heading_line2": "speed up your study",
+    "benefit": {
+      "focus": "Focused learning",
+      "save_time": "Save time"
+    },
+    "cta": "Upgrade now"
+  },
+  "footer": {
+    "ready_title": "Ready to get started?",
+    "description": "Join AI-Learning DashBoard and transform the way you learn.",
+    "cta_register": "Register now",
+    "cta_feature": "View features",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "copyright": "© {{year}} AI-Learning DashBoard.",
+    "made_with": "Made with",
+    "in_vietnam": "in Vietnam"
+  }
+}

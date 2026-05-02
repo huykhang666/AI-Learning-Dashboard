@@ -107,7 +107,6 @@ function UploadWidget({ onProcessAction, hideHeader }) {
                             clearInterval(fakeTimerId);
                             clearInterval(checkStatusInterval);
 
-                            // Chạy progress mượt từ ~75% lên 100% rồi chuyển trang
                             const finishTimer = setInterval(() => {
                                 setDisplayProgress(prev => {
                                     if (prev >= 100) {

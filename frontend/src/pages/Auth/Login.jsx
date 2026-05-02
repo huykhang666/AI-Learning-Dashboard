@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const T = {
   primary: "#2563EB",
@@ -136,15 +137,14 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
 
   const handleLogin = async () => {
     const e = {};
-    if (!username) e.username = "Vui lòng nhập username"; 
+    if (!username) e.username = "Vui lòng nhập username";
     if (!pass) e.pass = "Vui lòng nhập mật khẩu";
-    
+
     if (Object.keys(e).length) {
       setErrors(e);
       return;
     }
 
-    // 1. Bật xoay vòng vòng
     setLoading(true);
 
     try {
@@ -154,7 +154,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: username, 
+          username: username,
           password: pass,
         }),
       });
@@ -163,15 +163,31 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
       const data = await response.json();
 
       if (response.ok && data.code === 1000) {
+        // 1. Lưu token (bắt buộc)
         localStorage.setItem("token", data.result.token);
-        onLogin(); 
+
+        try {
+          // 2. Tự động bóc ID từ Token trả về
+          const decoded = jwtDecode(data.result.token);
+          // Chú ý: Backend của ông phải có claim "userId" thì dòng dưới mới chạy
+          const autoId = decoded.userId || decoded.id;
+
+          if (autoId) {
+            // Lưu vào máy để Pricing.jsx dùng
+            localStorage.setItem("user", JSON.stringify({ id: autoId }));
+            console.log("Đã lưu ID tự động vào LocalStorage:", autoId);
+          }
+        } catch (err) {
+          console.error("Lỗi khi bóc ID từ Token:", err);
+        }
+
+        onLogin();
       } else {
         setErrors({ username: data.message || "Tài khoản hoặc mật khẩu không đúng!" });
       }
     } catch (error) {
       setErrors({ username: "Không thể kết nối tới Server." });
     } finally {
-    
       setLoading(false);
     }
   };
@@ -427,8 +443,8 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               Đăng nhập để tiếp tục hành trình học tập
             </p>
             <button
-              onClick={handleGoogleLogin} 
-              disabled={gLoading}       
+              onClick={handleGoogleLogin}
+              disabled={gLoading}
               style={{
                 width: "100%",
                 padding: "11px",
@@ -447,10 +463,10 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 fontFamily: F,
                 boxShadow: "0 1px 3px rgba(0,0,0,.06)",
                 boxSizing: "border-box",
-                opacity: gLoading ? 0.7 : 1 
+                opacity: gLoading ? 0.7 : 1
               }}
             >
-              {}
+              { }
               {gLoading ? (
                 <div
                   style={{

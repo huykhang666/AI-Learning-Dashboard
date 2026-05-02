@@ -33,7 +33,7 @@ public class UserController {
     public ApiResponse<UserResponse> register(@RequestBody @Valid RegisterRequest request) {
         System.out.println("EMAIL = " + request.getEmail());
         return ApiResponse.<UserResponse>builder()
-               .code(1000)
+                .code(1000)
                 .message("User has been registered successfully")
                 .result(userService.register(request))
                 .build();
@@ -84,5 +84,7 @@ public class UserController {
                 .result(userService.getUsers())
                 .build();
     }
+
+
 
 }

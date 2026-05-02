@@ -1,7 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { TABS } from "./CoursesData";
 import styles from "./MyCourses.module.css";
 export default function CourseTabs({ activeTab, onTabChange }) {
+  const { t } = useTranslation();
   return (
     <div className={styles.tabs}>
       {TABS.map((tab) => (
@@ -10,7 +12,7 @@ export default function CourseTabs({ activeTab, onTabChange }) {
           className={`${styles.tabBtn} ${activeTab === tab.key ? styles.tabActive : ""}`}
           onClick={() => onTabChange(tab.key)}
         >
-          {tab.label}
+          {t(tab.labelKey)}
         </button>
       ))}
     </div>

@@ -43,7 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         }
 
         String accessToken = jwtUtils.generateToken(user);
-        String refreshToken = jwtUtils.generateRefreshToken(user.getUsername());
+        String refreshToken = jwtUtils.generateRefreshToken(user);
 
         String targetUrl = "http://localhost:5173/oauth2/callback"
                 + "?token=" + accessToken

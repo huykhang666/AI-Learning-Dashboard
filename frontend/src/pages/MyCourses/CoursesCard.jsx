@@ -1,14 +1,18 @@
 import React from "react";
-import styles from "./MyCourses.module.css";
+import { useTranslation } from "react-i18next";
+import styles from "./Mycourses.module.css";
 
 export default function CourseCard({ course }) {
+  const { t } = useTranslation();
   const isCompleted = course.progress === 100;
   const progressColor = isCompleted ? "#22c55e" : course.color;
 
   return (
     <div className={styles.card}>
       {course.badge && (
-        <span className={styles.cardBadge}>✓ {course.badge}</span>
+        <span className={styles.cardBadge}>
+          ✓ {t(`my_courses.badge.${course.badge}`)}
+        </span>
       )}
 
       <div className={styles.cardTop} style={{ background: course.bg }}>
@@ -18,7 +22,9 @@ export default function CourseCard({ course }) {
       </div>
 
       <h3 className={styles.cardTitle}>{course.title}</h3>
-      <p className={styles.cardLessons}>{course.lessons} Lessons</p>
+      <p className={styles.cardLessons}>
+        {t("my_courses.lessons", { count: course.lessons })}
+      </p>
 
       <div className={styles.progressBar}>
         <div
@@ -27,16 +33,18 @@ export default function CourseCard({ course }) {
         />
       </div>
       <p className={styles.progressLabel} style={{ color: progressColor }}>
-        {course.progress}% Complete
+        {t("my_courses.progress_complete", { percent: course.progress })}
       </p>
 
       <div className={styles.cardActions}>
-        <button className={styles.btnView}>View Course</button>
+        <button className={styles.btnView}>
+          {t("my_courses.button.view_course")}
+        </button>
         <button
           className={styles.btnLatest}
           style={{ background: course.color }}
         >
-          Latest Lesson
+          {t("my_courses.button.latest_lesson")}
         </button>
       </div>
     </div>

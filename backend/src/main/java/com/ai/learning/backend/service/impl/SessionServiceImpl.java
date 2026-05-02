@@ -15,6 +15,7 @@ import com.ai.learning.backend.repository.AIResultRepository;
 import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.SessionService;
+import com.ai.learning.backend.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +31,12 @@ import org.springframework.data.domain.Pageable;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class SessionServiceImpl implements SessionService {
-    final SessionRepository sessionRepository;
-    final AIResultRepository aiResultRepository;
-    final SessionMapper sessionMapper;
-    final UserRepository userRepository;
+    SessionRepository sessionRepository;
+    SessionMapper sessionMapper;
+    UserRepository userRepository;
+    UserService userService;
 
     //Create a new learning session for current user
     @Override
@@ -48,12 +49,18 @@ public class SessionServiceImpl implements SessionService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        userService.canUpload(user.getUserId());
+
         LearningSession session = sessionMapper.toEntity(request);
         session.setVideoUrl(request.getVideoUrl());
         session.setUser(user);
         session.setStatus(SessionStatus.PENDING);
 
-        return  sessionMapper.toListResponse(sessionRepository.save(session));
+        LearningSession savedSession = sessionRepository.save(session);
+
+        userService.updateUsage(user.getUserId());
+
+        return sessionMapper.toListResponse(savedSession);
     }
 
     //Retrieve session details including AI analysis results

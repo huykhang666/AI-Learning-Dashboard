@@ -69,7 +69,7 @@ public class PaymentController {
         return ResponseEntity.ok(momoIpnHandler.handle(params));
     }
 
-    @GetMapping("/subscriptions/me") 
+    @GetMapping("/subscriptions/me")
     public ResponseEntity<?> getMySubscription(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(paymentService.getMySubscription(userDetails.getUsername()));
     }

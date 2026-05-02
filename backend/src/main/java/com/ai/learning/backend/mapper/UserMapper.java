@@ -17,6 +17,8 @@ public interface UserMapper {
     @Mapping(target = "firstname", source = "firstName")
     @Mapping(target = "lastname", source = "lastName")
     @Mapping(target = "dateOfBirth", source = "dateOfBirth")
+    @Mapping(target = "premium", source = "premium")
+    @Mapping(target = "dailyUploadCount", source = "dailyUploadCount")
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "firstName", source = "firstname")

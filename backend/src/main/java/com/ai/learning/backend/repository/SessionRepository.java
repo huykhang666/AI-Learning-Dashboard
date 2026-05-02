@@ -18,7 +18,7 @@ public interface SessionRepository extends JpaRepository<LearningSession,Long> {
     List<LearningSession> findByStatus(SessionStatus sessionStatus);
 
     Page<LearningSession> findByUserUsername(String name, Pageable pageable);
-
+    long countByUserUsername(String username);
     List<LearningSession> findByUser(User user);
 
     @Query(value = "SELECT COUNT(*) FROM learning_session WHERE user_id = :userId", nativeQuery = true)
