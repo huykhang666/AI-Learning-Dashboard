@@ -1,7 +1,7 @@
 export const COURSES = [
   {
     id: 1,
-    title: "Discrete Math – Complete Course",
+    title: "Toán rời rạc – Khóa học đầy đủ",
     lessons: 12,
     progress: 75,
     status: "in-progress",
@@ -11,7 +11,7 @@ export const COURSES = [
   },
   {
     id: 2,
-    title: "AI Fundamental",
+    title: "Nguyên tắc cơ bản của AI",
     lessons: 5,
     progress: 75,
     status: "in-progress",
@@ -21,7 +21,7 @@ export const COURSES = [
   },
   {
     id: 3,
-    title: "Discrete Math – Fundamental",
+    title: "Toán rời rạc – Kiến thức cơ bản",
     lessons: 10,
     progress: 60,
     status: "in-progress",
@@ -31,7 +31,7 @@ export const COURSES = [
   },
   {
     id: 4,
-    title: "AI Fundamental Advanced",
+    title: "Kiến thức cơ bản và nâng cao về Trí tuệ nhân tạo",
     lessons: 11,
     progress: 100,
     status: "completed",
@@ -42,7 +42,7 @@ export const COURSES = [
   },
   {
     id: 5,
-    title: "Graph Theory Deep Dive",
+    title: "Phân tích chuyên sâu về lý thuyết đồ thị",
     lessons: 8,
     progress: 30,
     status: "completed",
@@ -52,7 +52,7 @@ export const COURSES = [
   },
   {
     id: 6,
-    title: "Probability & Statistics",
+    title: "Xác suất và Thống kê",
     lessons: 12,
     progress: 100,
     status: "completed",
