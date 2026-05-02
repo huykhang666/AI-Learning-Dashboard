@@ -11,7 +11,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return CustomUserDetails.create(user, oAuth2User.getAttributes());
     }
 
+
     private User registerNewUser(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+        // Sửa Set<UserRole> thành Set<String>
+        Set<String> defaultRoles = new HashSet<>();
+        defaultRoles.add(UserRole.USER.name()); // Dùng .name() để lấy chuỗi "USER"
+
         User user = User.builder()
                 .email((String) oAuth2User.getAttribute("email"))
                 .firstName((String) oAuth2User.getAttribute("given_name"))
@@ -52,9 +59,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .username((String) oAuth2User.getAttribute("email"))
                 .provider(userRequest.getClientRegistration().getRegistrationId())
                 .providerId(oAuth2User.getName())
-                .role(UserRole.USER)
                 .password("")
+                .role(UserRole.USER)
+                .roles(defaultRoles)
                 .build();
+
         return userRepository.save(user);
     }
 

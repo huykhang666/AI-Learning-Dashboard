@@ -2,16 +2,15 @@ import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
 import { authService } from "../../api/AuthService";
 import SuccessModal from "../../components/common/SuccessModal";
+
 const T = {
   primary: "#2563EB",
-  primaryHover: "#1D4ED8",
   text: "#0F172A",
   textMid: "#64748B",
-  textLight: "#94A3B8",
   border: "#E2E8F0",
   danger: "#EF4444",
   white: "#FFFFFF",
-  bg: "#F8FAFF"
+  bg: "#F8FAFF",
 };
 
 const F = "'Plus Jakarta Sans', sans-serif";
@@ -38,215 +37,91 @@ function calcStrength(p) {
   return s;
 }
 
-const Field = ({ label, type = "text", placeholder, value, onChange, error, right }) => (
+const Field = ({ label, type = "text", placeholder, value, onChange, error }) => (
   <div style={{ marginBottom: 12 }}>
-    <label
-      style={{
-        display: "block",
-        fontSize: 12,
-        fontWeight: 700,
-        color: T.text,
-        marginBottom: 5,
-        fontFamily: F
-      }}
-    >
+    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: T.text, marginBottom: 5, fontFamily: F }}>
       {label}
     </label>
-    <div style={{ position: "relative" }}>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        style={{
-          width: "100%",
-          padding: "10px 36px 10px 12px",
-          borderRadius: 10,
-          border: `1.5px solid ${error ? T.danger : T.border}`,
-          fontSize: 13,
-          outline: "none",
-          fontFamily: F,
-          color: T.text,
-          background: T.white,
-          boxSizing: "border-box",
-          transition: "border-color .15s"
-        }}
-      />
-      {right && (
-        <span
-          style={{
-            position: "absolute",
-            right: 10,
-            top: "50%",
-            transform: "translateY(-50%)"
-          }}
-        >
-          {right}
-        </span>
-      )}
-    </div>
-    {error && (
-      <p
-        style={{
-          fontSize: 11,
-          color: T.danger,
-          marginTop: 3,
-          fontFamily: F
-        }}
-      >
-        ⚠ {error}
-      </p>
-    )}
+    <input
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      style={{
+        width: "100%",
+        padding: "10px 12px",
+        borderRadius: 10,
+        border: `1.5px solid ${error ? T.danger : T.border}`,
+        fontSize: 13,
+        outline: "none",
+        fontFamily: F,
+        color: T.text,
+        background: T.white,
+        boxSizing: "border-box",
+      }}
+    />
+    {error && <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F }}>⚠ {error}</p>}
   </div>
 );
 
 const LeftPanel = () => (
-  <div
-    style={{
-      width: "50%",
-      flexShrink: 0,
-      background: "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "40px 44px",
-      position: "relative",
-      overflow: "hidden",
-      boxSizing: "border-box",
-      height: "100vh"
-    }}
-  >
+  <div style={{
+    width: "50%", flexShrink: 0,
+    background: "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
+    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+    padding: "40px 44px", position: "relative", overflow: "hidden", boxSizing: "border-box", height: "100vh"
+  }}>
     <button
       onClick={() => (window.location.href = "/")}
       style={{
-        position: "absolute",
-        top: 20,
-        left: 20,
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        background: "rgba(255,255,255,.15)",
-        border: "1px solid rgba(255,255,255,.25)",
-        borderRadius: 10,
-        padding: "7px 14px",
-        cursor: "pointer",
-        color: "#fff",
-        fontSize: 13,
-        fontWeight: 600,
-        fontFamily: F,
-        backdropFilter: "blur(4px)",
-        zIndex: 10
+        position: "absolute", top: 20, left: 20,
+        display: "flex", alignItems: "center", gap: 6,
+        background: "rgba(255,255,255,.15)", border: "1px solid rgba(255,255,255,.25)",
+        borderRadius: 10, padding: "7px 14px", cursor: "pointer",
+        color: "#fff", fontSize: 13, fontWeight: 600, fontFamily: F,
+        backdropFilter: "blur(4px)", zIndex: 10
       }}
     >
       ← Quay lại
     </button>
 
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        marginBottom: 36,
-        zIndex: 1
-      }}
-    >
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          background: "rgba(255,255,255,.18)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36, zIndex: 1 }}>
+      <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(255,255,255,.18)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <FaBolt size={20} color="#F59E0B" />
       </div>
-      <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
-        AI-Learning DashBoard
-      </span>
+      <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>AI-Learning DashBoard</span>
     </div>
 
     <div style={{ zIndex: 1, textAlign: "center", maxWidth: 340, width: "100%" }}>
-      <h2
-        style={{
-          fontSize: 28,
-          fontWeight: 900,
-          color: "#fff",
-          lineHeight: 1.2,
-          marginBottom: 10
-        }}
-      >
-        Học thông minh hơn
-        <br />
-        với sức mạnh của AI <FaBolt size={22} color="#F59E0B" style={{ display: "inline" }} />
+      <h2 style={{ fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: 10 }}>
+        Học thông minh hơn<br />với sức mạnh của AI <FaBolt size={22} color="#F59E0B" style={{ display: "inline" }} />
       </h2>
-      <p
-        style={{
-          fontSize: 13,
-          color: "rgba(255,255,255,.8)",
-          lineHeight: 1.7,
-          marginBottom: 22
-        }}
-      >
+      <p style={{ fontSize: 13, color: "rgba(255,255,255,.8)", lineHeight: 1.7, marginBottom: 22 }}>
         Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời mọi câu hỏi.
       </p>
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          marginBottom: 28
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
         {[
           ["🎙", "AI Whisper bóc băng tự động"],
           ["✨", "Tóm tắt nội dung thông minh"],
-          ["💬", "Chatbot hỏi đáp theo bài giảng"]
+          ["💬", "Chatbot hỏi đáp theo bài giảng"],
         ].map(([ic, txt]) => (
-          <div
-            key={txt}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              background: "rgba(255,255,255,.13)",
-              borderRadius: 12,
-              padding: "10px 16px",
-              border: "1px solid rgba(255,255,255,.2)",
-              textAlign: "left"
-            }}
-          >
+          <div key={txt} style={{
+            display: "flex", alignItems: "center", gap: 12,
+            background: "rgba(255,255,255,.13)", borderRadius: 12,
+            padding: "10px 16px", border: "1px solid rgba(255,255,255,.2)", textAlign: "left"
+          }}>
             <span style={{ fontSize: 18 }}>{ic}</span>
-            <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>
-              {txt}
-            </span>
+            <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{txt}</span>
           </div>
         ))}
       </div>
 
       <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
-        {[
-          ["2K+", "Người dùng"],
-          ["50K+", "Video xử lý"],
-          ["98%", "Hài lòng"]
-        ].map(([v, l]) => (
+        {[["2K+", "Người dùng"], ["50K+", "Video xử lý"], ["98%", "Hài lòng"]].map(([v, l]) => (
           <div key={l}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
-              {v}
-            </div>
-            <div
-              style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,.6)",
-                marginTop: 2
-              }}
-            >
-              {l}
-            </div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>{v}</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.6)", marginTop: 2 }}>{l}</div>
           </div>
         ))}
       </div>
@@ -254,28 +129,17 @@ const LeftPanel = () => (
   </div>
 );
 
-export default function PageRegister({ onRegister, onGoLogin }) {
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    dob: "",
-    pass: "",
-    confirm: ""
-  });
+export default function PageRegister({ onGoLogin }) {
+  const [form, setForm] = useState({ firstName: "", lastName: "", username: "", email: "", dob: "", pass: "", confirm: "" });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [gLoading, setGLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [agree, setAgree] = useState(false);
-  const [done, setDone] = useState(false);
   const [visible, setVisible] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => setVisible(true), 20);
-  }, []);
+  useEffect(() => { setTimeout(() => setVisible(true), 20); }, []);
 
   const set = (k) => (e) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -286,27 +150,22 @@ export default function PageRegister({ onRegister, onGoLogin }) {
 
   const handleGoogleRegister = () => {
     setGLoading(true);
-    setTimeout(() => {
-      window.location.href = "http://localhost:8080/oauth2/authorization/google";
-    }, 1500);
+    setTimeout(() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }, 1500);
   };
 
   const handleRegister = async () => {
+    // Validate phía client
     const e = {};
     if (!form.firstName.trim()) e.firstName = "Vui lòng nhập họ";
     if (!form.lastName.trim()) e.lastName = "Vui lòng nhập tên";
     if (!form.username.trim()) e.username = "Vui lòng nhập username";
-    if (!form.dob) e.dob = "Vui lòng chọn ngày sinh";
     if (!form.email) e.email = "Vui lòng nhập email";
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email không hợp lệ";
     if (!form.pass) e.pass = "Vui lòng nhập mật khẩu";
     else if (form.pass.length < 8) e.pass = "Mật khẩu tối thiểu 8 ký tự";
     if (form.confirm !== form.pass) e.confirm = "Mật khẩu không khớp";
     if (!agree) e.agree = "Bạn cần đồng ý với điều khoản";
-    if (Object.keys(e).length) {
-      setErrors(e);
-      return;
-    }
+    if (Object.keys(e).length) { setErrors(e); return; }
 
     setLoading(true);
     try {
@@ -316,197 +175,90 @@ export default function PageRegister({ onRegister, onGoLogin }) {
         username: form.username,
         email: form.email,
         password: form.pass,
-        dateOfBirth: form.dob
-        
+        dateOfBirth: form.dob || null, // không bắt buộc
       });
 
       await new Promise((r) => setTimeout(r, 800));
 
       if (data.code === 1000) {
         setShowSuccess(true);
-
       } else {
-        console.log(error.response?.data);
-        setErrors({
-          apiError: data.message || "Tài khoản đã tồn tại"
-        });
+        // Fix: dùng "data" thay vì "error" (error chỉ có trong catch)
+        setErrors({ apiError: data.message || "Tài khoản đã tồn tại" });
       }
-
     } catch (error) {
-      setErrors({
-        apiError: "Không thể kết nối server"
-      });
+      setErrors({ apiError: error.response?.data?.message || "Không thể kết nối server" });
     } finally {
       setLoading(false);
     }
   };
 
-
-
   return (
     <>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          fontFamily: F,
-          overflow: "hidden"
-        }}
-      >
+      <div style={{ width: "100vw", height: "100vh", display: "flex", fontFamily: F, overflow: "hidden" }}>
         <LeftPanel />
-        <div
-          style={{
-            flex: 1,
-            background: T.bg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "32px 48px",
-            overflowY: "auto",
-            opacity: visible ? 1 : 0,
-            transition: "all .25s ease"
-          }}
-        >
+        <div style={{
+          flex: 1, background: T.bg,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "32px 48px", overflowY: "auto",
+          opacity: visible ? 1 : 0, transition: "all .25s ease"
+        }}>
           <div style={{ width: "100%", maxWidth: 380 }}>
+
+            {/* Lỗi từ API */}
             {errors.apiError && (
-              <div
-                style={{
-                  background: "#FEF2F2",
-                  border: `1px solid ${T.danger}`,
-                  padding: "12px 16px",
-                  borderRadius: "10px",
-                  marginBottom: "20px",
-                  color: T.danger,
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  animation: "fadeIn 0.3s ease"
-                }}
-              >
-                <span style={{ fontSize: "18px" }}>⚠️</span>
+              <div style={{
+                background: "#FEF2F2", border: `1px solid ${T.danger}`,
+                padding: "12px 16px", borderRadius: 10, marginBottom: 20,
+                color: T.danger, fontSize: 13, fontWeight: 600,
+                display: "flex", alignItems: "center", gap: 10
+              }}>
+                <span style={{ fontSize: 18 }}>⚠️</span>
                 <span>
-                  {errors.apiError}. Bạn đã có tài khoản?
-                  <span
-                    onClick={onGoLogin}
-                    style={{
-                      textDecoration: "underline",
-                      cursor: "pointer",
-                      marginLeft: "5px",
-                      color: T.primary
-                    }}
-                  >
+                  {errors.apiError}. Bạn đã có tài khoản?{" "}
+                  <span onClick={onGoLogin} style={{ textDecoration: "underline", cursor: "pointer", color: T.primary }}>
                     Đăng nhập ngay
                   </span>
                 </span>
               </div>
             )}
-            <h1
-              style={{
-                fontSize: 24,
-                fontWeight: 800,
-                color: T.text,
-                marginBottom: 4
-              }}
-            >
-              Tạo tài khoản 🚀
-            </h1>
-            <p style={{ fontSize: 13, color: T.textMid, marginBottom: 20 }}>
-              Bắt đầu hành trình cùng AI-Learning
-            </p>
 
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 4 }}>Tạo tài khoản 🚀</h1>
+            <p style={{ fontSize: 13, color: T.textMid, marginBottom: 20 }}>Bắt đầu hành trình cùng AI-Learning</p>
+
+            {/* Đăng ký Google */}
             <button
               onClick={handleGoogleRegister}
               disabled={gLoading}
               style={{
-                width: "100%",
-                padding: "11px",
-                borderRadius: 11,
-                border: `1.5px solid ${T.border}`,
-                background: T.white,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 9,
-                fontWeight: 600,
-                fontSize: 14,
-                color: T.text,
-                marginBottom: 20
+                width: "100%", padding: 11, borderRadius: 11,
+                border: `1.5px solid ${T.border}`, background: T.white,
+                cursor: "pointer", display: "flex", alignItems: "center",
+                justifyContent: "center", gap: 9, fontWeight: 600, fontSize: 14,
+                color: T.text, marginBottom: 20
               }}
             >
-              {gLoading ? (
-                <div
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    border: "2px solid #ccc",
-                    borderTopColor: T.primary,
-                    animation: "spin .7s linear infinite"
-                  }}
-                />
-              ) : (
-                <GIcon />
-              )}
+              {gLoading
+                ? <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid #ccc", borderTopColor: T.primary, animation: "spin .7s linear infinite" }} />
+                : <GIcon />}
               {gLoading ? "Đang kết nối..." : "Đăng ký với Google"}
             </button>
 
             <div style={{ display: "flex", gap: 12 }}>
-              <Field
-                label="Họ & tên đệm"
-                placeholder="Nguyễn"
-                value={form.firstName}
-                onChange={set("firstName")}
-                error={errors.firstName}
-              />
-              <Field
-                label="Tên"
-                placeholder="Khang"
-                value={form.lastName}
-                onChange={set("lastName")}
-                error={errors.lastName}
-              />
+              <Field label="Họ & tên đệm" placeholder="Nguyễn" value={form.firstName} onChange={set("firstName")} error={errors.firstName} />
+              <Field label="Tên" placeholder="Khang" value={form.lastName} onChange={set("lastName")} error={errors.lastName} />
             </div>
 
-            <Field
-              label="Username"
-              placeholder="khang_utc"
-              value={form.username}
-              onChange={set("username")}
-              error={errors.username}
-            />
-            <Field
-              label="Email"
-              type="email"
-              placeholder="your@email.com"
-              value={form.email}
-              onChange={set("email")}
-              error={errors.email}
-            />
-            <Field
-              label="Ngày sinh"
-              type="date"
-              value={form.dob}
-              onChange={set("dob")}
-              error={errors.dob}
-            />
+            <Field label="Username" placeholder="khang_utc" value={form.username} onChange={set("username")} error={errors.username} />
+            <Field label="Email" type="email" placeholder="your@email.com" value={form.email} onChange={set("email")} error={errors.email} />
 
+            {/* Ngày sinh: không bắt buộc */}
+            <Field label="Ngày sinh (không bắt buộc)" type="date" value={form.dob} onChange={set("dob")} />
+
+            {/* Mật khẩu + strength indicator */}
             <div style={{ marginBottom: 12 }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: T.text,
-                  marginBottom: 5
-                }}
-              >
-                Mật khẩu
-              </label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: T.text, marginBottom: 5 }}>Mật khẩu</label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPass ? "text" : "password"}
@@ -514,154 +266,69 @@ export default function PageRegister({ onRegister, onGoLogin }) {
                   value={form.pass}
                   onChange={set("pass")}
                   style={{
-                    width: "100%",
-                    padding: "10px 36px 10px 12px",
-                    borderRadius: 10,
+                    width: "100%", padding: "10px 36px 10px 12px", borderRadius: 10,
                     border: `1.5px solid ${errors.pass ? T.danger : T.border}`,
-                    fontSize: 13,
-                    outline: "none"
+                    fontSize: 13, outline: "none", boxSizing: "border-box"
                   }}
                 />
                 <button
                   onClick={() => setShowPass(!showPass)}
-                  style={{
-                    position: "absolute",
-                    right: 10,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer"
-                  }}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer" }}
                 >
                   {showPass ? "🙈" : "👁"}
                 </button>
               </div>
+              {errors.pass && <p style={{ fontSize: 11, color: T.danger, marginTop: 3 }}>⚠ {errors.pass}</p>}
               {form.pass && (
                 <div style={{ marginTop: 5 }}>
                   <div style={{ display: "flex", gap: 3, marginBottom: 2 }}>
                     {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        style={{
-                          flex: 1,
-                          height: 3,
-                          borderRadius: 2,
-                          background:
-                            i <= strength ? S_COLOR[strength] : T.border
-                        }}
-                      />
+                      <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= strength ? S_COLOR[strength] : T.border }} />
                     ))}
                   </div>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      color: S_COLOR[strength],
-                      fontWeight: 700
-                    }}
-                  >
-                    Độ mạnh: {S_LABEL[strength]}
-                  </span>
+                  <span style={{ fontSize: 10, color: S_COLOR[strength], fontWeight: 700 }}>Độ mạnh: {S_LABEL[strength]}</span>
                 </div>
               )}
             </div>
 
-            <Field
-              label="Xác nhận mật khẩu"
-              type="password"
-              placeholder="••••••••"
-              value={form.confirm}
-              onChange={set("confirm")}
-              error={errors.confirm}
-            />
+            <Field label="Xác nhận mật khẩu" type="password" placeholder="••••••••" value={form.confirm} onChange={set("confirm")} error={errors.confirm} />
 
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                cursor: "pointer",
-                marginBottom: 20
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={agree}
-                onChange={() => setAgree(!agree)}
-              />
-              <span style={{ fontSize: 12, color: T.textMid }}>
-                Tôi đồng ý với các điều khoản dịch vụ
-              </span>
+            {/* Điều khoản */}
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", marginBottom: errors.agree ? 4 : 20 }}>
+              <input type="checkbox" checked={agree} onChange={() => { setAgree(!agree); setErrors({}); }} />
+              <span style={{ fontSize: 12, color: T.textMid }}>Tôi đồng ý với các điều khoản dịch vụ</span>
             </label>
+            {errors.agree && <p style={{ fontSize: 11, color: T.danger, marginBottom: 16 }}>⚠ {errors.agree}</p>}
 
+            {/* Nút đăng ký */}
             <button
               onClick={handleRegister}
               disabled={loading}
               style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: 11,
-                border: "none",
+                width: "100%", padding: 12, borderRadius: 11, border: "none",
                 background: loading ? "#BFDBFE" : T.primary,
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8
+                color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8
               }}
             >
-              {loading && (
-                <div
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    border: "2px solid #fff",
-                    borderTopColor: "transparent",
-                    animation: "spin .7s linear infinite"
-                  }}
-                />
-              )}
+              {loading && <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid #fff", borderTopColor: "transparent", animation: "spin .7s linear infinite" }} />}
               {loading ? "Đang tạo tài khoản..." : "Đăng ký ngay"}
             </button>
 
-            <p
-              style={{
-                textAlign: "center",
-                marginTop: 18,
-                marginBottom: 0,
-                fontSize: 13,
-                color: T.textMid,
-                fontWeight: 500,
-                fontFamily: F
-              }}
-            >
+            <p style={{ textAlign: "center", marginTop: 18, marginBottom: 0, fontSize: 13, color: T.textMid, fontWeight: 500 }}>
               Đã có tài khoản?{" "}
-              <span
-                onClick={onGoLogin}
-                style={{
-                  color: T.primary,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  textDecoration: "underline"
-                }}
-              >
+              <span onClick={onGoLogin} style={{ color: T.primary, fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}>
                 Đăng nhập tại đây
               </span>
             </p>
           </div>
         </div>
       </div>
+
       <SuccessModal
         open={showSuccess}
         username={form.username}
-        onClose={() => {
-          setShowSuccess(false);
-          onGoLogin();
-        }}
+        onClose={() => { setShowSuccess(false); onGoLogin(); }}
       />
     </>
   );

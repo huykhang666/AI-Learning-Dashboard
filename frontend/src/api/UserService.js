@@ -5,7 +5,7 @@ const API_URL = "http://localhost:8080/api/v1/users";
 export const userService = {
     getMyInfo: async () => {
         try {
-            const token = localStorage.getItem('token'); 
+            const token = localStorage.getItem('accessToken');
             const response = await axios.get(`${API_URL}/my-info`, {
                 headers: {
                     Authorization: `Bearer ${token}`

@@ -16,7 +16,8 @@ const api = axios.create({
  * Tự động chèn Token vào Header trước khi gửi request
  */
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,23 +35,23 @@ export const dashboardApi = {
 
             const hours = Math.floor(res.totalHours || 0);
             const minutes = Math.round(((res.totalHours || 0) - hours) * 60);
-            
+
             return {
-                user: { 
-                    fullName: res.fullname || res.fullName || "User" 
-                }, 
+                user: {
+                    fullName: res.fullname || res.fullName || "User"
+                },
                 overview: {
                     totalStudyTime: `${hours}h ${minutes}m`,
                     lecturesDone: res.totalLectures || 0,
                     goalProgress: Math.min(Math.round(((res.totalHours || 0) / (res.weekGoal || 10)) * 100), 100)
                 },
                 weeklyActivity: (res.weeklyProgress || []).map(p => ({
-                    day: p.day ? p.day.substring(0, 3) : "??", 
+                    day: p.day ? p.day.substring(0, 3) : "??",
                     hours: p.hours || 0,
                     active: p.day === new Date().toLocaleDateString('en-US', { weekday: 'short' })
                 })),
                 topKeywords: res.topKeywords || [],
-                recentCourses: [] 
+                recentCourses: []
             };
         } catch (error) {
             console.error("API Error: getAnalytics", error.message);
@@ -63,7 +64,7 @@ export const dashboardApi = {
      */
     getAllHistory: async () => {
         try {
-            const response = await api.get('/history'); 
+            const response = await api.get('/history');
             const data = response.data.result;
 
             if (Array.isArray(data)) {

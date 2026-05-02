@@ -139,53 +139,42 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
     const e = {};
     if (!username) e.username = "Vui lòng nhập username";
     if (!pass) e.pass = "Vui lòng nhập mật khẩu";
-
-    if (Object.keys(e).length) {
-      setErrors(e);
-      return;
-    }
+    if (Object.keys(e).length) { setErrors(e); return; }
 
     setLoading(true);
-
     try {
       const delay = new Promise(resolve => setTimeout(resolve, 1200));
-
       const apiCall = fetch("http://localhost:8080/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: username,
-          password: pass,
-        }),
+        body: JSON.stringify({ username, password: pass }),
       });
 
       const [response] = await Promise.all([apiCall, delay]);
       const data = await response.json();
 
       if (response.ok && data.code === 1000) {
-        // 1. Lưu token (bắt buộc)
-        localStorage.setItem("token", data.result.token);
+        localStorage.setItem("accessToken", data.result.token);
+        localStorage.setItem("refreshToken", data.result.refreshToken);
 
         try {
-          // 2. Tự động bóc ID từ Token trả về
           const decoded = jwtDecode(data.result.token);
-          // Chú ý: Backend của ông phải có claim "userId" thì dòng dưới mới chạy
-          const autoId = decoded.userId || decoded.id;
-
+          const autoId = decoded.userId || decoded.id || decoded.sub;
           if (autoId) {
-            // Lưu vào máy để Pricing.jsx dùng
             localStorage.setItem("user", JSON.stringify({ id: autoId }));
-            console.log("Đã lưu ID tự động vào LocalStorage:", autoId);
           }
-        } catch (err) {
-          console.error("Lỗi khi bóc ID từ Token:", err);
+        } catch (decodeErr) {
+          console.warn("Không decode được token:", decodeErr);
         }
 
-        onLogin();
+        onLogin(); 
+
       } else {
         setErrors({ username: data.message || "Tài khoản hoặc mật khẩu không đúng!" });
       }
+
     } catch (error) {
+      console.error("Login error:", error);
       setErrors({ username: "Không thể kết nối tới Server." });
     } finally {
       setLoading(false);
