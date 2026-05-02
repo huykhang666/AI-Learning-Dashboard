@@ -237,7 +237,7 @@ function UploadWidget({ onProcessAction, hideHeader }) {
                 <button
                     onClick={() => { setActiveTab("file"); setInputError(""); }}
                     className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition ${activeTab === "file" ? "bg-white shadow-sm text-gray-700" : "text-gray-400 hover:text-gray-600"}`}
-                >Upload File</button>
+                >Tải File</button>
                 <button
                     onClick={() => { setActiveTab("youtube"); setInputError(""); }}
                     className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition ${activeTab === "youtube" ? "bg-white shadow-sm text-gray-700" : "text-gray-400 hover:text-gray-600"}`}
@@ -295,7 +295,7 @@ function UploadWidget({ onProcessAction, hideHeader }) {
                 className="w-full bg-gradient-to-r from-blue-700 to-cyan-500 rounded-full py-3.5 text-white font-bold hover:from-indigo-600 hover:to-blue-500 transition mt-auto active:scale-95"
                 onClick={handleStartProcess}
             >
-                PROCESS VIDEO
+                Hiện video
             </button>
         </div>
     );

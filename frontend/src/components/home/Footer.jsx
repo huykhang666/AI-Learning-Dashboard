@@ -29,7 +29,7 @@ function Footer({ onRegister }) {
             { label: "Tính năng", href: "#Feature" },
             { label: "Bảng giá", href: "#Pricing" },
             { label: "Về chúng tôi", href: "#About" },
-            { label: "FAQ", href: "#FAQ" },
+            { label: "Câu hỏi", href: "#FAQ" },
             { label: "Điều khoản", href: "#" },
             { label: "Bảo mật", href: "#" },
             { label: "Liên hệ", href: "#" },

@@ -13,7 +13,7 @@ function HeroSection({ onRegister }) {
                     {/* ... (Giữ nguyên toàn bộ code phần bên trái của bạn) ... */}
                     <div className="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-1.5 rounded-full mb-6">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                        <span className="text-sm text-blue-600">Made for Vietnamese Students</span>
+                        <span className="text-sm text-blue-600">Dành cho sinh viên Việt Nam</span>
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold text-black-300 leading-tigh mb-4">
                         Biến video bài giảng <br />

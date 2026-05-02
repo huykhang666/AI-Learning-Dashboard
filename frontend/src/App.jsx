@@ -10,13 +10,13 @@ import {
 } from "react-router-dom";
 
 import Sidebar from "./components/layout/Sidebar";
-import Header from "./components/layout/header";
+import Header from "./components/layout/Header";
 import LandingPage from "./pages/Home";
 import LoginPage from "./pages/Auth/Login";
 import RegisterPage from "./pages/Auth/Register";
 import DashboardPage from "./pages/dashboard/Dashboard";
 import OAuth2RedirectHandler from "./pages/Auth/OAuth2RedirectHandler";
-import HistoryPage from "./pages/history/History";
+import HistoryPage from "./pages/History/History";
 import PremiumPage from "./pages/Premium/Premium";
 import SettingPage from "./pages/Setting/Setting";
 import AnalyticsPage from "./pages/analytics/Analytics";

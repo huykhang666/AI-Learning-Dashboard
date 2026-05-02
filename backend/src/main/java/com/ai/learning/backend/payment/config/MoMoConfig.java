@@ -1,4 +1,5 @@
 package com.ai.learning.backend.payment.config;
+
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -10,22 +11,23 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 @Getter
 public class MoMoConfig {
-    @Value("${momo.partner-code}")
+
+    @Value("${momo.partner-code:DUMMY_PARTNER_CODE}")
     private String partnerCode;
 
-    @Value("${momo.access-key}")
+    @Value("${momo.access-key:DUMMY_ACCESS_KEY}")
     private String accessKey;
 
-    @Value("${momo.secret-key}")
+    @Value("${momo.secret-key:DUMMY_SECRET_KEY}")
     private String secretKey;
 
-    @Value("${momo.endpoint}")
+    @Value("${momo.endpoint:https://test-payment.momo.vn/v2/gateway/api/create}")
     private String endpoint;
 
-    @Value("${momo.return-url}")
+    @Value("${momo.return-url:http://localhost/return}")
     private String returnUrl;
 
-    @Value("${momo.notify-url}")
+    @Value("${momo.notify-url:http://localhost/notify}")
     private String notifyUrl;
 
     public String hmacSHA256(String data) throws Exception {

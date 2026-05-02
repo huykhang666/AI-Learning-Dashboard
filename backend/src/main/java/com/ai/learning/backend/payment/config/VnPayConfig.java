@@ -13,17 +13,17 @@ import java.nio.charset.StandardCharsets;
 @Getter
 public class VnPayConfig {
 
-    // Nạp các cấu hình từ file application.yaml hoặc môi trường
-    @Value("${vnpay.tmn-code}")
+    // Nạp các cấu hình từ file application.yaml hoặc môi trường (Đã gài sẵn Key Sandbox)
+    @Value("${vnpay.tmn-code:858C6TFV}")
     private String vnp_TmnCode;
 
-    @Value("${vnpay.secret-key}")
+    @Value("${vnpay.secret-key:EFHOGXXC4RQCLPQIRIXSVEJEKFPIS46E}")
     private String secretKey;
 
-    @Value("${vnpay.pay-url}")
+    @Value("${vnpay.pay-url:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}")
     private String vnp_PayUrl;
 
-    @Value("${vnpay.return-url}")
+    @Value("${vnpay.return-url:http://localhost:8080/api/v1/payment/vnpay-return}")
     private String vnp_ReturnUrl;
 
     // Các hằng số mặc định của VNPay

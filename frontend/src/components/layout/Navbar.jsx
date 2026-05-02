@@ -8,7 +8,7 @@ function Navbar({ onLogin, onRegister }) {
     { label: " TÍNH NĂNG", href: "#Feature" },
     { label: " BẢNG GIÁ", href: "#Pricing" },
     { label: " VỀ CHÚNG TÔI", href: "#About" }, 
-    { label: " FAQ", href: "#FAQ" },
+    { label: " CÂU HỎI", href: "#FAQ" },
   ];
 
   return (
@@ -45,7 +45,7 @@ function Navbar({ onLogin, onRegister }) {
             onClick={onRegister}
             className="bg-gradient-to-r from-blue-700 to-cyan-500 text-white text-sm font-medium px-3 py-1.5 rounded-full hover:from-indigo-600 hover:to-blue-500"
           >
-            Sign Up Free
+            Đăng ký
           </button>
         </div>
          {/* HAMBURGER - chỉ hiện mobile */}

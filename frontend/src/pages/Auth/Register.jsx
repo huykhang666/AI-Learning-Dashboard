@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
-import { authService } from "../../api/authService";
+import { authService } from "../../api/AuthService";
 import SuccessModal from "../../components/common/SuccessModal";
 const T = {
   primary: "#2563EB",

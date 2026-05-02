@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./Mycourses.module.css";
+import styles from "./MyCourses.module.css";
 
 export default function CourseCard({ course }) {
   const isCompleted = course.progress === 100;

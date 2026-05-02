@@ -50,6 +50,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       AI_SERVICE_URL: http://ai-service:8000
+      APP_DIR_UPLOADS: /app/uploads
     volumes:
       - ./uploads:/app/uploads
     depends_on:
