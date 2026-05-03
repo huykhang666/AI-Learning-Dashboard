@@ -1,18 +1,18 @@
 package com.ai.learning.backend.dto.response;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MyCourseResponse {
+public class CourseDetailResponse {
     Long courseId;
     String title;
-    String thumbnailUrl;
-    Integer progress; 
-    Integer totalLessons;
-    boolean isActive;
+    String description;
+    List<LessonResponse> lessons;
+    boolean canAccess;
 }

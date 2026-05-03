@@ -30,11 +30,13 @@ public class JwtUtils {
     private static final long REFRESHABLE_DURATION = 604800;
     public String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        String scope = buildScope(user);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issuer("AI-Learning-DashBoard")
                 .issueTime(new Date())
+                .claim("scope", scope)
                 .expirationTime(new Date(
                         Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()
                 ))

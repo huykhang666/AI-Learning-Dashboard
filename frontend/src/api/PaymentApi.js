@@ -4,7 +4,7 @@ const BASE_URL = 'http://localhost:8080/api/payment';
 
 export const paymentApi = {
     createPaymentUrl: async (paymentRequest) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         
         try {
             const response = await axios.post(

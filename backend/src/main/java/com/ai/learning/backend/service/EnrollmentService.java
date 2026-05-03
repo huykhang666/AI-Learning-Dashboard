@@ -1,11 +1,8 @@
 package com.ai.learning.backend.service;
 
-import com.ai.learning.backend.dto.request.UpdateProgressRequest;
-import com.ai.learning.backend.dto.response.MyCourseResponse;
-
-import java.util.List;
+import com.ai.learning.backend.dto.response.EnrollmentResponse;
 
 public interface EnrollmentService {
-    List<MyCourseResponse> getMyCourses(Long userId);
-    void updateProgress(UpdateProgressRequest request);
+    EnrollmentResponse enrollCourse(Long userId, Long courseId);
+    void updateProgress(Long userId, Long courseId, Integer progress);
 }

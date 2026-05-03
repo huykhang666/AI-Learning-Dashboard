@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface CourseTransactionRepository extends JpaRepository<CourseTransaction, Long> {
-    Optional<CourseTransaction> findByVnpTxnRef(String vnpTxnRef);
-    List<CourseTransaction> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
+    boolean existsByUserUserIdAndCourseCourseIdAndStatus(Long userId, Long courseId, String status);
+    List<CourseTransaction> findByUserUserIdOrderByCreatedAtDesc(Long userId);
 }

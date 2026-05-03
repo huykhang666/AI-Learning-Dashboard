@@ -1,4 +1,4 @@
-package com.ai.learning.backend.dto.response;
+package com.ai.learning.backend.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -7,9 +7,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LessonResponse {
-    Long lessonId;
-    String title;
-    String videoId;
-    Integer orderIndex;
+public class CreateTransactionRequest {
+    Long userId;
+    Long courseId;
+    String paymentMethod;
 }

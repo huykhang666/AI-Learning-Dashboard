@@ -69,6 +69,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/analytics/**").permitAll()
                         .requestMatchers("/api/v1/progress/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(UserRole.ADMIN.name())
+                        .requestMatchers("/api/v1/transactions/**").hasRole("USER")
+                        .requestMatchers("/api/v1/transactions/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/messages/**").hasRole("USER")
                         .requestMatchers("/api/payment/**").permitAll()
                         .anyRequest().authenticated()

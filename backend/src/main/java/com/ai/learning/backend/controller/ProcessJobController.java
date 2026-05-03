@@ -36,7 +36,6 @@ public class ProcessJobController {
                 .build();
     }
 
-
     @PreAuthorize("permitAll()")
     @PatchMapping("/update-progress/{jobId}")
     public ApiResponse<String> updateProgress(

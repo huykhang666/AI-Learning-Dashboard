@@ -36,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
                     null
             );
             String paymentUrl = vnPayService.createPaymentUrl(vnPayRequest, httpRequest);
-            return new VNPayResponse("1000", "Create payment URL successfully", paymentUrl);
+            return new VNPayResponse("00", "Tạo URL thành công", paymentUrl);
 
         } catch (Exception e) {
             return new VNPayResponse("9999", "System error: " + e.getMessage(), null);
@@ -54,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
             return momoService.createPayment(moMoRequest);
 
         } catch (Exception e) {
-            return new MomoResponse(null, null, "System error: " + e.getMessage(), 9999);
+            return new MomoResponse(null, null, "Lỗi hệ thống: " + e.getMessage(), 99);
         }
     }
 

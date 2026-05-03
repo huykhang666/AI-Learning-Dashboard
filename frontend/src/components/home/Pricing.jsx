@@ -117,7 +117,7 @@
     const handleConfirmPayment = async () => {
       try {
         setIsProcessing(true);
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('accessToken');
 
         const decoded = jwtDecode(token);
         const userId = decoded.userId || decoded.id;

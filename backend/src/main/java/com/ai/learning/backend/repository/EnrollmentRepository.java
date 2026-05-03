@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface EnrollmentRepository  extends JpaRepository<Enrollment, Long> {
-    List<Enrollment> findByUser_UserId(Long userId);
-    Optional<Enrollment> findByUser_UserIdAndCourse_CourseId(Long userId, Long courseId);
-    
+    Optional<Enrollment> findByUserUserIdAndCourseCourseId(Long userId, Long courseId);
+    boolean existsByUserUserIdAndCourseCourseIdAndInActiveFalse(Long userId, Long courseId);
 }

@@ -5,11 +5,12 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateProgressRequest {
-    Long userId;
-    Long courseId;
-    Integer progress;
+public class CourseFilterRequest {
+    String keyword;
+    Double minPrice;
+    Double maxPrice;
+    Boolean isPremium;
 }

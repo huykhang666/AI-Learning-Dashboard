@@ -11,5 +11,5 @@ import java.util.Optional;
 
 @Repository
 public interface LessonRepository  extends JpaRepository<Lesson, Long> {
-    List<Lesson> findByCourse_CourseIdOrderByOrderIndexAsc(Long courseId);
+    List<Lesson> findByCourseCourseIdOrderByOrderIndexAsc(Long courseId);
 }
