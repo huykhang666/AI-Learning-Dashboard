@@ -99,12 +99,6 @@ export default function Header({
       {/* Actions */}
       <div className="flex items-center gap-1.5 shrink-0">
         <LanguageSwitcher />
-        <button className="flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-full text-xs font-bold transition shadow-sm whitespace-nowrap">
-          <span className="text-yellow-200">
-            <IconBolt />
-          </span>
-          <span>{t("header.upgrade")}</span>
-        </button>
         <button
           className="relative text-orange-400 hover:text-orange-500 p-2 shrink-0"
           onClick={onClearNotification}
