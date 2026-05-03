@@ -43,7 +43,10 @@ export default function MyCourses() {
           <div className={styles.emptyState}>{t("my_courses.empty")}</div>
         ) : (
           filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard
+              key={course.courseId} 
+              course={course}
+            />
           ))
         )}
       </div>

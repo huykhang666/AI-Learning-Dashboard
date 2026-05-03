@@ -1,0 +1,49 @@
+.heroSection {
+  background: #1c1d1f;
+  color: #fff;
+  padding: 60px 0 100px; /* Padding dưới cao để tạo khoảng trống cho Card[cite: 6] */
+}
+.heroContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.mainContent {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+}
+.leftCol { flex: 1; }
+.sidebarCol { width: 340px; position: relative; }
+
+.stickyCard {
+  position: sticky;
+  top: 20px;
+  background: #fff;
+  border: 1px solid #d1d7dc;
+  margin-top: -200px; /* Đây là chìa khóa để nó đè lên banner đen[cite: 6] */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+.previewImg { width: 100%; height: 180px; object-fit: cover; }
+.cardBody { padding: 20px; text-align: center; }
+.priceTag { font-size: 24px; font-weight: 700; margin-bottom: 15px; }
+.btnAction {
+  width: 100%;
+  padding: 12px;
+  background: #a435f0;
+  color: white;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lessonRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+.lessonRow:hover { background: #f8fafc; }

@@ -29,7 +29,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponse> getAllCourses(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = (userId != null) ? userRepository.findById(userId).orElse(null) : null;
 
         return courseRepository.findAll().stream().map(course -> {
             CourseResponse response = courseMapper.toCourseResponse(course);
@@ -43,7 +43,7 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findByIdWithLessons(courseId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
 
-        User user = userRepository.findById(userId).orElse(null);
+        User user = (userId != null) ? userRepository.findById(userId).orElse(null) : null;
         boolean canAccess = checkAccess(user, course);
 
         CourseDetailResponse response = courseMapper.toCourseDetailResponse(course);

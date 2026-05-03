@@ -1,22 +1,33 @@
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/api/v1/users"; 
+const BASE_URL = "http://localhost:8080/api/v1";
+
+const apiClient = axios.create({
+    baseURL: BASE_URL,
+});
+
+apiClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken'); 
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 
 export const userService = {
     getMyInfo: async () => {
-        try {
-            const token = localStorage.getItem('accessToken');
-            const response = await axios.get(`${API_URL}/my-info`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            
-            return response.data;
+        const response = await apiClient.get('/users/my-info');
+        return response.data;
+    },
 
-        } catch (error) {
-            console.error("Lỗi khi gọi API getMyInfo:", error);
-            throw error;
-        }
+
+    getCourses: async (userId) => {
+        const response = await apiClient.get('/courses', { params: { userId } });
+        return response.data;
+    },
+
+    getTransactions: async (userId) => {
+        const response = await apiClient.get(`/transactions/user/${userId}`);
+        return response.data;
     }
 };

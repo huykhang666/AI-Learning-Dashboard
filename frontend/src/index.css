@@ -2,3 +2,14 @@
 html {
   scroll-behavior: smooth;
 }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased; /* Giúp font chữ nhìn thanh mảnh hơn trên Mac/iOS */
+  -moz-osx-font-smoothing: grayscale;
+}

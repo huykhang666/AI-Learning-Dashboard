@@ -24,6 +24,7 @@ import HelpCenter from "./pages/HelpCenter/HelpCenter";
 import CourseDetail from "./pages/CourseDetail/CourseDetail";
 import PaymentSuccessPage from "./pages/Payment/PaymentSuccess.jsx";
 import PaymentFailedPage from "./pages/Payment/PaymentFailed.jsx";
+import CourseLanding from "./pages/MyCourses/CourseLanding.jsx";
 
 // 1. AppLayout: Chỉ chứa các Route cần Sidebar và Header
 function AppLayout({ onLogout }) {
@@ -67,6 +68,7 @@ function AppLayout({ onLogout }) {
             <Route path="settings" element={<SettingPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
+            <Route path="courses/:courseId" element={<CourseLanding />} />
             {/* Route này để hỗ trợ điều hướng trong nội bộ main */}
             <Route path="history/:id" element={<CourseDetail />} />
           </Routes>
