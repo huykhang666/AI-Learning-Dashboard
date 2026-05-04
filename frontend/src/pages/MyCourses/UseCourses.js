@@ -5,7 +5,7 @@ import { userService } from "../../api/UserService";
 export function useCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all"); // 'all' hoặc 'mine'
+  const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -31,9 +31,7 @@ export function useCourses() {
   const filteredCourses = useMemo(() => {
     let result = courses;
 
-    // Fix lại logic lọc tab ở đây
     if (activeTab === "mine") {
-      // Chỉ lấy những khóa học đã được mở khóa (đã mua hoặc free)[cite: 7]
       result = result.filter((c) => c.unlocked === true);
     }
 

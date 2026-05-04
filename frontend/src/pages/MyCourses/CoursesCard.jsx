@@ -1,15 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import styles from "./MyCourses.module.css"; 
+import styles from "./MyCourses.module.css";
 
 export default function CourseCard({ course }) {
   const { t } = useTranslation();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleViewDetails = () => {
-   
-    navigate(`/app/courses/${course.courseId}`); 
+
+    navigate(`/app/courses/${course.courseId}`);
   };
 
   const progress = course.progress || 0;
@@ -42,38 +42,41 @@ export default function CourseCard({ course }) {
 
       <h3 className={styles.cardTitle}>{course.title}</h3>
 
-      {course.unlocked ? (
-        <>
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${progress}%`, background: progressColor }}
-            />
-          </div>
-          <p className={styles.progressLabel} style={{ color: progressColor }}>
-            {t("my_courses.progress_complete", { percent: progress })}
+      <div className={styles.infoSection}>
+        {course.unlocked && progress > 0 ? (
+          <>
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{ width: `${progress}%`, background: progressColor }}
+              />
+            </div>
+            <p className={styles.progressLabel} style={{ color: progressColor }}>
+              {t("my_courses.progress_complete", { percent: progress })}
+            </p>
+          </>
+        ) : (
+          <p style={{
+            fontSize: '16px',
+            fontWeight: '800',
+            color: course.price > 0 ? '#4f6ef7' : '#22c55e', 
+            margin: '10px 0'
+          }}>
+            {displayPrice}
           </p>
-        </>
-      ) : (
-        <p style={{
-          fontSize: '14px',
-          fontWeight: '700',
-          color: course.price > 0 ? '#4f6ef7' : '#22c55e',
-          margin: '4px 0'
-        }}>
-          {displayPrice}
-        </p>
-      )}
+        )}
+      </div>
 
       <p className={styles.cardLessons}>
-        {t("my_courses.lessons", { count: course.lessons || 0 })}
+        {/* Sửa từ course.lessons thành course.lessons_count cho đúng DB ní gửi */}
+        {t("my_courses.lessons", { count: course.lessons_count || 0 })}
       </p>
 
       <div className={styles.cardActions}>
         <button className={styles.btnView} onClick={handleViewDetails}>
           {t("my_courses.button.view_course")}
         </button>
-        
+
         {course.unlocked && (
           <button
             className={styles.btnLatest}

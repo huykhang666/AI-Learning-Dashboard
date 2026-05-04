@@ -1,49 +1,478 @@
+/* =============================================
+   CourseLanding.module.css  — Professional Theme
+   Font: Sora (display) + DM Sans (body)
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+/* ---------- tokens ---------- */
+:root {
+    --brand:       #2563EB;
+    --brand-dark:  #1D4ED8;
+    --brand-light: #EFF6FF;
+    --accent:      #F59E0B;
+    --success:     #10B981;
+    --text-primary:  #0F172A;
+    --text-secondary:#475569;
+    --text-muted:    #94A3B8;
+    --border:      #E2E8F0;
+    --surface:     #FFFFFF;
+    --bg:          #F8FAFC;
+    --hero-bg:     #0F172A;
+    --radius-sm:   8px;
+    --radius-md:   12px;
+    --radius-lg:   16px;
+    --shadow-sm:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md:   0 4px 16px rgba(0,0,0,.10);
+    --shadow-lg:   0 20px 40px rgba(0,0,0,.14);
+    --transition:  0.2s ease;
+}
+
+/* ---------- base ---------- */
+.landingPage {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text-primary);
+}
+
+/* ---------- loading ---------- */
+.loadingScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.loadingSpinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--brand);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- hero ---------- */
 .heroSection {
-  background: #1c1d1f;
-  color: #fff;
-  padding: 60px 0 100px; /* Padding dưới cao để tạo khoảng trống cho Card[cite: 6] */
+    position: relative;
+    background: var(--hero-bg);
+    overflow: hidden;
+    padding: 72px 0 60px;
 }
+
+.heroGradient {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 60% at 60% -10%, rgba(37,99,235,.35) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 80%,  rgba(245,158,11,.12) 0%, transparent 60%);
+    pointer-events: none;
+}
+
 .heroContainer {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 20px;
+    position: relative;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 32px;
 }
+
+.heroBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(37,99,235,.2);
+    border: 1px solid rgba(37,99,235,.4);
+    color: #93C5FD;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+}
+
+.heroTitle {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
+    color: #F8FAFC;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    letter-spacing: -.02em;
+}
+
+.heroSub {
+    font-size: 16px;
+    color: #94A3B8;
+    line-height: 1.7;
+    margin: 0 0 28px;
+    max-width: 640px;
+    font-weight: 400;
+}
+
+.heroMeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #CBD5E1;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.metaIconStar { color: var(--accent); }
+
+.metaDivider {
+    width: 1px;
+    height: 14px;
+    background: #334155;
+}
+
+/* ---------- layout ---------- */
 .mainContent {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: flex;
-  gap: 30px;
-  padding: 20px;
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 36px;
+    align-items: start;
 }
-.leftCol { flex: 1; }
-.sidebarCol { width: 340px; position: relative; }
+
+/* ---------- cards ---------- */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.cardTitle {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 20px;
+    letter-spacing: -.01em;
+}
+
+.cardHeader .cardTitle { margin-bottom: 0; }
+
+.lessonCount {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand);
+    background: var(--brand-light);
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+/* ---------- learn grid ---------- */
+.learnGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.learnItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.checkIcon { color: var(--success); flex-shrink: 0; margin-top: 1px; }
+
+/* ---------- lesson list ---------- */
+.lessonList { display: flex; flex-direction: column; gap: 4px; }
+
+.lessonRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: background var(--transition), border-color var(--transition), transform var(--transition);
+}
+
+.lessonUnlocked {
+    cursor: pointer;
+}
+
+.lessonUnlocked:hover {
+    background: var(--brand-light);
+    border-color: #BFDBFE;
+    transform: translateX(4px);
+}
+
+.lessonUnlocked:hover .iconPlay { color: var(--brand); }
+
+.lessonLocked { cursor: default; }
+
+.lessonLeft {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.lessonIndex {
+    font-family: 'Sora', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    width: 28px;
+    flex-shrink: 0;
+}
+
+.lessonInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.lessonTitle {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.lessonDuration {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.lessonRight { display: flex; align-items: center; }
+
+.iconPlay { color: var(--text-muted); transition: color var(--transition); }
+.iconLock { color: var(--text-muted); }
+
+/* ---------- sidebar sticky card ---------- */
+.sidebarCol { position: relative; }
 
 .stickyCard {
-  position: sticky;
-  top: 20px;
-  background: #fff;
-  border: 1px solid #d1d7dc;
-  margin-top: -200px; /* Đây là chìa khóa để nó đè lên banner đen[cite: 6] */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  z-index: 10;
+    position: sticky;
+    top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
 }
-.previewImg { width: 100%; height: 180px; object-fit: cover; }
-.cardBody { padding: 20px; text-align: center; }
-.priceTag { font-size: 24px; font-weight: 700; margin-bottom: 15px; }
+
+/* ---------- preview image ---------- */
+.previewWrapper {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: #0F172A;
+}
+
+.previewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.previewWrapper:hover .previewImg {
+    transform: scale(1.04);
+    opacity: 0.7;
+}
+
+.previewOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+    opacity: 0;
+    transition: opacity var(--transition);
+    cursor: pointer;
+}
+
+.previewWrapper:hover .previewOverlay { opacity: 1; }
+
+.playBtn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    border: 2px solid rgba(255,255,255,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    transition: transform var(--transition), background var(--transition);
+}
+
+.playBtn:hover { transform: scale(1.1); background: rgba(255,255,255,.25); }
+
+.previewOverlay span {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+/* ---------- card body ---------- */
+.cardBody { padding: 24px; }
+
+.priceRow {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.priceTag {
+    font-family: 'Sora', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -.02em;
+}
+
+.priceOriginal {
+    font-size: 15px;
+    color: var(--text-muted);
+    text-decoration: line-through;
+    font-weight: 400;
+}
+
+/* ---------- action button ---------- */
 .btnAction {
-  width: 100%;
-  padding: 12px;
-  background: #a435f0;
-  color: white;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+    letter-spacing: .01em;
+    margin-bottom: 12px;
 }
-.lessonRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid #f1f5f9;
-  cursor: pointer;
+
+.btnAction:active { transform: scale(0.98); }
+
+.btnBuy {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(37,99,235,.35);
 }
-.lessonRow:hover { background: #f8fafc; }
+
+.btnBuy:hover { filter: brightness(1.08); box-shadow: 0 6px 20px rgba(37,99,235,.45); }
+
+.btnStudy {
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(16,185,129,.30);
+}
+
+.btnStudy:hover { filter: brightness(1.08); box-shadow: 0 6px 20px rgba(16,185,129,.40); }
+
+/* arrow icon push to end */
+.btnAction svg:last-child { margin-left: auto; }
+
+/* ---------- guarantee ---------- */
+.guarantee {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.guarantee svg { color: var(--success); flex-shrink: 0; }
+
+/* ---------- sidebar features ---------- */
+.sidebarFeatures {
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+}
+
+.featuresTitle {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin: 0 0 12px;
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border-bottom: 1px solid var(--bg);
+}
+
+.featureItem svg { color: var(--brand); flex-shrink: 0; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+        padding: 32px 20px 60px;
+    }
+
+    .stickyCard { position: static; }
+
+    .learnGrid { grid-template-columns: 1fr; }
+
+    .heroContainer { padding: 0 20px; }
+}
+
+@media (max-width: 560px) {
+    .heroSection { padding: 48px 0 40px; }
+    .heroTitle { font-size: 22px; }
+    .heroMeta { gap: 8px 4px; }
+    .card { padding: 20px; }
+    .cardBody { padding: 18px; }
+}
