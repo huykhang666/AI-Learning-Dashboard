@@ -27,15 +27,18 @@ ai:
 app:
   dir:
     uploads: "uploads"
+
 vnpay:
   tmn-code: 858C6TFV
   secret-key: EFHOGXXC4RQCLPQIRIXSVEJEKFPIS46E
   pay-url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-  return-url: http://localhost:5173/app/premium
+  return-url: "http://localhost:5173/app/premium"
+  ipn-url: "https://abc123.ngrok-free.app/api/payment/vnpay-ipn"
+
 momo:
   partner-code: MOMO5RGW20191128
   access-key: mS6n6S3u4S3u4S3u
   secret-key: F8BBA842ECF85D152590E8D1D1650D67
   endpoint: https://test-payment.momo.vn/v2/gateway/api/create
-  return-url: http://localhost:3000/payment/success
-  notify-url: http://localhost:8080/api/payment/momo-ipn
+  return-url: "http://localhost:3000/payment/success"
+  notify-url: "http://localhost:8080/api/payment/momo-ipn"

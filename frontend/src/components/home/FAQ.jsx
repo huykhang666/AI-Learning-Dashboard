@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 function FAQ() {
   const { t } = useTranslation();
@@ -38,8 +39,12 @@ function FAQ() {
                 >
                   {faq.question}
                 </h3>
-                <span className="text-gray-400 text-sm ml-4">
-                  {openIndex === index ? "^" : "v"}
+                <span className="text-gray-400 ml-4 flex-shrink-0">
+                  {openIndex === index ? (
+                    <ChevronUp size={18} />
+                  ) : (
+                    <ChevronDown size={18} />
+                  )}
                 </span>
               </div>
 

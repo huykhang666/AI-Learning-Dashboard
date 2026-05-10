@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
+import { Mic, Sparkles, MessageSquare, Eye, EyeOff, AlertTriangle, Check } from "lucide-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -101,8 +102,8 @@ const Field = ({
       )}
     </div>
     {error && (
-      <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F }}>
-        ⚠ {error}
+      <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F, display: "flex", alignItems: "center", gap: 4 }}>
+        <AlertTriangle size={11} /> {error}
       </p>
     )}
   </div>
@@ -340,10 +341,10 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               }}
             >
               {[
-                ["🎙", "AI Whisper bóc băng tự động"],
-                ["✨", "Tóm tắt nội dung thông minh"],
-                ["💬", "Chatbot hỏi đáp theo bài giảng"],
-              ].map(([ic, txt]) => (
+                [Mic, "AI Whisper bóc băng tự động"],
+                [Sparkles, "Tóm tắt nội dung thông minh"],
+                [MessageSquare, "Chatbot hỏi đáp theo bài giảng"],
+              ].map(([Icon, txt]) => (
                 <div
                   key={txt}
                   style={{
@@ -357,7 +358,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                     textAlign: "left",
                   }}
                 >
-                  <span style={{ fontSize: 18 }}>{ic}</span>
+                  <Icon size={18} color="#fff" />
                   <span
                     style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}
                   >
@@ -418,7 +419,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 marginTop: 0,
               }}
             >
-              Chào mừng trở lại! 👋
+              Chào mừng trở lại!
             </h1>
             <p
               style={{
@@ -528,7 +529,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                     padding: 0,
                   }}
                 >
-                  {showPass ? "🙈" : "👁"}
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               }
             />
@@ -564,11 +565,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                   }}
                 >
                   {remember && (
-                    <span
-                      style={{ color: "#fff", fontSize: 10, fontWeight: 900 }}
-                    >
-                      ✓
-                    </span>
+                    <Check size={10} color="#fff" strokeWidth={3} />
                   )}
                 </div>
                 <span

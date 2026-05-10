@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
+import {
+  Eye,
+  EyeOff,
+  AlertTriangle,
+  Mic,
+  Sparkles,
+  MessageSquare,
+} from "lucide-react";
 import { authService } from "../../api/AuthService";
 import SuccessModal from "../../components/common/SuccessModal";
 
@@ -60,9 +68,19 @@ const Field = ({ label, type = "text", placeholder, value, onChange, error }) =>
         boxSizing: "border-box",
       }}
     />
-    {error && <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F }}>⚠ {error}</p>}
+    {error && (
+      <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F, display: "flex", alignItems: "center", gap: 4 }}>
+        <AlertTriangle size={11} /> {error}
+      </p>
+    )}
   </div>
 );
+
+const featureItems = [
+  { Icon: Mic, text: "AI Whisper bóc băng tự động" },
+  { Icon: Sparkles, text: "Tóm tắt nội dung thông minh" },
+  { Icon: MessageSquare, text: "Chatbot hỏi đáp theo bài giảng" },
+];
 
 const LeftPanel = () => (
   <div style={{
@@ -93,26 +111,23 @@ const LeftPanel = () => (
     </div>
 
     <div style={{ zIndex: 1, textAlign: "center", maxWidth: 340, width: "100%" }}>
-      <h2 style={{ fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: 10 }}>
-        Học thông minh hơn<br />với sức mạnh của AI <FaBolt size={22} color="#F59E0B" style={{ display: "inline" }} />
+      <h2 style={{ fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+        Học thông minh hơn với sức mạnh của AI
+        <FaBolt size={22} color="#F59E0B" />
       </h2>
       <p style={{ fontSize: 13, color: "rgba(255,255,255,.8)", lineHeight: 1.7, marginBottom: 22 }}>
         Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời mọi câu hỏi.
       </p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
-        {[
-          ["🎙", "AI Whisper bóc băng tự động"],
-          ["✨", "Tóm tắt nội dung thông minh"],
-          ["💬", "Chatbot hỏi đáp theo bài giảng"],
-        ].map(([ic, txt]) => (
-          <div key={txt} style={{
+        {featureItems.map(({ Icon, text }) => (
+          <div key={text} style={{
             display: "flex", alignItems: "center", gap: 12,
             background: "rgba(255,255,255,.13)", borderRadius: 12,
             padding: "10px 16px", border: "1px solid rgba(255,255,255,.2)", textAlign: "left"
           }}>
-            <span style={{ fontSize: 18 }}>{ic}</span>
-            <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{txt}</span>
+            <Icon size={18} color="#fff" style={{ flexShrink: 0 }} />
+            <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{text}</span>
           </div>
         ))}
       </div>
@@ -154,11 +169,10 @@ export default function PageRegister({ onGoLogin }) {
   };
 
   const handleRegister = async () => {
-    // Validate phía client
     const e = {};
     if (!form.firstName.trim()) e.firstName = "Vui lòng nhập họ";
     if (!form.lastName.trim()) e.lastName = "Vui lòng nhập tên";
-    if (!form.username.trim()) e.username = "Vui lòng nhập username";
+    if (!form.username.trim()) e.username = "Vui lòng nhập tên đăng nhập";
     if (!form.email) e.email = "Vui lòng nhập email";
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email không hợp lệ";
     if (!form.pass) e.pass = "Vui lòng nhập mật khẩu";
@@ -175,7 +189,7 @@ export default function PageRegister({ onGoLogin }) {
         username: form.username,
         email: form.email,
         password: form.pass,
-        dateOfBirth: form.dob || null, // không bắt buộc
+        dateOfBirth: form.dob || null,
       });
 
       await new Promise((r) => setTimeout(r, 800));
@@ -183,7 +197,6 @@ export default function PageRegister({ onGoLogin }) {
       if (data.code === 1000) {
         setShowSuccess(true);
       } else {
-        // Fix: dùng "data" thay vì "error" (error chỉ có trong catch)
         setErrors({ apiError: data.message || "Tài khoản đã tồn tại" });
       }
     } catch (error) {
@@ -214,7 +227,7 @@ export default function PageRegister({ onGoLogin }) {
                 color: T.danger, fontSize: 13, fontWeight: 600,
                 display: "flex", alignItems: "center", gap: 10
               }}>
-                <span style={{ fontSize: 18 }}>⚠️</span>
+                <AlertTriangle size={18} color={T.danger} style={{ flexShrink: 0 }} />
                 <span>
                   {errors.apiError}. Bạn đã có tài khoản?{" "}
                   <span onClick={onGoLogin} style={{ textDecoration: "underline", cursor: "pointer", color: T.primary }}>
@@ -224,7 +237,7 @@ export default function PageRegister({ onGoLogin }) {
               </div>
             )}
 
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 4 }}>Tạo tài khoản 🚀</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: T.text, marginBottom: 4 }}>Tạo tài khoản mới</h1>
             <p style={{ fontSize: 13, color: T.textMid, marginBottom: 20 }}>Bắt đầu hành trình cùng AI-Learning</p>
 
             {/* Đăng ký Google */}
@@ -246,14 +259,12 @@ export default function PageRegister({ onGoLogin }) {
             </button>
 
             <div style={{ display: "flex", gap: 12 }}>
-              <Field label="Họ & tên đệm" placeholder="Nguyễn" value={form.firstName} onChange={set("firstName")} error={errors.firstName} />
-              <Field label="Tên" placeholder="Khang" value={form.lastName} onChange={set("lastName")} error={errors.lastName} />
+              <Field label="Họ & tên đệm" placeholder="Nguyễn Văn" value={form.firstName} onChange={set("firstName")} error={errors.firstName} />
+              <Field label="Tên" placeholder="An" value={form.lastName} onChange={set("lastName")} error={errors.lastName} />
             </div>
 
-            <Field label="Username" placeholder="khang_utc" value={form.username} onChange={set("username")} error={errors.username} />
-            <Field label="Email" type="email" placeholder="your@email.com" value={form.email} onChange={set("email")} error={errors.email} />
-
-            {/* Ngày sinh: không bắt buộc */}
+            <Field label="Tên đăng nhập" placeholder="ten_dang_nhap" value={form.username} onChange={set("username")} error={errors.username} />
+            <Field label="Email" type="email" placeholder="example@email.com" value={form.email} onChange={set("email")} error={errors.email} />
             <Field label="Ngày sinh (không bắt buộc)" type="date" value={form.dob} onChange={set("dob")} />
 
             {/* Mật khẩu + strength indicator */}
@@ -262,23 +273,27 @@ export default function PageRegister({ onGoLogin }) {
               <div style={{ position: "relative" }}>
                 <input
                   type={showPass ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="Tối thiểu 8 ký tự"
                   value={form.pass}
                   onChange={set("pass")}
                   style={{
-                    width: "100%", padding: "10px 36px 10px 12px", borderRadius: 10,
+                    width: "100%", padding: "10px 40px 10px 12px", borderRadius: 10,
                     border: `1.5px solid ${errors.pass ? T.danger : T.border}`,
-                    fontSize: 13, outline: "none", boxSizing: "border-box"
+                    fontSize: 13, outline: "none", boxSizing: "border-box", fontFamily: F,
                   }}
                 />
                 <button
                   onClick={() => setShowPass(!showPass)}
-                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer" }}
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", color: T.textMid }}
                 >
-                  {showPass ? "🙈" : "👁"}
+                  {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
-              {errors.pass && <p style={{ fontSize: 11, color: T.danger, marginTop: 3 }}>⚠ {errors.pass}</p>}
+              {errors.pass && (
+                <p style={{ fontSize: 11, color: T.danger, marginTop: 3, display: "flex", alignItems: "center", gap: 4 }}>
+                  <AlertTriangle size={11} /> {errors.pass}
+                </p>
+              )}
               {form.pass && (
                 <div style={{ marginTop: 5 }}>
                   <div style={{ display: "flex", gap: 3, marginBottom: 2 }}>
@@ -291,14 +306,18 @@ export default function PageRegister({ onGoLogin }) {
               )}
             </div>
 
-            <Field label="Xác nhận mật khẩu" type="password" placeholder="••••••••" value={form.confirm} onChange={set("confirm")} error={errors.confirm} />
+            <Field label="Xác nhận mật khẩu" type="password" placeholder="Nhập lại mật khẩu" value={form.confirm} onChange={set("confirm")} error={errors.confirm} />
 
             {/* Điều khoản */}
             <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", marginBottom: errors.agree ? 4 : 20 }}>
               <input type="checkbox" checked={agree} onChange={() => { setAgree(!agree); setErrors({}); }} />
               <span style={{ fontSize: 12, color: T.textMid }}>Tôi đồng ý với các điều khoản dịch vụ</span>
             </label>
-            {errors.agree && <p style={{ fontSize: 11, color: T.danger, marginBottom: 16 }}>⚠ {errors.agree}</p>}
+            {errors.agree && (
+              <p style={{ fontSize: 11, color: T.danger, marginBottom: 16, display: "flex", alignItems: "center", gap: 4 }}>
+                <AlertTriangle size={11} /> {errors.agree}
+              </p>
+            )}
 
             {/* Nút đăng ký */}
             <button
@@ -308,7 +327,8 @@ export default function PageRegister({ onGoLogin }) {
                 width: "100%", padding: 12, borderRadius: 11, border: "none",
                 background: loading ? "#BFDBFE" : T.primary,
                 color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                fontFamily: F,
               }}
             >
               {loading && <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid #fff", borderTopColor: "transparent", animation: "spin .7s linear infinite" }} />}

@@ -1,29 +1,26 @@
 import { useTranslation } from "react-i18next";
+import { FaUserTie } from "react-icons/fa";
 
 function About() {
   const { t } = useTranslation();
 
   const members = [
     {
-      avatar: "👨‍💼",
       name: "Nguyễn Huy Khang",
       role: t("about.team.roles.backend"),
       description: t("about.team.description"),
     },
     {
-      avatar: "👨‍💼",
       name: "Nguyễn Trọng Hiểu",
       role: t("about.team.roles.frontend"),
       description: t("about.team.description"),
     },
     {
-      avatar: "👨‍💼",
       name: "Lê Quang Chí",
       role: t("about.team.roles.frontend"),
       description: t("about.team.description"),
     },
     {
-      avatar: "👨‍💼",
       name: "Trần Minh Huấn",
       role: t("about.team.roles.frontend"),
       description: t("about.team.description"),
@@ -112,7 +109,11 @@ function About() {
                 key={member.name}
                 className="bg-white border border-gray-200 rounded-2xl p-6 text-center hover:border-indigo-400 transition"
               >
-                <div className="text-5xl mb-4">{member.avatar}</div>
+                <div className="flex justify-center mb-4">
+                  <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center">
+                    <FaUserTie size={28} className="text-indigo-500" />
+                  </div>
+                </div>
                 <h3 className="font-bold text-gray-900 mb-1">{member.name}</h3>
                 <p className="text-indigo-500 text-sm font-medium mb-3">
                   {member.role}

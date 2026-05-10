@@ -58,3 +58,10 @@ __pycache__/
 ai-service/.env
 ai-service/storage/
 ai-service/ffmpeg.exe
+
+# temp audio files
+*.mp3
+*.m4a
+
+# ai temp
+ai-service/temp_*

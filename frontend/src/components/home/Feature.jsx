@@ -1,4 +1,17 @@
 import { useTranslation } from "react-i18next";
+import {
+  Mic,
+  Sparkles,
+  MessageSquare,
+  TrendingUp,
+  Link,
+  FileText,
+  Tag,
+  Lock,
+  Upload,
+  Settings,
+  GraduationCap,
+} from "lucide-react";
 import FeatureCard from "./FeatureCard";
 
 function Feature() {
@@ -6,42 +19,42 @@ function Feature() {
 
   const features = [
     {
-      icon: "🎙️",
+      icon: Mic,
       title: t("feature.cards.whisper.title"),
       description: t("feature.cards.whisper.description"),
     },
     {
-      icon: "✨",
+      icon: Sparkles,
       title: t("feature.cards.summary.title"),
       description: t("feature.cards.summary.description"),
     },
     {
-      icon: "💬",
+      icon: MessageSquare,
       title: t("feature.cards.chat.title"),
       description: t("feature.cards.chat.description"),
     },
     {
-      icon: "📈",
+      icon: TrendingUp,
       title: t("feature.cards.progress.title"),
       description: t("feature.cards.progress.description"),
     },
     {
-      icon: "🔗",
+      icon: Link,
       title: t("feature.cards.youtube.title"),
       description: t("feature.cards.youtube.description"),
     },
     {
-      icon: "📄",
+      icon: FileText,
       title: t("feature.cards.export.title"),
       description: t("feature.cards.export.description"),
     },
     {
-      icon: "🏷️",
+      icon: Tag,
       title: t("feature.cards.tags.title"),
       description: t("feature.cards.tags.description"),
     },
     {
-      icon: "🔒",
+      icon: Lock,
       title: t("feature.cards.security.title"),
       description: t("feature.cards.security.description"),
     },
@@ -49,17 +62,17 @@ function Feature() {
 
   const action = [
     {
-      icon: "↑",
+      icon: Upload,
       title: t("feature.steps.upload.title"),
       description: t("feature.steps.upload.description"),
     },
     {
-      icon: "⚙️",
+      icon: Settings,
       title: t("feature.steps.process.title"),
       description: t("feature.steps.process.description"),
     },
     {
-      icon: "🎓",
+      icon: GraduationCap,
       title: t("feature.steps.learn.title"),
       description: t("feature.steps.learn.description"),
     },
@@ -111,4 +124,5 @@ function Feature() {
     </section>
   );
 }
+
 export default Feature;

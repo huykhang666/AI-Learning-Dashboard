@@ -1,5 +1,6 @@
 package com.ai.learning.backend.payment.entity;
 import com.ai.learning.backend.entity.User;
+import com.ai.learning.backend.enums.SessionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

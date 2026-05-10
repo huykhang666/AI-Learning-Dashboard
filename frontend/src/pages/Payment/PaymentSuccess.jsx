@@ -7,19 +7,26 @@ export default function PaymentSuccessPage() {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate("/app/dash");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  // 1. Xóa thông tin user cũ trong localStorage (nếu ní có lưu)
+  // Để lần tới Sidebar load nó phải gọi lại API mới
+  localStorage.removeItem("user_info"); 
 
-    return () => clearInterval(timer);
-  }, [navigate]);
+  const timer = setInterval(() => {
+    setCountdown((prev) => {
+      if (prev <= 1) {
+        clearInterval(timer);
+        
+  
+        window.location.href = "/app/dash"; 
+        
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(timer); 
+}, [navigate]);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 text-center p-4">
       <h1 className="inline-flex items-center gap-3 text-2xl font-bold text-green-600">

@@ -143,20 +143,20 @@ export default function CourseLanding() {
                 {/* 3. CỘT PHẢI (SIDEBAR): Giá và Nút hành động */}
                 <div className={styles.sidebarCol}>
                     <div className={styles.stickyCard}>
-                        {(course.thumbnailUrl || course.thumbnail_url) ? (
+                        {course.thumbnailUrl ? (
                             <img
-                                src={course.thumbnailUrl || course.thumbnail_url}
+                                src={course.thumbnailUrl}
                                 alt={course.title}
                                 className={styles.previewImg}
+                                /* Thêm cái này để YouTube cho phép hiển thị ảnh trên localhost */
                                 referrerPolicy="no-referrer"
+                                onError={(e) => {
+                                    e.target.src = "https://via.placeholder.com/400x225?text=Link+Anh+Loi";
+                                }}
                             />
                         ) : (
-                            <div className={styles.emptyThumbnail} />
+                            <div className={styles.emptyThumbnail} style={{ height: '225px', background: '#eee' }} />
                         )}
-                        <div className={styles.previewOverlay}>
-                            <PlayCircle size={45} className={styles.centerPlayIcon} />
-                            <span>Xem giới thiệu</span>
-                        </div>
 
                         <div className={styles.previewOverlay}>
                             <PlayCircle size={45} className={styles.centerPlayIcon} />

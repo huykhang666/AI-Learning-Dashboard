@@ -5,96 +5,129 @@ import { FaBolt, FaSignOutAlt, FaTimes } from "react-icons/fa";
 import { userService } from "../../api/UserService";
 
 
-const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData }) => (
-  <div className="flex flex-col h-full px-3 py-4 overflow-y-auto relative">
-    {showClose && (
-      <button onClick={onMobileClose} className="absolute top-3.5 right-3 text-gray-400 hover:text-gray-600 p-1">
-        <FaTimes size={18} />
-      </button>
-    )}
+const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData }) => {
+  // Kiểm tra trạng thái Premium
+  const isPremium = userData?.isPremium;
 
-    <div className="flex items-center gap-2 mb-2">
-      <div className="bg-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
-        <FaBolt size={14} color="orange" />
+  return (
+    <div className="flex flex-col h-full px-3 py-4 overflow-y-auto relative bg-white">
+      {/* Nút đóng trên Mobile */}
+      {showClose && (
+        <button onClick={onMobileClose} className="absolute top-3.5 right-3 text-gray-400 hover:text-gray-600 p-1">
+          <FaTimes size={18} />
+        </button>
+      )}
+
+      {/* Logo Group */}
+      <div className="flex items-center gap-2 mb-2">
+        <div className="bg-indigo-600 w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+          <FaBolt size={14} color="orange" />
+        </div>
+        <div className="flex flex-col leading-tight">
+          <span className="font-bold text-sm text-gray-800">AI-Learning</span>
+          <span className="text-indigo-600 font-bold text-sm">DashBoard</span>
+        </div>
       </div>
-      <div className="flex flex-col leading-tight">
-        <span className="font-bold text-sm text-gray-800">AI-Learning</span>
-        <span className="text-indigo-600 font-bold text-sm">DashBoard</span>
-      </div>
-    </div>
 
-    <hr className="border-gray-200 mb-4" />
+      <hr className="border-gray-200 mb-4" />
 
-    <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
-      {[
-        { label: "Tổng quan", key: "dashboard", path: "/app/dash" },
-        { label: "Khóa học", key: "courses", path: "/app/courses" },
-        { label: "Lịch sử", key: "History", path: "/app/history" },
-        { label: "Phân tích", key: "analytics", path: "/app/analytics" },
-        { label: "Premium", key: "premium", badge: "FREE", path: "/app/premium" },
-        { label: "Cài đặt", key: "settings", path: "/app/settings" },
-        { label: "Hỗ trợ", key: "help", path: "/app/help" },
-      ].map((item) => (
-        <NavLink
-          key={item.key}
-          to={item.path}
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left
-            ${isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-50"}`
-          }
+      {/* Navigation Links */}
+      <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
+        {[
+          { label: "Tổng quan", key: "dashboard", path: "/app/dash" },
+          { label: "Khóa học", key: "courses", path: "/app/courses" },
+          { label: "Lịch sử", key: "History", path: "/app/history" },
+          { label: "Phân tích", key: "analytics", path: "/app/analytics" },
+          {
+            label: "Premium",
+            key: "premium",
+            path: "/app/premium",
+            // Đổi badge dựa trên hạng tài khoản
+            badge: isPremium ? "PRO" : "FREE"
+          },
+          { label: "Cài đặt", key: "settings", path: "/app/settings" },
+          { label: "Hỗ trợ", key: "help", path: "/app/help" },
+        ].map((item) => (
+          <NavLink
+            key={item.key}
+            to={item.path}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left
+              ${isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-50"}`
+            }
+          >
+            {/* Đổi màu text riêng cho mục Premium/PRO */}
+            <span className={item.key === "premium"
+              ? (isPremium ? "text-green-600 font-bold" : "text-orange-500 font-bold")
+              : ""
+            }>
+              {item.label}
+            </span>
+
+            {item.badge && (
+              <span className={`ml-auto text-white text-[10px] font-bold px-2 py-0.5 rounded-full ${isPremium ? "bg-green-500" : "bg-orange-400"
+                }`}>
+                {item.badge}
+              </span>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+
+      {/* BẢNG USAGE - Chỉ hiện nếu là tài khoản thường (FREE) */}
+      {!isPremium && (
+        <div className="bg-indigo-50 border border-indigo-100 rounded-xl py-3 px-4 flex flex-col gap-3 mb-4 mt-4">
+          <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm">
+            <FaBolt size={14} color="orange" />
+            <span>Dùng {usageData.used}/{usageData.total} video</span>
+          </div>
+
+          <div className="w-full bg-indigo-200 h-2 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-700 ease-in-out ${usageData.used >= usageData.total ? "bg-red-500" : "bg-blue-600"
+                }`}
+              style={{
+                width: `${Math.min((Number(usageData.used) / Number(usageData.total)) * 100, 100)}%`
+              }}
+            />
+          </div>
+
+          <NavLink
+            to="/app/premium"
+            className="w-full bg-blue-600 text-white rounded-lg py-2 font-bold text-sm text-center hover:bg-blue-700 transition-colors"
+          >
+            Nâng cấp Premium
+          </NavLink>
+        </div>
+      )}
+
+      {/* User Profile Section */}
+      <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+            {userData.avatar}
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-bold text-gray-800 truncate">
+              {/* Hiển thị fullName đã gộp từ firstname + lastname */}
+              {userData.fullName || "Người dùng"}
+            </span>
+            <span className={`text-xs font-medium ${isPremium ? "text-green-600" : "text-gray-500"}`}>
+              {userData.plan}
+            </span>
+          </div>
+        </div>
+
+        <button
+          onClick={onLogout}
+          className="flex items-center justify-center gap-2 w-full border border-gray-200 rounded-xl py-2 text-red-500 text-sm font-bold hover:bg-red-50 transition-colors"
         >
-          <span className={item.key === "premium" ? "text-orange-500 font-bold" : ""}>{item.label}</span>
-          {item.badge && (
-            <span className="ml-auto bg-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">{item.badge}</span>
-          )}
-        </NavLink>
-      ))}
-    </nav>
-
-    {/* Sidebar.jsx */}
-    {/* Trong SidebarInner */}
-    <div className="bg-indigo-50 border border-indigo-100 rounded-xl py-3 px-4 flex flex-col gap-3 mb-4 mt-4">
-      <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm">
-        <FaBolt size={14} color="orange" />
-        {/* Hiển thị số lượng thực tế từ backend */}
-        <span>Dùng {usageData.used}/{usageData.total} video</span>
+          <FaSignOutAlt /> Đăng xuất
+        </button>
       </div>
-
-      <div className="w-full bg-indigo-200 h-2 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ease-in-out ${usageData.used >= usageData.total ? "bg-red-500" : "bg-blue-600"
-            }`}
-          style={{
-            width: `${Math.min((Number(usageData.used) / Number(usageData.total)) * 100, 100)}%`
-          }}
-        />
-      </div>
-
-      {/* Khi click vào đây nên dẫn tới trang Premium */}
-      <NavLink
-        to="/app/premium"
-        className="w-full bg-blue-600 text-white rounded-lg py-2 font-bold text-sm text-center hover:bg-blue-700 transition-colors"
-      >
-        Nâng cấp Premium
-      </NavLink>
     </div>
-
-    <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
-          {userData.avatar}
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-bold text-gray-800 truncate">{userData.name}</span>
-          <span className="text-xs text-gray-500">{userData.plan}</span>
-        </div>
-      </div>
-      <button onClick={onLogout} className="flex items-center justify-center gap-2 w-full border border-gray-200 rounded-xl py-2 text-red-500 text-sm font-bold hover:bg-red-50 transition">
-        <FaSignOutAlt /> Đăng xuất
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const navigate = useNavigate();
@@ -112,17 +145,24 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
     const fetchInfo = async () => {
       try {
         const res = await userService.getMyInfo();
+
+        // Gộp tên từ firstname và lastname như log Sidebar.jsx:118 của ní
+        const fullName = `${res.firstname || ''} ${res.lastname || ''}`.trim();
+
         setUserData({
-          name: res.fullName || "USER",
-          plan: res.premium ? "Premium Plan" : "Free Plan",
-          avatar: (res.fullName || "U").substring(0, 2).toUpperCase()
+          fullName: fullName || "Nguyễn Khang",
+          // Đón đầu cả 2 kiểu đặt tên của Backend (is_premium hoặc isPremium)
+          isPremium: res.is_premium === true || res.isPremium === true || res.premium === true,
+          plan: (res.is_premium || res.isPremium || res.premium) ? "Premium Plan" : "Free Plan",
+          avatar: (res.firstname || "U").charAt(0).toUpperCase()
         });
+
         setUsageData({
           used: Number(res.dailyUploadCount) || 0,
           total: 4
         });
       } catch (err) {
-        console.error("Lỗi sidebar:", err);
+        console.error("Lỗi lấy thông tin Sidebar:", err);
       }
     };
     fetchInfo();
