@@ -25,6 +25,11 @@ import CourseDetail from "./pages/CourseDetail/CourseDetail";
 import PaymentSuccessPage from "./pages/Payment/PaymentSuccess.jsx";
 import PaymentFailedPage from "./pages/Payment/PaymentFailed.jsx";
 import CourseLanding from "./pages/MyCourses/CourseLanding.jsx";
+import AdminRoute from "./routes/AdminRoute.jsx";
+import AdminLayout from "./components/admin/AdminLayout.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import UserManagement from "./pages/admin/UserManagement.jsx";
+import PaymentManagement from "./pages/admin/PaymentManagement.jsx";
 
 // 1. AppLayout: Chỉ chứa các Route cần Sidebar và Header
 function AppLayout({ onLogout }) {
@@ -84,6 +89,10 @@ function AppRoutes() {
   
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("user");
     navigate("/");
   };
 
@@ -122,6 +131,20 @@ function AppRoutes() {
       <Route path="/payment/failed" element={<PaymentFailedPage />} />
       
       <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
+
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout onLogout={handleLogout} />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="payments" element={<PaymentManagement />} />
+      </Route>
       
       {/* Route chính dẫn vào Dashboard Layout */}
       <Route path="/app/*" element={<AppLayout onLogout={handleLogout} />} />
