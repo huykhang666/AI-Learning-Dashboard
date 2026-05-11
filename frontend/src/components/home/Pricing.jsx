@@ -4,11 +4,9 @@
     FaStar, FaRocket, FaCreditCard,
     FaUniversity, FaShieldAlt, FaTimes, FaInfoCircle
   } from "react-icons/fa";
- import { paymentApi } from '../../api/PaymentApi'; 
-  import momoLogo from '../../img/MoMo.png';
-  import vnpayLogo from '../../img/VNpay.png';
-  import { jwtDecode } from "jwt-decode";
-
+import { paymentApi } from '../../api/PaymentApi';
+import momoLogo from '../../img/MoMo.png';
+import vnpayLogo from '../../img/VNPay.png';
   const PLANS_CONFIG = [
     {
       id: 'free',
