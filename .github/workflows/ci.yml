@@ -47,7 +47,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Build & run tests
-        run: ./mvnw clean verify -B
+        run: mvn clean verify -B
         env:
           SPRING_PROFILES_ACTIVE: test
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ai_learning_dashboard
