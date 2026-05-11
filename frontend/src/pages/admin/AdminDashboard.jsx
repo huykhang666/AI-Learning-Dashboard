@@ -98,7 +98,7 @@ export default function AdminDashboard() {
               key={card.label}
               className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className={`mb-5 inline-flex rounded-2xl bg-gradient-to-br ${card.accent} p-3 text-white`}>
+              <div className={`mb-5 inline-flex rounded-2xl bg-linear-to-br ${card.accent} p-3 text-white`}>
                 <Icon className="h-5 w-5" />
               </div>
 
