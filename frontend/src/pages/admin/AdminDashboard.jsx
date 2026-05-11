@@ -80,10 +80,6 @@ export default function AdminDashboard() {
               Admin overview
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-900">Tổng quan hệ thống</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Khu vực này là điểm bắt đầu để theo dõi tăng trưởng người dùng, lượng session xử lý
-              và doanh thu của nền tảng.
-            </p>
           </div>
 
           <div className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white">

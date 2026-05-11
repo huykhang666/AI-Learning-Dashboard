@@ -74,10 +74,6 @@ export default function PaymentManagement() {
           <div>
             <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-400">Payments</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-900">Quản lý thanh toán</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              Đây là màn hình scaffold cho luồng payment admin: xem giao dịch, trạng thái và cổng
-              thanh toán đang được sử dụng.
-            </p>
           </div>
 
           <label className="flex w-full max-w-sm items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500">
