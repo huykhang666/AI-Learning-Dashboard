@@ -1,0 +1,81 @@
+name: PR Check — Quick Validation
+
+# Workflow nhẹ, chạy nhanh để dev có feedback ngay khi tạo PR
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Compile nhanh Backend (không cần DB)
+  # ─────────────────────────────────────────────
+  compile-backend:
+    name: "Backend — Compile check"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+      # compile-only, không chạy test → nhanh hơn CI
+      - run: ./mvnw compile -B -q
+
+  # ─────────────────────────────────────────────
+  # Build check Frontend
+  # ─────────────────────────────────────────────
+  build-frontend:
+    name: "Frontend — Build check"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_API_URL: http://localhost:8080/api/v1
+
+  # ─────────────────────────────────────────────
+  # Tự động comment kết quả lên PR
+  # ─────────────────────────────────────────────
+  pr-summary:
+    name: "PR Summary Comment"
+    needs: [compile-backend, build-frontend]
+    runs-on: ubuntu-latest
+    if: always()   # Chạy dù job trên pass hay fail
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Comment kết quả lên PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const backendStatus = '${{ needs.compile-backend.result }}';
+            const frontendStatus = '${{ needs.build-frontend.result }}';
+            const icon = (s) => s === 'success' ? 'hoàn thành' : 'lỗi';
+
+            const body = `## PR Check Result
+            | Service | Status |
+            |---------|--------|
+            | Backend (Spring Boot) | ${icon(backendStatus)} ${backendStatus} |
+            | Frontend (React/Vite) | ${icon(frontendStatus)} ${frontendStatus} |
+
+            ${backendStatus === 'success' && frontendStatus === 'success'
+              ? '**Sẵn sàng merge!**'
+              : '**Có lỗi — kiểm tra logs phía trên.**'
+            }`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

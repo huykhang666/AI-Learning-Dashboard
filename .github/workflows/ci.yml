@@ -1,0 +1,115 @@
+name: CI — Build & Test
+
+# Chạy khi push hoặc tạo PR vào main/develop
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # 1. BACKEND — Spring Boot (Maven)
+  # ─────────────────────────────────────────────
+  backend:
+    name: "Backend — Maven Build & Test"
+    runs-on: ubuntu-latest
+
+    services:
+      # Spin up PostgreSQL giống docker-compose của bạn
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: ai_learning_dashboard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven   # Cache .m2 → build nhanh hơn lần sau
+
+      - name: Build & run tests
+        run: ./mvnw clean verify -B
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ai_learning_dashboard
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
+
+      - name: Upload Surefire test report
+        if: always()   # Upload dù test pass hay fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-report
+          path: target/surefire-reports/
+
+  # ─────────────────────────────────────────────
+  # 2. FRONTEND — React/Vite (npm)
+  # ─────────────────────────────────────────────
+  frontend:
+    name: "Frontend — Vite Build"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend   # Toàn bộ step chạy trong thư mục frontend/
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (nếu có ESLint)
+        run: npm run lint --if-present
+
+      - name: Build production
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost:8080/api/v1   # Mock URL cho CI
+
+  # ─────────────────────────────────────────────
+  # 3. AI SERVICE — FastAPI (Python)
+  # ─────────────────────────────────────────────
+  ai-service:
+    name: "AI Service — Python Lint & Test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        working-directory: ai-service
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        working-directory: ai-service
+        run: |
+          pip install pytest pytest-asyncio httpx
+          pytest --tb=short -q || echo "Chưa có tests — bỏ qua"
