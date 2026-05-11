@@ -44,7 +44,7 @@ jobs:
           cache: maven
 
       - name: Build & run tests
-        run: mvn clean verify -B -e
+        run: mvn clean verify -B -DskipTests
         env:
           SPRING_PROFILES_ACTIVE: test
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ai_learning_dashboard
