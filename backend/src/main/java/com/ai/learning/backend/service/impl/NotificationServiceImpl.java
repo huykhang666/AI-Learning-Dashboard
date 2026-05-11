@@ -14,6 +14,8 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +28,10 @@ public class NotificationServiceImpl implements NotificationService {
     NotificationRepository notificationRepository;
     NotificationMapper notificationMapper;
     UserRepository userRepository;
+    SimpMessagingTemplate messagingTemplate;
+
     @Override
-    public void createNotification(User user, String title, String message, NotificationType type, String sessionId) {
+    public Notification createNotification(User user, String title, String message, NotificationType type, String sessionId) {
         Notification notification = Notification.builder()
                 .user(user)
                 .title(title)
@@ -36,6 +40,24 @@ public class NotificationServiceImpl implements NotificationService {
                 .targetId(sessionId)
                 .isRead(false)
                 .build();
+
+        Notification savedNote = notificationRepository.save(notification);
+
+        // Kiểm tra an toàn trước khi bắn WebSocket
+        if (savedNote.getUser() != null) {
+            String destination = "/queue/notifications";
+
+            // Dùng username làm định danh để gửi (thường STOMP dùng Principal là username)
+            String receiver = savedNote.getUser().getUsername();
+
+            messagingTemplate.convertAndSendToUser(
+                    receiver,
+                    destination,
+                    notificationMapper.toNotificationResponse(savedNote)
+            );
+        }
+
+        return savedNote;
     }
 
     @Override
