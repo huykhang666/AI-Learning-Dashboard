@@ -43,6 +43,9 @@ jobs:
           distribution: "temurin"
           cache: maven
 
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
       - name: Build & run tests
         run: ./mvnw clean verify -B
         env:
