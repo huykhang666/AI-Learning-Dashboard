@@ -43,10 +43,8 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      - name: Grant execute permission for mvnw
-        run: chmod +x mvnw
-
       - name: Build & run tests
+        # Dùng trực tiếp lệnh mvn, không cần cấp quyền chmod cho file không tồn tại
         run: mvn clean verify -B
         env:
           SPRING_PROFILES_ACTIVE: test
@@ -59,6 +57,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-report
+          # Đường dẫn này phải khớp với working-directory là backend
           path: backend/target/surefire-reports/
 
   # ─────────────────────────────────────────────
