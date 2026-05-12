@@ -83,10 +83,6 @@ export default function AdminDashboard() {
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               Tổng quan hệ thống
             </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-              Bảng điều khiển được đồng bộ theo ngôn ngữ thiết kế của trang User: sáng, sạch,
-              bo mềm và nhấn mạnh bằng gradient xanh dương - cyan.
-            </p>
           </div>
 
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-700 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-sm">

@@ -185,9 +185,6 @@ export default function UserManagement() {
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               Quản lý người dùng
             </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-              Tìm kiếm, chỉnh sửa, xóa và quản lý trạng thái Premium của user.
-            </p>
           </div>
 
           <label className="flex w-full max-w-sm items-center gap-3 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-500 shadow-sm transition focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100">
