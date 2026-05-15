@@ -30,5 +30,6 @@ public class CourseTransaction {
 
     private String status;
 
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 }

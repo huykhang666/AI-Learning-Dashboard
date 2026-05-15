@@ -39,6 +39,23 @@ export const adminApi = {
     return unwrapResponse(response);
   },
 
+  updateUser: async (userId, data) => {
+    const response = await adminClient.put(`/users/${userId}`, data);
+    return unwrapResponse(response);
+  },
+
+  deleteUser: async (userId) => {
+    const response = await adminClient.delete(`/users/${userId}`);
+    return unwrapResponse(response);
+  },
+
+  togglePremium: async (userId, isPremium) => {
+    const response = await adminClient.patch(`/users/${userId}/premium`, {
+      isPremium: isPremium,
+    });
+    return unwrapResponse(response);
+  },
+
   getUsers: async () => {
     return adminApi.getAllUsers();
   },

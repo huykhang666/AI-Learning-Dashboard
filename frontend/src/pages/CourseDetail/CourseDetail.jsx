@@ -43,6 +43,52 @@ const CourseDetail = () => {
   const intervalRef = useRef(null);
   const startTimeRef = useRef(Date.now());
 
+  const handleExportPdf = async () => {
+    if (!courseData || !courseData.summary) {
+      alert("Dữ liệu tóm tắt chưa sẵn sàng!");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken'); 
+      if (!token) {
+        alert("Không tìm thấy Token! Bạn đã đăng nhập chưa?");
+        return; 
+      }
+      const summaryText = Array.isArray(courseData.summary)
+        ? courseData.summary.join(".\n\n") // Nếu là mảng thì nối các câu lại, xuống dòng
+        : courseData.summary;
+      const response = await fetch(`http://localhost:8080/api/summaries/${id}/export-pdf`, {
+        method: 'POST', // ĐỔI THÀNH POST
+        headers: {
+           'Authorization': `Bearer ${token}`,
+           'Content-Type': 'application/json' // Báo cho Backend biết đây là gói dữ liệu JSON
+        },
+        body: JSON.stringify({
+           title: courseData.title || "Tóm tắt bài học",
+           summary: summaryText
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server trả về mã lỗi: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tom-tat-${id}.pdf`; 
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error("[CourseDetail] Lỗi xuất PDF chi tiết:", error.message);
+      alert("Không thể xuất file PDF lúc này! Vui lòng mở F12 Console để xem chi tiết.");
+    }
+  };
   // Gửi tiến độ lên server, debounce 5s, chỉ khi đang PLAYING
   const updateProgress = useCallback(async () => {
     const player = playerInstance.current;
@@ -94,7 +140,6 @@ const CourseDetail = () => {
     };
 
     fetchDetail();
-
     return () => {
       const timeSpent = Math.floor((Date.now() - startTimeRef.current) / 1000);
       if (timeSpent > 5)
@@ -165,7 +210,7 @@ const CourseDetail = () => {
   }, []);
 
   if (loading) return <LoadingScreen />;
-
+  
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
       {/* HEADER */}
@@ -184,7 +229,7 @@ const CourseDetail = () => {
             {courseData?.title || t("course_detail.summary")}
           </h1>
         </div>
-        <button className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors">
+        <button onClick={handleExportPdf} className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors">
           <FileText size={16} /> {t("course_detail.export_pdf")}
         </button>
       </header>
