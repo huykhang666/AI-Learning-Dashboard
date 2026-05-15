@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -53,7 +54,9 @@ public class AIResultServiceImpl implements AIResultService {
 
     //Get AI analysis results by session ID
     @Override
+    @Cacheable(value = "ai-result", key = "#sessionId.toString()")
     public AIResultResponse getResultById(Long sessionId) {
+        System.out.println("--- ĐANG CHẠY LOGIC THẬT (KHÔNG CÓ CACHE) ---");
         log.info("AI Result for session: {}", sessionId);
         AIResult aiResult = aiResultRepository.findByLearningSession_LearningSessionId((long) sessionId.intValue())
                 .orElseThrow(() -> new AppException(ErrorCode.RESULT_NOT_FOUND));

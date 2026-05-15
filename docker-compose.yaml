@@ -4,8 +4,6 @@ networks:
   ai-network:
     driver: bridge
 
-volumes:
-  postgres_data:
 
 services:
   db:
@@ -80,3 +78,19 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_flyspeech
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
+
+volumes:
+  postgres_data:
+  redis_data:
+
+
+

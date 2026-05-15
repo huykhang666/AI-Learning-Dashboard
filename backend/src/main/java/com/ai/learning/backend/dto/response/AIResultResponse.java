@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -11,7 +12,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AIResultResponse {
+public class AIResultResponse implements Serializable {
+    static final long serialVersionUID = 1L;
     String transcript;
     String summary;
     @JsonProperty("key_points")
