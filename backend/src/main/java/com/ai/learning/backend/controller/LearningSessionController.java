@@ -115,4 +115,10 @@ public class LearningSessionController {
                 .code(1000)
                 .build();
     }
+
+    @GetMapping("/force-cache/{id}")
+    public String forceCache(@PathVariable Long id) {
+        aiResultService.getResultById(id);
+        return "call function getResultById with ID: " + id;
+    }
 }

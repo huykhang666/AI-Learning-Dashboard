@@ -54,7 +54,7 @@ public class AIResultServiceImpl implements AIResultService {
 
     //Get AI analysis results by session ID
     @Override
-    @Cacheable(value = "ai-result", key = "#sessionId.toString()")
+    @Cacheable(value = "ai-result", key = "'session_' + #sessionId.toString()")
     public AIResultResponse getResultById(Long sessionId) {
         System.out.println("--- ĐANG CHẠY LOGIC THẬT (KHÔNG CÓ CACHE) ---");
         log.info("AI Result for session: {}", sessionId);
