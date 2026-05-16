@@ -76,8 +76,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<UserResponse>> getUsers() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("User đang gọi API: {}", authentication.getName());
-        log.info("Quyền hạn đang có: {}", authentication.getAuthorities());
+
 
         return ApiResponse.<List<UserResponse>>builder()
                 .code(1000)

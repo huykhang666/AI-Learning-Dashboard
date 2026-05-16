@@ -14,9 +14,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.text.ParseException;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -26,6 +29,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     JwtUtils jwtUtils;
+    RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var isValid = jwtUtils.validateToken(request.getToken());
@@ -48,7 +53,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         var token = jwtUtils.generateToken(user);
-        String refreshToken = jwtUtils.generateRefreshToken(user);        return AuthenticationResponse.builder()
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+
+        String redisKey = "auth:refresh_token:" + refreshToken;
+
+        redisTemplate.opsForValue().set(
+                redisKey,
+                user.getUsername(),
+                7,
+                TimeUnit.DAYS
+        );
+
+        return AuthenticationResponse.builder()
                 .token(token)
                 .refreshToken(refreshToken)
                 .authenticated(true)

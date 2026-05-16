@@ -16,10 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.FetchProfile;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -35,6 +38,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     UserMapper userMapper;
+    StringRedisTemplate redisTemplate;
 
 
     @Override
@@ -94,20 +98,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean canUpload(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND)) ;
-        if(user.isPremium())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.isPremium())
             return true;
 
-        LocalDate today = LocalDate.now();
+        String today = LocalDate.now().toString();
+        String redisKey = "upload:count:" + userId + ":" + today;
 
-        if(user.getLastUploadDate() == null || !user.getLastUploadDate().equals(today)) {
-            user.setDailyUploadCount(0);
-            user.setLastUploadDate(today);
-            userRepository.save(user);
-        }
+        String currentCountStr = redisTemplate.opsForValue().get(redisKey);
 
-        if(user.getDailyUploadCount() >= 4) {
-            throw new AppException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+        if (currentCountStr != null) {
+            int currentCount = Integer.parseInt(currentCountStr);
+            if (currentCount >= 4) {
+                throw new AppException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+            }
         }
         return true;
     }
@@ -115,19 +120,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updateUsage(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String today = LocalDate.now().toString();
+        String redisKey = "upload:count:" + userId + ":" + today;
 
-        LocalDate today = LocalDate.now();
-
-        if(user.getLastUploadDate() == null || !user.getLastUploadDate().equals(today)) {
-            user.setDailyUploadCount(1);
-            user.setLastUploadDate(today);
-        } else {
-            user.setDailyUploadCount(user.getDailyUploadCount() + 1);
+        Long newCount = redisTemplate.opsForValue().increment(redisKey);
+        if(newCount != null && newCount == 1) {
+            redisTemplate.expire(redisKey, Duration.ofDays(1));
         }
-
-        userRepository.save(user);
     }
 
     @Override

@@ -48,9 +48,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
     private User registerNewUser(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
-        // Sửa Set<UserRole> thành Set<String>
         Set<String> defaultRoles = new HashSet<>();
-        defaultRoles.add(UserRole.USER.name()); // Dùng .name() để lấy chuỗi "USER"
+        defaultRoles.add(UserRole.USER.name());
 
         User user = User.builder()
                 .email((String) oAuth2User.getAttribute("email"))
