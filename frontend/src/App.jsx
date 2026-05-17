@@ -1,5 +1,5 @@
 import MyCourses from "./pages/MyCourses/MyCourses.jsx";
-import { useState } from "react";
+import { useState, useEffect } from "react"; 
 import {
   BrowserRouter,
   Routes,
@@ -30,11 +30,59 @@ import AdminLayout from "./components/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import UserManagement from "./pages/admin/UserManagement.jsx";
 import PaymentManagement from "./pages/admin/PaymentManagement.jsx";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import webSocketService from "./api/WebSocketService.js";
 
-// 1. AppLayout: Chỉ chứa các Route cần Sidebar và Header
+
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    
+    
+    let username = localStorage.getItem("username");
+    if (!username) {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          username = userObj.username;
+        } catch (e) {
+          console.error("Không thể parse thông tin user từ localStorage", e);
+        }
+      }
+    }
+
+    if (token && username) {
+      webSocketService.connect(token, () => {
+        console.log(`✉️ WebSocket kết nối thành công! Đang lắng nghe user: ${username}`);
+
+        const notificationTopic = `/user/${username}/queue/notifications`;
+
+        webSocketService.subscribe(notificationTopic, (data) => {
+          console.log("Nhận thông báo realtime mới tinh từ Backend:", data);
+
+          if (data.message) {
+            toast.success(data.message, {
+              position: "top-right",
+              autoClose: 5000,
+            });
+          }
+
+         
+          const wsEvent = new CustomEvent("ws-notification", { detail: data });
+          window.dispatchEvent(wsEvent);
+        });
+      });
+    }
+
+    return () => {
+      webSocketService.disconnect();
+    };
+  }, []);
 
   const isCourseDetail =
     location.pathname.includes("/history/") &&
@@ -54,7 +102,6 @@ function AppLayout({ onLogout }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
-      {/* Sidebar dùng onLogout nhận từ props */}
       <Sidebar
         onLogout={onLogout}
         mobileOpen={mobileOpen}
@@ -74,7 +121,6 @@ function AppLayout({ onLogout }) {
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
             <Route path="courses/:courseId" element={<CourseLanding />} />
-            {/* Route này để hỗ trợ điều hướng trong nội bộ main */}
             <Route path="history/:id" element={<CourseDetail />} />
           </Routes>
         </main>
@@ -158,6 +204,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
+      <ToastContainer position="top-right" autoClose={4000} hideProgressBar={false} />
     </BrowserRouter>
   );
 }
