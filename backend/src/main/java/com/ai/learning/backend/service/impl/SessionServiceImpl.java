@@ -11,9 +11,7 @@ import com.ai.learning.backend.enums.SessionStatus;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.SessionMapper;
-import com.ai.learning.backend.repository.AIResultRepository;
-import com.ai.learning.backend.repository.SessionRepository;
-import com.ai.learning.backend.repository.UserRepository;
+import com.ai.learning.backend.repository.*;
 import com.ai.learning.backend.service.SessionService;
 import com.ai.learning.backend.service.UserService;
 import jakarta.transaction.Transactional;
@@ -37,6 +35,8 @@ public class SessionServiceImpl implements SessionService {
     SessionMapper sessionMapper;
     UserRepository userRepository;
     UserService userService;
+    TopKeywordRepository topKeywordRepository;
+    UserProgressRepository userProgressRepository;
 
     //Create a new learning session for current user
     @Override
@@ -109,6 +109,11 @@ public class SessionServiceImpl implements SessionService {
         if(!sessionRepository.existsById(id)) {
             throw new AppException(ErrorCode.LESSON_NOT_EXISTED);
         }
+
+        topKeywordRepository.deleteBySession_LearningSessionId(id);
+
+        userProgressRepository.deleteBySession_LearningSessionId(id);
+
         sessionRepository.deleteById(id);
         log.info("Deleted session ID: {}", id);
     }

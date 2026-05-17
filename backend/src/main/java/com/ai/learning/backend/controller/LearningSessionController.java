@@ -4,9 +4,7 @@ import com.ai.learning.backend.dto.request.FileMetadataRequest;
 import com.ai.learning.backend.dto.request.SessionRequest;
 import com.ai.learning.backend.dto.response.*;
 import com.ai.learning.backend.enums.StorageProvider;
-import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.repository.AIResultRepository;
-import com.ai.learning.backend.service.AIIntegrationService;
 import com.ai.learning.backend.service.AIResultService;
 import com.ai.learning.backend.service.FileStorageService;
 import com.ai.learning.backend.service.SessionService;
@@ -14,7 +12,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -115,7 +112,7 @@ public class LearningSessionController {
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("{id}")
-    @CacheEvict(value = "ai-service", key = "'session_'+ #id.toString()")
+    @org.springframework.cache.annotation.CacheEvict(value = "ai-result", key = "'session_' + #id")
     public ApiResponse<Void> delete(@PathVariable Long id) {
         sessionService.delete(id);
         return ApiResponse.<Void>builder()
@@ -123,7 +120,7 @@ public class LearningSessionController {
                 .build();
     }
 
-    @GetMapping("/public/force-cache/{id}") 
+    @GetMapping("/public/force-cache/{id}")
     public String forceCache(@PathVariable Long id) {
         aiResultService.getResultById(id);
         return "Force cache successfully for session ID: " + id;

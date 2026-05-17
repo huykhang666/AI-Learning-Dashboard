@@ -17,4 +17,7 @@ public interface TopKeywordRepository extends JpaRepository<TopKeyword,Long> {
     List<TopKeyword> findBySession_LearningSessionId(Long sessionId);
     @Query(value = "SELECT * FROM top_keywords WHERE user_id = :userId " +
             "ORDER BY search_count DESC LIMIT 5", nativeQuery = true)
-    List<TopKeyword> findTop5ByUser(@Param("userId") Long userId);}
+    List<TopKeyword> findTop5ByUser(@Param("userId") Long userId);
+    void deleteBySession_LearningSessionId(Long learningSessionId);
+}
+

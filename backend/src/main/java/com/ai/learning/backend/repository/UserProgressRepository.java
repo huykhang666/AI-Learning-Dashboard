@@ -15,4 +15,5 @@ public interface UserProgressRepository extends JpaRepository<UserProgress,Long>
     List<UserProgress> findByUser_UserIdAndCompletedTrue(Long userId);
     Optional<UserProgress> findBySession(LearningSession session);
     Optional<UserProgress> findByUserAndSession(User user, LearningSession session);
+    void deleteBySession_LearningSessionId(Long learningSessionId);
 }
