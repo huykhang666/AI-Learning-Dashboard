@@ -38,7 +38,9 @@ export const dashboardApi = {
 
             return {
                 user: {
-                    fullName: res.fullname || res.fullName || "User"
+                    fullName: res.fullname || res.fullName || "User",
+                    uploadCount: typeof res.uploadCount !== "undefined" ? res.uploadCount : 0,
+                    isPremium: res.role === "PREMIUM" || res.isPremium === true
                 },
                 overview: {
                     totalStudyTime: `${hours}h ${minutes}m`,

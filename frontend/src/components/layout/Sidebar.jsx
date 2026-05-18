@@ -74,33 +74,6 @@ const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData 
         ))}
       </nav>
 
-      {/* BẢNG USAGE - Chỉ hiện nếu là tài khoản thường (FREE) */}
-      {!isPremium && (
-        <div className="bg-indigo-50 border border-indigo-100 rounded-xl py-3 px-4 flex flex-col gap-3 mb-4 mt-4">
-          <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm">
-            <FaBolt size={14} color="orange" />
-            <span>Dùng {usageData.used}/{usageData.total} video</span>
-          </div>
-
-          <div className="w-full bg-indigo-200 h-2 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-700 ease-in-out ${usageData.used >= usageData.total ? "bg-red-500" : "bg-blue-600"
-                }`}
-              style={{
-                width: `${Math.min((Number(usageData.used) / Number(usageData.total)) * 100, 100)}%`
-              }}
-            />
-          </div>
-
-          <NavLink
-            to="/app/premium"
-            className="w-full bg-blue-600 text-white rounded-lg py-2 font-bold text-sm text-center hover:bg-blue-700 transition-colors"
-          >
-            Nâng cấp Premium
-          </NavLink>
-        </div>
-      )}
-
       {/* User Profile Section */}
       <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
         <div className="flex items-center gap-3">

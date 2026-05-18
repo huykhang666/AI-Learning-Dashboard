@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { FaClock, FaCheckCircle, FaBolt, FaCrown, FaExclamationTriangle } from "react-icons/fa";
 import UploadWidget from "../../components/common/UpLoadWidget";
 import CourseCard from "../../components/common/CourseCard";
 import { dashboardApi } from "../../api/DashboardApi";
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [uploadCount, setUploadCount] = useState(0);
+  const [isPremium, setIsPremium] = useState(false);
+
   useEffect(() => {
     const loadData = async () => {
       try {
         setIsLoading(true);
-
         const result = await dashboardApi.getAnalytics();
-
         setData(result);
+
+        const count = result?.user?.uploadCount ?? 0;
+        const premiumStatus = result?.user?.isPremium ?? false;
+
+        setUploadCount(count);
+        setIsPremium(premiumStatus);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu Dashboard:", error);
       } finally {
@@ -26,6 +35,23 @@ export default function DashboardPage() {
     };
     loadData();
   }, []);
+
+  useEffect(() => {
+    const handleWSUpdate = (event) => {
+      const notiData = event.detail;
+      
+      if (notiData && typeof notiData.currentUploadCount !== "undefined") {
+        setUploadCount(notiData.currentUploadCount);
+      }
+      
+      if (notiData && notiData.type === "PREMIUM_UPGRADE_SUCCESS") {
+        setIsPremium(true);
+      }
+    };
+
+    window.addEventListener("ws-notification", handleWSUpdate);
+    return () => window.removeEventListener("ws-notification", handleWSUpdate);
+  }, [uploadCount, isPremium]);
 
   if (isLoading || !data) {
     return (
@@ -42,39 +68,98 @@ export default function DashboardPage() {
     ...data.weeklyActivity.map((item) => item.hours),
     1,
   );
-  console.log("Dữ liệu tuần:", data.weeklyActivity);
-  console.log("Max Hours hiện tại:", maxHours);
+
+  const isLimitReached = !isPremium && uploadCount >= 5;
 
   return (
-    /* FIX: p-4 trên mobile → sm:p-6 → lg:p-8, tránh padding quá lớn trên màn nhỏ */
     <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-full w-full overflow-x-hidden">
       {/* Welcome */}
-      <div className="mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-          {t("dashboard.welcome", { name: data.user.fullName })}
-        </h1>
-        <p className="text-gray-500 mt-1 text-sm">{t("dashboard.subtitle")}</p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            {t("dashboard.welcome", { name: data.user.fullName })}
+          </h1>
+          <p className="text-gray-500 mt-1 text-sm">{t("dashboard.subtitle")}</p>
+        </div>
+
+        {/* Banner Giới hạn & Phối màu mới */}
+        <div className="shrink-0 flex flex-col items-end gap-2">
+          <div className={`px-4 py-2.5 rounded-2xl border text-sm font-medium flex items-center gap-3 shadow-sm transition-all ${
+            isPremium 
+              ? "bg-blue-600 text-white border-transparent" 
+              : isLimitReached
+                ? "bg-red-50 border-red-200 text-red-700"
+                : "bg-indigo-50 border-indigo-100 text-indigo-700"
+          }`}>
+            <span className="flex h-2 w-2 relative">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPremium ? 'bg-green-300' : isLimitReached ? 'bg-red-400' : 'bg-indigo-400'}`}></span>
+              <span className={`relative inline-flex rounded-full h-2 w-2 ${isPremium ? 'bg-green-500' : isLimitReached ? 'bg-red-500' : 'bg-indigo-600'}`}></span>
+            </span>
+            <div className="flex items-center gap-2">
+              {isPremium ? (
+                <span className="font-bold flex items-center gap-1.5">
+                  <FaCrown className="text-yellow-300" /> Gói Premium: Không giới hạn lượt dùng
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5">
+                  <FaBolt className="text-orange-400" /> Hôm nay: <strong className="text-base font-bold">{uploadCount}</strong> / 5 lượt upload bài giảng
+                </span>
+              )}
+            </div>
+          </div>
+
+          {!isPremium && (
+            <button
+              onClick={() => navigate("/app/premium")}
+              className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl border border-blue-100 transition-all shadow-sm active:scale-95 flex items-center gap-1.5"
+            >
+              <FaCrown /> Nâng cấp Premium để mở khóa thêm
+            </button>
+          )}
+        </div>
       </div>
+
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 lg:gap-6">
+        {/* Left column: Upload area */}
         <div className="xl:col-span-1 flex flex-col">
           <h2 className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">
             {t("dashboard.upload_widget")}
           </h2>
-          <div className="flex-1">
-            <UploadWidget
-              hideHeader={true}
-              onProcessAction={(sessionId) =>
-                navigate(`/app/history/${sessionId}`)
-              }
-            />
+          
+          <div className="flex-1 relative rounded-3xl overflow-hidden group">
+            <div className={`h-full w-full transition-all duration-300 ${isLimitReached ? "pointer-events-none select-none blur-[4px] opacity-60" : ""}`}>
+              <UploadWidget
+                hideHeader={true}
+                onProcessAction={(sessionId) =>
+                  navigate(`/app/history/${sessionId}`)
+                }
+              />
+            </div>
+
+            {/* Premium Gate Overlay */}
+            {isLimitReached && (
+              <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[3px] flex flex-col items-center justify-center p-6 text-center z-10 rounded-3xl border-2 border-dashed border-red-200">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-3 shadow-md">
+                  <FaExclamationTriangle className="text-red-600 text-xl" />
+                </div>
+                <h3 className="text-base font-bold text-slate-950">Đã hết lượt dùng miễn phí!</h3>
+                <p className="text-xs text-gray-600 mt-1.5 max-w-[220px] leading-relaxed">
+                  Tài khoản thường chỉ được upload tối đa 5 bài giảng/ngày. Hãy nâng cấp để tiếp tục học tập.
+                </p>
+                <button 
+                  onClick={() => navigate("/app/premium")}
+                  className="mt-4 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white font-bold text-xs rounded-xl shadow-lg hover:opacity-95 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5"
+                >
+                  <FaCrown /> Nâng cấp Premium ngay
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Right column */}
         <div className="xl:col-span-2 flex flex-col gap-5 lg:gap-6">
-          {/* Overview cards: 
-              FIX: grid-cols-1 → sm:grid-cols-3 (bỏ md breakpoint giữa chừng gây ra layout lẻ)
-              Trên mobile 1 cột thẳng, từ sm trở lên 3 cột đều nhau. */}
+          {/* Overview cards */}
           <div>
             <h2 className="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">
               {t("dashboard.learning_overview")}
@@ -82,128 +167,54 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
                 <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center mb-3">
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <FaClock className="text-gray-600 text-base" />
                 </div>
-                <h3 className="text-2xl font-bold text-blue-600">
-                  {data.overview.totalStudyTime}
-                </h3>
-                <p className="text-sm font-medium text-gray-800 mt-1">
-                  {t("dashboard.total_study_time")}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {t("dashboard.total_all_time")}
-                </p>
+                <h3 className="text-2xl font-bold text-blue-600">{data.overview.totalStudyTime}</h3>
+                <p className="text-sm font-medium text-gray-800 mt-1">{t("dashboard.total_study_time")}</p>
+                <p className="text-xs text-gray-400">{t("dashboard.total_all_time")}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
                 <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center mb-3">
-                  <svg
-                    className="w-4 h-4 text-purple-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
-                    />
-                  </svg>
+                  <FaCheckCircle className="text-purple-600 text-base" />
                 </div>
-                <h3 className="text-2xl font-bold text-green-500">
-                  {data.overview.lecturesDone}
-                </h3>
-                <p className="text-sm font-medium text-gray-800 mt-1">
-                  {t("dashboard.lectures_done")}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {t("dashboard.lectures")}
-                </p>
+                <h3 className="text-2xl font-bold text-green-500">{data.overview.lecturesDone}</h3>
+                <p className="text-sm font-medium text-gray-800 mt-1">{t("dashboard.lectures_done")}</p>
+                <p className="text-xs text-gray-400">{t("dashboard.lectures")}</p>
               </div>
 
               <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
                 <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center mb-3">
-                  <svg
-                    className="w-4 h-4 text-pink-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
+                  <FaBolt className="text-pink-500 text-base" />
                 </div>
-                <h3 className="text-2xl font-bold text-red-500">
-                  {data.overview.goalProgress}%
-                </h3>
-                <p className="text-sm font-medium text-gray-800 mt-1">
-                  {t("dashboard.goal_progress")}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {t("dashboard.goal_label")}
-                </p>
+                <h3 className="text-2xl font-bold text-red-500">{data.overview.goalProgress}%</h3>
+                <p className="text-sm font-medium text-gray-800 mt-1">{t("dashboard.goal_progress")}</p>
+                <p className="text-xs text-gray-400">{t("dashboard.goal_label")}</p>
               </div>
             </div>
           </div>
 
-          {/* Charts row: 
-              FIX: Bỏ overflow-x-auto ở wrapper ngoài, để nó stack thành 1 cột trên mobile.
-              Chart bar thêm overflow-x-auto vào chính nó để scroll ngang nếu cần. */}
+          {/* Charts row */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Weekly Activity */}
             <div className="sm:col-span-2 bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 flex flex-col">
-              <h3 className="text-sm font-medium text-gray-600 mb-4">
-                {t("dashboard.weekly_activity")}
-              </h3>
+              <h3 className="text-sm font-medium text-gray-600 mb-4">{t("dashboard.weekly_activity")}</h3>
               <div className="overflow-x-auto">
                 <div className="flex items-end justify-between h-32 gap-1.5 mt-auto min-w-[200px]">
                   {data.weeklyActivity.map((item, index) => {
-                    // 1. Tính % chiều cao dựa trên maxHours (10h)
                     const heightPercent = (item.hours / maxHours) * 100;
-
                     return (
-                      <div
-                        key={index}
-                        className="flex flex-col items-center flex-1 gap-2 group h-full"
-                      >
+                      <div key={index} className="flex flex-col items-center flex-1 gap-2 group h-full">
                         <div className="w-full bg-gray-50 rounded-t-sm flex items-end justify-center h-32 group-hover:bg-gray-100 transition-colors relative">
                           <div
-                            className={`w-full rounded-t-sm transition-all duration-700 ease-out ${
-                              item.active
-                                ? "bg-blue-700 shadow-lg"
-                                : "bg-blue-400 group-hover:bg-blue-500"
-                            }`}
-                            style={{
-                              height: `${heightPercent}%`,
-                              minHeight: item.hours > 0 ? "2px" : "0px",
-                            }}
+                            className={`w-full rounded-t-sm transition-all duration-700 ease-out ${item.active ? "bg-blue-700 shadow-lg" : "bg-blue-400 group-hover:bg-blue-500"}`}
+                            style={{ height: `${heightPercent}%`, minHeight: item.hours > 0 ? "2px" : "0px" }}
                           />
-
                           <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                             {item.hours}h
                           </div>
                         </div>
-
-                        <span className="text-[10px] text-gray-400 font-medium">
-                          {item.day}
-                        </span>
+                        <span className="text-[10px] text-gray-400 font-medium">{item.day}</span>
                       </div>
                     );
                   })}
@@ -213,17 +224,14 @@ export default function DashboardPage() {
 
             {/* Top Keywords */}
             <div className="sm:col-span-1 bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100">
-              <h3 className="text-sm font-medium text-gray-600 mb-4">
-                {t("dashboard.top_keywords")}
-              </h3>
-              {/* FIX: Luôn flex-col, bỏ flex-row trên mobile (tránh keyword tràn ngang) */}
+              <h3 className="text-sm font-medium text-gray-600 mb-4">{t("dashboard.top_keywords")}</h3>
               <div className="flex flex-col gap-2">
                 {data.topKeywords.map((keyword, index) => (
                   <span
                     key={index}
                     className="text-[13px] font-semibold text-blue-600 cursor-pointer hover:text-blue-800 transition bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-100 truncate"
                   >
-                    {keyword}
+                    #{keyword}
                   </span>
                 ))}
               </div>
@@ -235,17 +243,11 @@ export default function DashboardPage() {
       {/* Recent Courses */}
       <div className="mt-8 lg:mt-10">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-            {t("dashboard.recent_courses")}
-          </h2>
-          <a
-            href="#"
-            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition"
-          >
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">{t("dashboard.recent_courses")}</h2>
+          <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition">
             {t("dashboard.view_all")}
           </a>
         </div>
-        {/* FIX: grid-cols-1 → sm:grid-cols-2 → xl:grid-cols-3, tránh col-span lẻ gây vỡ layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {data.recentCourses.map((course) => (
             <CourseCard key={course.id} course={course} />

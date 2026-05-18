@@ -19,7 +19,8 @@ public class AnalyticsResponse {
     Integer weekGoal;
     List<DailyProgress> weeklyProgress;
     List<String> topKeywords;
-
+    int uploadCount;
+    String role;
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

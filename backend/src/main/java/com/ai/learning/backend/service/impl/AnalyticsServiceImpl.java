@@ -14,9 +14,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     UserRepository userRepository;
     SessionRepository sessionRepository;
     TopKeywordRepository keywordRepository;
-
+    StringRedisTemplate redisTemplate;
 
     @Override
     public AnalyticsResponse getDashBoardStats() {
@@ -44,6 +46,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Object rawHours = sessionRepository.getTotalStudyHours(user.getUserId());
         double totalHours = (rawHours != null) ? Double.parseDouble(rawHours.toString()) : 0.0;
         long totalLectures = sessionRepository.countByUserId(user.getUserId());
+        String userRole = user.isPremium() ? "PREMIUM" : "FREE";
+
+        String today = LocalDate.now().toString();
+        String redisKey = "upload:count:" + user.getUserId() + ":" + today;
+        String currentCountStr = redisTemplate.opsForValue().get(redisKey);
+        int todayUploads = (currentCountStr != null) ? Integer.parseInt(currentCountStr) : 0;
 
         List<Object[]> rawProgress = sessionRepository.getWeeklyProgress(user.getUserId());
 
@@ -71,6 +79,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .weeklyProgress(weeklyProgress)
                 .topKeywords(keywords)
                 .fullname(fullname)
+                .uploadCount(todayUploads)
+                .role(userRole)
                 .build();
     }
 }
