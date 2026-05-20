@@ -42,7 +42,6 @@ function AppLayout({ onLogout }) {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     
-    
     let username = localStorage.getItem("username");
     if (!username) {
       const userStr = localStorage.getItem("user");
@@ -72,7 +71,6 @@ function AppLayout({ onLogout }) {
             });
           }
 
-         
           const wsEvent = new CustomEvent("ws-notification", { detail: data });
           window.dispatchEvent(wsEvent);
         });
@@ -109,7 +107,7 @@ function AppLayout({ onLogout }) {
       />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <Header onMenuOpen={() => setMobileOpen(true)} />
+        <Header onMenuOpen={() => setMobileOpen(true)} onLogout={onLogout} />
 
         <main className="flex-1 overflow-y-auto">
           <Routes>
@@ -117,7 +115,7 @@ function AppLayout({ onLogout }) {
             <Route path="history" element={<HistoryPage />} />
             <Route path="premium" element={<PremiumPage />} />
             <Route path="courses" element={<MyCourses />} />
-            <Route path="settings" element={<SettingPage />} />
+            {/* ❌ ĐÃ XÓA ROUTE SETTINGS CŨ TẠI ĐÂY THEO YÊU CẦU ĐỂ KHÔNG BỊ LOÃNG ROUTE */}
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
             <Route path="courses/:courseId" element={<CourseLanding />} />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
+import { FaUser, FaReceipt, FaSignOutAlt, FaCrown } from "react-icons/fa"; // Thêm FaCrown làm vương miện VIP
+import UserProfileModal from "../../pages/Premium/UserProfileModal";
 
 const IconMenu = () => (
   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round">
@@ -27,6 +29,7 @@ const IconBell = () => (
 export default function Header({
   userData = { avatar: "NK" },
   onMenuOpen,
+  onLogout,
 }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,20 +43,30 @@ export default function Header({
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-  // 1. Detect kích thước màn hình Mobile
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState("profile");
+  const userMenuRef = useRef(null);
+
+  // State cục bộ để quản lý thông tin User sau khi thay đổi ở Modal
+  const [localUserData, setLocalUserData] = useState({
+    fullName: userData.fullName || "Nguyễn Huy Khang",
+    avatar: userData.avatar || "NK",
+    isImage: false,
+    isPremium: userData.isPremium || false // Khang gài thêm cờ nhận diện Premium vào đây nha
+  });
+
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
-    window.innerWidth < 768 && setUnreadCount(prev => prev); // Giữ nguyên state hiện tại
+    window.innerWidth < 768 && setUnreadCount(prev => prev); 
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // 2. BẪY REALTIME: Lắng nghe sự kiện WebSocket truyền tải từ AppLayout gửi sang
   useEffect(() => {
     const handleWSNotification = (event) => {
       const newNoti = event.detail; 
       
-      // Định dạng lại cấu hình object để render lên giao diện dropdown
       const formattedNoti = {
         id: newNoti.id || Date.now(),
         message: newNoti.message || "Hệ thống vừa xử lý xong yêu cầu của bạn.",
@@ -61,7 +74,6 @@ export default function Header({
         isRead: false
       };
 
-      // Đẩy tin mới lên đầu danh sách, tăng số đếm chưa đọc lên 1
       setNotifications((prev) => [formattedNoti, ...prev]);
       setUnreadCount((prev) => prev + 1);
     };
@@ -70,25 +82,48 @@ export default function Header({
     return () => window.removeEventListener("ws-notification", handleWSNotification);
   }, []);
 
-  // 3. Đóng dropdown khi click ra vùng ngoài màn hình
+  // LẮNG NGHE SỰ KIỆN CẬP NHẬT PROFILE TỪ MODAL ĐỂ ĐỒNG BỘ REALTIME LÊN HEADER
+  useEffect(() => {
+    const handleProfileUpdate = (event) => {
+      const updatedData = event.detail;
+      setLocalUserData(prev => ({
+        ...prev,
+        fullName: updatedData.fullName,
+        avatar: updatedData.avatar,
+        isImage: updatedData.isImage
+      }));
+    };
+
+    window.addEventListener("user-profile-updated", handleProfileUpdate);
+    return () => window.removeEventListener("user-profile-updated", handleProfileUpdate);
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 4. Hành động bấm vào Chuông: Mở dropdown và xoá số dư chưa đọc
   const handleBellClick = () => {
     setShowDropdown(!showDropdown);
+    setShowUserDropdown(false);
     setUnreadCount(0); 
   };
 
+  const handleAvatarClick = () => {
+    setShowUserDropdown(!showUserDropdown);
+    setShowDropdown(false);
+  };
+
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-100 flex items-center gap-2 px-3 py-3">
+    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-100 flex items-center gap-2 px-3 py-4 pr-14">
       {/* Hamburger Menu (Mobile) */}
       {isMobile && (
         <button
@@ -120,7 +155,7 @@ export default function Header({
       <div className="flex items-center gap-1.5 shrink-0">
         <LanguageSwitcher />
         
-        {/* KHU VỰC CHUÔNG THÔNG BÁO THẦN THÁNH */}
+        {/* KHU VỰC CHUÔNG THÔNG BÁO */}
         <div className="relative" ref={dropdownRef}>
           <button
             className={`p-2 shrink-0 rounded-xl transition ${showDropdown ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:bg-slate-100'}`}
@@ -179,10 +214,94 @@ export default function Header({
         </div>
 
         {/* User Profile Avatar */}
-        <button className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xs shadow-sm hover:opacity-90 shrink-0">
-          {userData.avatar}
-        </button>
+        <div className="relative" ref={userMenuRef}>
+          {/* Phóng to nút bọc ngoài lên w-10 h-10 để nhìn thoáng đãng và có không gian gài Badge VIP */}
+          <button 
+            onClick={handleAvatarClick}
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-150 relative active:scale-95 ${
+              localUserData.isPremium 
+                ? 'bg-gradient-to-tr from-amber-500 via-orange-400 to-yellow-300 p-[2px] ring-2 ring-amber-400 ring-offset-1' 
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+            } ${showUserDropdown ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`}
+          >
+            {/* Ruột Avatar: Bọc thêm thẻ div tròn nhỏ bên trong để xử lý viền gradient cho tài khoản Premium */}
+            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-blue-500 text-white">
+              {localUserData.isImage ? (
+                <img 
+                  src={localUserData.avatar} 
+                  alt="Avatar" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                localUserData.avatar
+              )}
+            </div>
+
+            {/* CÀI BADGE PREMIUM: Nếu là tài khoản VIP, búng thêm cái icon vương miện nhỏ xíu lấp lánh góc chân avatar */}
+            {localUserData.isPremium && (
+              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full flex items-center justify-center text-[8px] text-white shadow-md border border-white">
+                <FaCrown />
+              </span>
+            )}
+          </button>
+
+          {showUserDropdown && (
+            <div className="absolute right-0 md:-right-4 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-150">
+              <div className="px-4 py-2.5 border-b border-gray-50 bg-slate-50/40 flex justify-between items-center">
+                <div className="min-w-0 flex-1 pr-2">
+                  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Tài khoản</p>
+                  <p className="text-sm font-bold text-gray-800 truncate mt-0.5">{localUserData.fullName}</p>
+                </div>
+                {/* Badge trạng thái hiển thị bằng chữ bên trong khối Popup */}
+                <span className={`px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase shrink-0 ${
+                  localUserData.isPremium 
+                    ? 'bg-amber-50 text-amber-600 border border-amber-100 shadow-sm' 
+                    : 'bg-slate-100 text-gray-500'
+                }`}>
+                  {localUserData.isPremium ? "PRO" : "FREE"}
+                </span>
+              </div>
+
+              <button 
+                onClick={() => {
+                  setModalTab("profile");
+                  setIsModalOpen(true);
+                  setShowUserDropdown(false);
+                }}
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-slate-50 flex items-center gap-2.5 transition-colors"
+              >
+                <FaUser className="text-gray-400" size={12} /> Thông tin cá nhân
+              </button>
+
+              <button 
+                onClick={() => {
+                  setModalTab("billing");
+                  setIsModalOpen(true);
+                  setShowUserDropdown(false);
+                }}
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2.5 transition-colors"
+              >
+                <FaReceipt className="text-blue-500/80" size={12} /> Lịch sử thanh toán
+              </button>
+
+              <hr className="my-1 border-gray-100" />
+              
+              <button 
+                onClick={onLogout} 
+                className="w-full text-left px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
+              >
+                <FaSignOutAlt size={12} /> Đăng xuất
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      <UserProfileModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        initialTab={modalTab}
+      />
     </header>
   );
 }

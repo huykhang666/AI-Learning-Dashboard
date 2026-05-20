@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { FaBolt, FaSignOutAlt, FaTimes } from "react-icons/fa";
+import { FaBolt, FaTimes } from "react-icons/fa";
 import { userService } from "../../api/UserService";
 
 
-const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData }) => {
+const SidebarInner = ({ showClose, onMobileClose, usageData, userData }) => {
   // Kiểm tra trạng thái Premium
   const isPremium = userData?.isPremium;
 
@@ -29,10 +29,7 @@ const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData 
         </div>
       </div>
 
-      <hr className="border-gray-200 mb-4" />
-
-      {/* Navigation Links */}
-      <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
+      <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto mt-4">
         {[
           { label: "Tổng quan", key: "dashboard", path: "/app/dash" },
           { label: "Khóa học", key: "courses", path: "/app/courses" },
@@ -42,10 +39,8 @@ const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData 
             label: "Premium",
             key: "premium",
             path: "/app/premium",
-            // Đổi badge dựa trên hạng tài khoản
             badge: isPremium ? "PRO" : "FREE"
           },
-          { label: "Cài đặt", key: "settings", path: "/app/settings" },
           { label: "Hỗ trợ", key: "help", path: "/app/help" },
         ].map((item) => (
           <NavLink
@@ -74,30 +69,6 @@ const SidebarInner = ({ showClose, onMobileClose, onLogout, usageData, userData 
         ))}
       </nav>
 
-      {/* User Profile Section */}
-      <div className="border-t border-gray-200 pt-4 flex flex-col gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
-            {userData.avatar}
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold text-gray-800 truncate">
-              {/* Hiển thị fullName đã gộp từ firstname + lastname */}
-              {userData.fullName || "Người dùng"}
-            </span>
-            <span className={`text-xs font-medium ${isPremium ? "text-green-600" : "text-gray-500"}`}>
-              {userData.plan}
-            </span>
-          </div>
-        </div>
-
-        <button
-          onClick={onLogout}
-          className="flex items-center justify-center gap-2 w-full border border-gray-200 rounded-xl py-2 text-red-500 text-sm font-bold hover:bg-red-50 transition-colors"
-        >
-          <FaSignOutAlt /> Đăng xuất
-        </button>
-      </div>
     </div>
   );
 };
@@ -106,7 +77,6 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // FIX: Thay data tĩnh bằng state để nhận dữ liệu từ API
   const [usageData, setUsageData] = useState({ used: 0, total: 4 });
   const [userData, setUserData] = useState({ name: "Đang tải...", plan: "Free Plan", avatar: ".." });
 
@@ -114,17 +84,14 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
     const check = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", check);
 
-    // FIX: Gọi API để lấy thông tin thực tế
     const fetchInfo = async () => {
       try {
         const res = await userService.getMyInfo();
 
-        // Gộp tên từ firstname và lastname như log Sidebar.jsx:118 của ní
         const fullName = `${res.firstname || ''} ${res.lastname || ''}`.trim();
 
         setUserData({
           fullName: fullName || "Nguyễn Khang",
-          // Đón đầu cả 2 kiểu đặt tên của Backend (is_premium hoặc isPremium)
           isPremium: res.is_premium === true || res.isPremium === true || res.premium === true,
           plan: (res.is_premium || res.isPremium || res.premium) ? "Premium Plan" : "Free Plan",
           avatar: (res.firstname || "U").charAt(0).toUpperCase()
@@ -143,10 +110,8 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // FIX: Đảm bảo phần trăm không vượt quá 100% để tránh lỗi giao diện
   const percent = Math.min((usageData.used / usageData.total) * 100, 100);
 
-  // DESKTOP: sidebar tĩnh trong flex layout
   if (!isMobile) {
     return (
       <aside className="w-64 shrink-0 h-screen sticky top-0 bg-white border-r border-gray-100 overflow-y-auto">
