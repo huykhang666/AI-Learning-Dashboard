@@ -6,6 +6,8 @@ import com.ai.learning.backend.payment.dto.request.VNPayRequest;
 import com.ai.learning.backend.payment.dto.response.MomoResponse;
 import com.ai.learning.backend.payment.dto.response.SubscriptionResponse;
 import com.ai.learning.backend.payment.dto.response.VNPayResponse;
+import com.ai.learning.backend.payment.entity.Payment;
+import com.ai.learning.backend.payment.repository.PaymentRepository;
 import com.ai.learning.backend.payment.repository.SubscriptionRepository;
 import com.ai.learning.backend.payment.service.MomoService;
 import com.ai.learning.backend.payment.service.PaymentService;
@@ -15,7 +17,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     MomoService momoService;
     SubscriptionService subscriptionService;
     SubscriptionRepository subscriptionRepository;
-
+    PaymentRepository paymentRepository;
     @Override
     public VNPayResponse initiateVNPay(PaymentRequest request, HttpServletRequest httpRequest) {
         try {
@@ -69,5 +74,11 @@ public class PaymentServiceImpl implements PaymentService {
                         subscriptionService.isPremium(sub.getUser().getUserId())
                 ))
                 .orElse(new SubscriptionResponse("FREE", null, null, false, false));
+    }
+
+    @Override
+    public List<Payment> getMyTransactionHistory() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return paymentRepository.findByUser_UsernameOrderByCreatedAtDesc(username);
     }
 }

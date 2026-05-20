@@ -10,9 +10,11 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -21,6 +23,8 @@ import java.util.Optional;
 public class SubscriptionServiceImpl implements SubscriptionService {
     SubscriptionRepository subScriptionRepository;
     UserRepository userRepository;
+    SimpMessagingTemplate messagingTemplate;
+
     @Override
     @Transactional
     public void activatePremium(Payment payment) {
@@ -52,6 +56,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         user.setPremium(true);
         user.setPremiumExpiredAt(endDate);
         userRepository.save(user);
+
+        try {
+            String destination = "/topic/notifications/" + user.getUserId();
+            Map<String, Object> payload = Map.of(
+                    "type", "PREMIUM_UPGRADE_SUCCESS",
+                    "message", "Chúc mừng bạn! Hệ thống đã kích hoạt gói Premium thành công.",
+                    "currentUploadCount", 0
+            );
+
+            messagingTemplate.convertAndSend(destination, payload);
+            System.out.println("======> Đã bắn thành công sự kiện PREMIUM_UPGRADE_SUCCESS qua WebSocket tới user: " + user.getUserId());
+        } catch (Exception e) {
+            System.err.println("Lỗi bắn WebSocket thông báo nâng cấp Premium thất bại: " + e.getMessage());
+        }
     }
 
     @Override
@@ -72,8 +90,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .ifPresent(sub -> {
                     sub.setActive(false);
                     subScriptionRepository.save(sub);
-
-                    // Cập nhật lại User
                     User user = sub.getUser();
                     user.setPremium(false);
                     user.setPremiumExpiredAt(null);
