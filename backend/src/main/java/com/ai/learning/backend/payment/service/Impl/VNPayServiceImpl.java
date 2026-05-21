@@ -44,7 +44,7 @@ public class VNPayServiceImpl implements VNPayService {
     public String createPaymentUrl(VNPayRequest request, HttpServletRequest httpRequest) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        // 1. Tạo Payment record lưu vào DB
+
         Payment newPayment = Payment.builder()
                 .amount((long) request.amount())
                 .user(user)
@@ -57,7 +57,6 @@ public class VNPayServiceImpl implements VNPayService {
         Payment savedPayment = paymentRepository.save(newPayment);
         String txnRef = savedPayment.getPaymentId().toString();
 
-        // 2. Build params gửi VNPay
         Map<String, String> vnpParams = new HashMap<>();
         vnpParams.put(VNPayParams.VERSION,    vnPayConfig.vnp_Version);
         vnpParams.put(VNPayParams.COMMAND,    vnPayConfig.vnp_Command);
@@ -77,7 +76,6 @@ public class VNPayServiceImpl implements VNPayService {
         cld.add(Calendar.MINUTE, 15);
         vnpParams.put(VNPayParams.EXPIRE_DATE, formatter.format(cld.getTime()));
 
-        // 3. Sort A-Z, build hashData và queryUrl
         List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(fieldNames);
 
@@ -89,9 +87,9 @@ public class VNPayServiceImpl implements VNPayService {
             String fieldName  = itr.next();
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII);
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8);
                 hashData.append(fieldName).append('=').append(encodedValue);
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8))
                         .append('=').append(encodedValue);
                 if (itr.hasNext()) {
                     hashData.append('&');
@@ -100,7 +98,6 @@ public class VNPayServiceImpl implements VNPayService {
             }
         }
 
-        // 4. Ký HMAC-SHA512 và trả URL
         String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
         return vnPayConfig.getVnp_PayUrl() + "?" + query + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
     }
@@ -109,7 +106,6 @@ public class VNPayServiceImpl implements VNPayService {
     @Transactional
     public IpnResponse processIpn(Map<String, String> params) {
 
-        // 1. Lấy và kiểm tra secure hash
         String receivedHash = params.get(VNPayParams.SECURE_HASH);
         if (receivedHash == null)
             return new IpnResponse(VnpIpnResponseConst.UNKNOWN_ERROR, "Missing signature");
@@ -117,25 +113,22 @@ public class VNPayServiceImpl implements VNPayService {
         params.remove("vnp_SecureHashType");
         params.remove(VNPayParams.SECURE_HASH);
 
-        // 2. Build lại hashData để verify
+
         String hashData = params.entrySet().stream()
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
                 .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.US_ASCII))
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
                 .collect(Collectors.joining("&"));
 
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
 
-        // 3. So sánh checksum
         if (!checkSum.equals(receivedHash))
             return new IpnResponse(VnpIpnResponseConst.INVALID_CHECKSUM, "Invalid checksum");
 
-        // 4. Kiểm tra response code từ VNPay
         if (!"00".equals(params.get(VNPayParams.RESPONSE_CODE))) {
             return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Transaction failed but IPN received");
         }
 
-        // 5. Tìm payment trong DB
         UUID paymentId;
         try {
             paymentId = UUID.fromString(params.get(VNPayParams.TXN_REF));
@@ -149,16 +142,13 @@ public class VNPayServiceImpl implements VNPayService {
         if (payment == null)
             return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Order not found");
 
-        // 6. Idempotent check — tránh xử lý 2 lần
         if (!PaymentStatus.PENDING.equals(payment.getStatus()))
             return new IpnResponse(VnpIpnResponseConst.ALREADY_CONFIRMED, "Order already confirmed");
 
-        // 7. Cập nhật payment + kích hoạt Premium
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setGatewayTransactionId(params.get(VNPayParams.TRANSACTION_NO));
-        paymentRepository.save(payment); // Lưu lại vào bảng payment
+        paymentRepository.save(payment);
 
-        // 8. Kích hoạt Premium cho User (Cập nhật isPremium = true, ngày hết hạn...)
         subscriptionService.activatePremium(payment);
 
         return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Confirm success");

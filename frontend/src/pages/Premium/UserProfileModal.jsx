@@ -70,7 +70,6 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
     }
   };
 
-  // Kích hoạt click ngầm vào thẻ input file khi người dùng bấm nút "Thay đổi"
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
@@ -84,12 +83,16 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
       }
     }
 
+
+    const currentIsPremium = history.some(item => item.status === "SUCCESS");
+
     const updateEvent = new CustomEvent("user-profile-updated", {
       detail: {
         fullName: formData.name,
         email: formData.email,
         avatar: avatarPreview || shortName,
-        isImage: !!avatarPreview 
+        isImage: !!avatarPreview,
+        isPremium: currentIsPremium 
       }
     });
     window.dispatchEvent(updateEvent);

@@ -1,4 +1,4 @@
-  import React, { useState } from 'react';
+import React, { useState } from 'react';
   import {
     FaHeart, FaCheck, FaBolt, FaCrown,
     FaStar, FaRocket, FaCreditCard,
@@ -95,7 +95,7 @@ import vnpayLogo from '../../img/VNPay.png';
     },
   ];
 
-  const Pricing = ({ onRegister }) => {
+  const Pricing = ({ onRegister, userData = null }) => {
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [selectedGateway, setSelectedGateway] = useState('VNPAY');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -114,14 +114,32 @@ import vnpayLogo from '../../img/VNPay.png';
 
     const handleConfirmPayment = async () => {
       try {
-        setIsProcessing(true);
+        setIsProcessing(true); // 🌟 FIX CHUẨN: Gọi hàm đúng cú pháp Hook React, không dùng dấu bằng
+        
+        // Đọc chuẩn key accessToken từ LocalStorage theo ảnh F12
         const token = localStorage.getItem('accessToken');
+        if (!token) {
+          alert("Vui lòng đăng nhập để tiếp tục thanh toán!");
+          return;
+        }
 
-        const decoded = jwtDecode(token);
-        const userId = decoded.userId || decoded.id;
+        // Lấy userId ưu tiên từ userData prop, nếu không có sẽ bóc từ key "user" chuẩn xác
+        let userId = userData?.userId || userData?.id;
 
         if (!userId) {
-          alert("Không tìm thấy ID người dùng. Hãy thử Đăng xuất và Đăng nhập lại!");
+          const userStr = localStorage.getItem("user");
+          if (userStr) {
+            try {
+              const userObj = JSON.parse(userStr);
+              userId = userObj.id || userObj.userId; // Trích xuất ra giá trị 3 chuẩn chỉnh
+            } catch (e) {
+              console.error("Không thể parse object user", e);
+            }
+          }
+        }
+
+        if (!userId) {
+          alert("Không tìm thấy thông tin người dùng. Hãy thử đăng nhập lại!");
           return;
         }
 
@@ -135,10 +153,18 @@ import vnpayLogo from '../../img/VNPay.png';
         console.log("Đang gửi ID thanh toán:", userId);
 
         const response = await paymentApi.createPaymentUrl(paymentRequest);
-        if (response?.code === "00" && response?.paymentUrl) {
-          window.location.href = response.paymentUrl;
+        
+        // Xử lý linh hoạt dữ liệu trả về từ Axios
+        const resData = response?.data || response;
+        if (resData?.code === "00" && resData?.paymentUrl) {
+          window.location.href = resData.paymentUrl;
+        } else if (resData?.paymentUrl) {
+          window.location.href = resData.paymentUrl;
+        } else {
+          alert("Hệ thống bận!");
         }
       } catch (error) {
+        console.error("Lỗi chi tiết tại Pricing:", error);
         alert("Hệ thống bận!");
       } finally {
         setIsProcessing(false);
@@ -315,7 +341,7 @@ import vnpayLogo from '../../img/VNPay.png';
 
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-bold text-slate-800 leading-none mb-0.5">{gw.name}</p>
-                          <p className="text-[11px] text-slate-500">{gw.description}</p>
+                          <p className="text-[11px] text-slate-500"></p>
                           <p className="text-[10px] text-slate-400 mt-0.5">{gw.note}</p>
                         </div>
 

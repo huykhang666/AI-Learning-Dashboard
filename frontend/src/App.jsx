@@ -33,14 +33,48 @@ import PaymentManagement from "./pages/admin/PaymentManagement.jsx";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import webSocketService from "./api/WebSocketService.js";
+import { userService } from "./api/UserService.js"; 
 
 
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
+  // Khai báo state tập trung để phân phối dữ liệu cho cả Sidebar và Header
+  const [usageData, setUsageData] = useState({ used: 0, total: 4 });
+  const [userData, setUserData] = useState({ fullName: "Đang tải...", plan: "Free Plan", avatar: "..", isPremium: false });
+
+  // Gọi API để lấy thông tin thực tế ngay tại Layout cha
+  useEffect(() => {
+    const fetchInfo = async () => {
+      try {
+        const res = await userService.getMyInfo();
+
+        // Gộp tên từ firstname và lastname như log Sidebar.jsx:118 của ní
+        const fullName = `${res.firstname || ''} ${res.lastname || ''}`.trim();
+
+        setUserData({
+          fullName: fullName || "Nguyễn Khang",
+          // Đón đầu cả 2 kiểu đặt tên của Backend (is_premium hoặc isPremium)
+          isPremium: res.is_premium === true || res.isPremium === true || res.premium === true,
+          plan: (res.is_premium || res.isPremium || res.premium) ? "Premium Plan" : "Free Plan",
+          avatar: (res.firstname || "U").charAt(0).toUpperCase()
+        });
+
+        setUsageData({
+          used: Number(res.dailyUploadCount) || 0,
+          total: 4
+        });
+      } catch (err) {
+        console.error("Lỗi lấy thông tin tại AppLayout:", err);
+      }
+    };
+    fetchInfo();
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
+    
     
     let username = localStorage.getItem("username");
     if (!username) {
@@ -71,6 +105,7 @@ function AppLayout({ onLogout }) {
             });
           }
 
+          
           const wsEvent = new CustomEvent("ws-notification", { detail: data });
           window.dispatchEvent(wsEvent);
         });
@@ -104,10 +139,16 @@ function AppLayout({ onLogout }) {
         onLogout={onLogout}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
+        userData={userData}
+        usageData={usageData}
       />
 
       <div className="flex flex-col flex-1 min-w-0">
-        <Header onMenuOpen={() => setMobileOpen(true)} onLogout={onLogout} />
+        <Header
+          onMenuOpen={() => setMobileOpen(true)}
+          onLogout={onLogout}
+          userData={userData} 
+        />
 
         <main className="flex-1 overflow-y-auto">
           <Routes>
@@ -115,7 +156,6 @@ function AppLayout({ onLogout }) {
             <Route path="history" element={<HistoryPage />} />
             <Route path="premium" element={<PremiumPage />} />
             <Route path="courses" element={<MyCourses />} />
-            {/* ❌ ĐÃ XÓA ROUTE SETTINGS CŨ TẠI ĐÂY THEO YÊU CẦU ĐỂ KHÔNG BỊ LOÃNG ROUTE */}
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
             <Route path="courses/:courseId" element={<CourseLanding />} />
@@ -130,7 +170,7 @@ function AppLayout({ onLogout }) {
 // 2. AppRoutes: Chứa các Route chính của ứng dụng
 function AppRoutes() {
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -173,7 +213,7 @@ function AppRoutes() {
       {/* Các Route thanh toán nằm ở ngoài AppLayout để hiển thị Full màn hình */}
       <Route path="/payment/success" element={<PaymentSuccessPage />} />
       <Route path="/payment/failed" element={<PaymentFailedPage />} />
-      
+
       <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
 
       <Route
@@ -189,10 +229,10 @@ function AppRoutes() {
         <Route path="users" element={<UserManagement />} />
         <Route path="payments" element={<PaymentManagement />} />
       </Route>
-      
+
       {/* Route chính dẫn vào Dashboard Layout */}
       <Route path="/app/*" element={<AppLayout onLogout={handleLogout} />} />
-      
+
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

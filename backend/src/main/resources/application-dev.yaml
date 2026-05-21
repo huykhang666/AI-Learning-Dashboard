@@ -51,5 +51,5 @@ momo:
   access-key: mS6n6S3u4S3u4S3u
   secret-key: F8BBA842ECF85D152590E8D1D1650D67
   endpoint: https://test-payment.momo.vn/v2/gateway/api/create
-  return-url: "http://localhost:3000/payment/success"
-  notify-url: "http://localhost:8080/api/payment/momo-ipn"
+  return-url: "http://localhost:5173/payment/success"
+  notify-url: "https://abc123.ngrok-free.app/api/payment/momo-ipn"

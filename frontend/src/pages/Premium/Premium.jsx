@@ -2,7 +2,8 @@ import React from 'react';
 import { Target, Clock, Zap } from 'lucide-react';
 import Pricing from '../../components/home/Pricing';
 
-const PremiumPage = () => {
+// Nhận userData kế thừa tập trung từ App.jsx
+const PremiumPage = ({ userData }) => {
   return (
     <div className="bg-slate-50 min-h-screen pt-12 pb-24">
       
@@ -33,7 +34,8 @@ const PremiumPage = () => {
       </div>
 
       <div className="-mt-8">
-        <Pricing />
+        {/* Truyền nối tiếp dữ liệu người dùng xuống component con */}
+        <Pricing userData={userData} />
       </div>
 
     </div>

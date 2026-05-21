@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { FaUser, FaReceipt, FaSignOutAlt, FaCrown } from "react-icons/fa"; // Thêm FaCrown làm vương miện VIP
+import { FaUser, FaReceipt, FaSignOutAlt, FaCrown } from "react-icons/fa"; 
 import UserProfileModal from "../../pages/Premium/UserProfileModal";
 
 const IconMenu = () => (
@@ -48,13 +48,23 @@ export default function Header({
   const [modalTab, setModalTab] = useState("profile");
   const userMenuRef = useRef(null);
 
-  // State cục bộ để quản lý thông tin User sau khi thay đổi ở Modal
   const [localUserData, setLocalUserData] = useState({
-    fullName: userData.fullName || "Nguyễn Huy Khang",
-    avatar: userData.avatar || "NK",
+    fullName: userData?.fullName || "Nguyễn Huy Khang",
+    avatar: userData?.avatar || "NK",
     isImage: false,
-    isPremium: userData.isPremium || false // Khang gài thêm cờ nhận diện Premium vào đây nha
+    isPremium: userData?.isPremium || false 
   });
+
+  useEffect(() => {
+    if (userData) {
+      setLocalUserData({
+        fullName: userData.fullName || "Nguyễn Huy Khang",
+        avatar: userData.avatar || "NK",
+        isImage: false,
+        isPremium: userData.isPremium || false
+      });
+    }
+  }, [userData]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -82,15 +92,15 @@ export default function Header({
     return () => window.removeEventListener("ws-notification", handleWSNotification);
   }, []);
 
-  // LẮNG NGHE SỰ KIỆN CẬP NHẬT PROFILE TỪ MODAL ĐỂ ĐỒNG BỘ REALTIME LÊN HEADER
-  useEffect(() => {
+ useEffect(() => {
     const handleProfileUpdate = (event) => {
       const updatedData = event.detail;
       setLocalUserData(prev => ({
         ...prev,
         fullName: updatedData.fullName,
         avatar: updatedData.avatar,
-        isImage: updatedData.isImage
+        isImage: updatedData.isImage,
+        isPremium: updatedData.isPremium ?? prev.isPremium 
       }));
     };
 
