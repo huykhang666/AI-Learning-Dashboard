@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { FaBolt } from "react-icons/fa";
-import { Mic, Sparkles, MessageSquare, Eye, EyeOff, AlertTriangle, Check } from "lucide-react";
+import {
+  Mic,
+  Sparkles,
+  MessageSquare,
+  Eye,
+  EyeOff,
+  AlertTriangle,
+  Check,
+} from "lucide-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -102,7 +110,17 @@ const Field = ({
       )}
     </div>
     {error && (
-      <p style={{ fontSize: 11, color: T.danger, marginTop: 3, fontFamily: F, display: "flex", alignItems: "center", gap: 4 }}>
+      <p
+        style={{
+          fontSize: 11,
+          color: T.danger,
+          marginTop: 3,
+          fontFamily: F,
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+        }}
+      >
         <AlertTriangle size={11} /> {error}
       </p>
     )}
@@ -132,7 +150,8 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   const handleGoogleLogin = () => {
     setGLoading(true);
     setTimeout(() => {
-      window.location.href = "http://localhost:8080/oauth2/authorization/google";
+      window.location.href =
+        "http://localhost:8080/oauth2/authorization/google";
     }, 1500);
   };
 
@@ -140,11 +159,14 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
     const e = {};
     if (!username) e.username = "Vui lòng nhập username";
     if (!pass) e.pass = "Vui lòng nhập mật khẩu";
-    if (Object.keys(e).length) { setErrors(e); return; }
+    if (Object.keys(e).length) {
+      setErrors(e);
+      return;
+    }
 
     setLoading(true);
     try {
-      const delay = new Promise(resolve => setTimeout(resolve, 1200));
+      const delay = new Promise((resolve) => setTimeout(resolve, 1200));
       const apiCall = fetch("http://localhost:8080/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -168,12 +190,12 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
           console.warn("Không decode được token:", decodeErr);
         }
 
-        onLogin(); 
-
+        onLogin();
       } else {
-        setErrors({ username: data.message || "Tài khoản hoặc mật khẩu không đúng!" });
+        setErrors({
+          username: data.message || "Tài khoản hoặc mật khẩu không đúng!",
+        });
       }
-
     } catch (error) {
       console.error("Login error:", error);
       setErrors({ username: "Không thể kết nối tới Server." });
@@ -186,63 +208,22 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
     <>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          fontFamily: F,
-          overflow: "hidden",
-          boxSizing: "border-box",
-        }}
+        className="min-h-screen w-screen flex flex-col md:flex-row overflow-hidden"
+        style={{ fontFamily: F }}
       >
         {/* LEFT */}
         <div
+          className="hidden md:flex md:w-1/2 flex-col items-center justify-center relative overflow-hidden p-10 lg:p-12 h-screen"
           style={{
-            width: "50%",
-            flexShrink: 0,
             background:
               "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "40px 44px",
-            position: "relative",
-            overflow: "hidden",
-            boxSizing: "border-box",
-            height: "100vh",
           }}
         >
           <button
+            className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/25 z-10"
             onClick={() => {
               window.location.href = "/";
             }}
-            style={{
-              position: "absolute",
-              top: 20,
-              left: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              background: "rgba(255,255,255,.15)",
-              border: "1px solid rgba(255,255,255,.25)",
-              borderRadius: 10,
-              padding: "7px 14px",
-              cursor: "pointer",
-              color: "#fff",
-              fontSize: 13,
-              fontWeight: 600,
-              fontFamily: F,
-              backdropFilter: "blur(4px)",
-              transition: "background .15s",
-              zIndex: 10,
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "rgba(255,255,255,.25)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "rgba(255,255,255,.15)")
-            }
           >
             ← Quay lại
           </button>
@@ -268,16 +249,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               background: "rgba(56,189,248,.15)",
             }}
           />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 36,
-              zIndex: 1,
-              alignSelf: "center",
-            }}
-          >
+          <div className="flex items-center gap-2.5 mb-9 z-10 self-center">
             <div
               style={{
                 width: 40,
@@ -295,23 +267,8 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               AI-Learning DashBoard
             </span>
           </div>
-          <div
-            style={{
-              zIndex: 1,
-              textAlign: "center",
-              maxWidth: 340,
-              width: "100%",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 28,
-                fontWeight: 900,
-                color: "#fff",
-                lineHeight: 1.2,
-                marginBottom: 10,
-              }}
-            >
+          <div className="z-10 text-center max-w-[340px] w-full">
+            <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">
               Học thông minh hơn
               <br />
               với sức mạnh của AI{" "}
@@ -321,25 +278,11 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 style={{ verticalAlign: "middle", display: "inline" }}
               />
             </h2>
-            <p
-              style={{
-                fontSize: 13,
-                color: "rgba(255,255,255,.8)",
-                lineHeight: 1.7,
-                marginBottom: 22,
-              }}
-            >
+            <p className="text-sm text-white/80 leading-relaxed mb-6">
               Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời
               mọi câu hỏi.
             </p>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                marginBottom: 28,
-              }}
-            >
+            <div className="flex flex-col gap-2.5 mb-7">
               {[
                 [Mic, "AI Whisper bóc băng tự động"],
                 [Sparkles, "Tóm tắt nội dung thông minh"],
@@ -347,45 +290,24 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               ].map(([Icon, txt]) => (
                 <div
                   key={txt}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    background: "rgba(255,255,255,.13)",
-                    borderRadius: 12,
-                    padding: "10px 16px",
-                    border: "1px solid rgba(255,255,255,.2)",
-                    textAlign: "left",
-                  }}
+                  className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-4 py-3"
                 >
                   <Icon size={18} color="#fff" />
-                  <span
-                    style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}
-                  >
+                  <span className="text-sm font-semibold text-white">
                     {txt}
                   </span>
                 </div>
               ))}
             </div>
-            <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
+            <div className="flex flex-wrap justify-center gap-8">
               {[
                 ["2K+", "Người dùng"],
                 ["50K+", "Video xử lý"],
                 ["98%", "Hài lòng"],
               ].map(([v, l]) => (
-                <div key={l}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
-                    {v}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "rgba(255,255,255,.6)",
-                      marginTop: 2,
-                    }}
-                  >
-                    {l}
-                  </div>
+                <div key={l} className="min-w-[90px] text-center">
+                  <div className="text-2xl font-black text-white">{v}</div>
+                  <div className="text-xs text-white/70 mt-1">{l}</div>
                 </div>
               ))}
             </div>
@@ -394,69 +316,25 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
 
         {/* RIGHT — fade in */}
         <div
+          className="w-full md:w-1/2 flex-1 min-w-0 bg-[#f8faff] flex items-center justify-center p-8 md:p-12 overflow-y-auto transition duration-300 ease-out"
           style={{
-            flex: "1 1 50%",
-            minWidth: 0,
-            background: T.bg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "32px 48px",
-            overflowY: "auto",
-            boxSizing: "border-box",
-            transition: "opacity .25s ease, transform .25s ease",
             opacity: visible ? 1 : 0,
             transform: visible ? "translateY(0)" : "translateY(10px)",
           }}
         >
-          <div style={{ width: "100%", maxWidth: 380 }}>
-            <h1
-              style={{
-                fontSize: 26,
-                fontWeight: 800,
-                color: T.text,
-                marginBottom: 4,
-                marginTop: 0,
-              }}
-            >
+          <div className="w-full max-w-md">
+            <h1 className="text-3xl font-extrabold text-slate-900 mb-1">
               Chào mừng trở lại!
             </h1>
-            <p
-              style={{
-                fontSize: 13,
-                color: T.textMid,
-                marginBottom: 24,
-                fontWeight: 500,
-                marginTop: 0,
-              }}
-            >
+            <p className="text-sm text-slate-500 font-medium mb-6">
               Đăng nhập để tiếp tục hành trình học tập
             </p>
             <button
               onClick={handleGoogleLogin}
               disabled={gLoading}
-              style={{
-                width: "100%",
-                padding: "11px",
-                borderRadius: 11,
-                border: `1.5px solid ${T.border}`,
-                background: T.white,
-                cursor: gLoading ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 9,
-                fontWeight: 600,
-                fontSize: 14,
-                color: T.text,
-                marginBottom: 20,
-                fontFamily: F,
-                boxShadow: "0 1px 3px rgba(0,0,0,.06)",
-                boxSizing: "border-box",
-                opacity: gLoading ? 0.7 : 1
-              }}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition duration-200 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-3 mb-5"
             >
-              { }
+              {}
               {gLoading ? (
                 <div
                   style={{
@@ -475,26 +353,12 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               {gLoading ? "Đang kết nối Google..." : "Đăng nhập với Google"}
             </button>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 20,
-              }}
-            >
-              <div style={{ flex: 1, height: 1, background: T.border }} />
-              <span
-                style={{
-                  fontSize: 12,
-                  color: T.textLight,
-                  fontWeight: 500,
-                  whiteSpace: "nowrap",
-                }}
-              >
+            <div className="flex items-center gap-2.5 mb-5">
+              <div className="h-px flex-1 bg-slate-200"></div>
+              <span className="text-xs text-slate-400 uppercase tracking-[0.16em]">
                 hoặc đăng nhập với email
               </span>
-              <div style={{ flex: 1, height: 1, background: T.border }} />
+              <div className="h-px flex-1 bg-slate-200"></div>
             </div>
             <Field
               label="Username"
@@ -564,9 +428,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                     transition: "all .15s",
                   }}
                 >
-                  {remember && (
-                    <Check size={10} color="#fff" strokeWidth={3} />
-                  )}
+                  {remember && <Check size={10} color="#fff" strokeWidth={3} />}
                 </div>
                 <span
                   style={{ fontSize: 12, color: T.textMid, fontWeight: 500 }}
