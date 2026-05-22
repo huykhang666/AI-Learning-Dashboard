@@ -1,11 +1,21 @@
+# =========================================================================
+# BACKEND (Java / Spring Boot)
+# =========================================================================
 ### JAVA ###
 HELP.md
 target/
+**/target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+### Spring Boot Configuration (SECURITY CRITICAL) ###
+# Chặn toàn bộ file cấu hình ứng dụng chứa thông tin nhạy cảm/mật khẩu
+backend/src/main/resources/application*.yaml
+backend/src/main/resources/application*.properties
+backend/src/main/resources/application*.yml
+
+### IDEs & Editors ###
 .apt_generated
 .classpath
 .factorypath
@@ -13,12 +23,11 @@ target/
 .settings
 .springBeans
 .sts4-cache
-
-### IntelliJ ###
 .idea
 *.iws
 *.iml
 *.ipr
+.vscode/
 
 ### NetBeans ###
 /nbproject/private/
@@ -30,38 +39,43 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-
-# =====================
-# FRONTEND (React/Vite)
-# =====================
+# =========================================================================
+# FRONTEND (React / Vite)
+# =========================================================================
 node_modules/
+frontend/node_modules/
 dist/
+frontend/dist/
 build/
+frontend/build/
 coverage/
 *.log
 .env
+frontend/.env
+frontend/.env.local
 
-# =====================
-# PYTHON
-# =====================
+# =========================================================================
+# AI SERVICE (Python / FastAPI)
+# =========================================================================
+### Python Virtual Environments ###
 ai-service/venv/
 ai-service/.venv/
 .venv/
 venv/
 
+### Python Cache ###
 __pycache__/
 **/__pycache__/
 *.pyc
 
+### AI Storage & Temporary Files ###
 ai-service/.env
 ai-service/storage/
 ai-service/ffmpeg.exe
+ai-service/temp_*
 
-# temp audio files
+### Temporary Audio Files ###
 *.mp3
 *.m4a
-
-# ai temp
-ai-service/temp_*
+*.wav
+uploads/
