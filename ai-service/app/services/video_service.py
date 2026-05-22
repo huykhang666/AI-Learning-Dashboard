@@ -1,14 +1,14 @@
 import re
-import whisper
 import httpx
+from groq import Groq
 from app.core.config import settings
 from youtube_transcript_api import YouTubeTranscriptApi
 
 class VideoService:
     def __init__(self):
-        # Load model 1 lần duy nhất khi khởi tạo Service
-        print(f"--- Đang tải model Whisper ({settings.WHISPER_MODEL})... ---")
-        self.model_whisper = whisper.load_model(settings.WHISPER_MODEL)
+        # Không tải model local nữa, chuyển sang gọi Client của Groq thông qua API Key
+        print("--- [INFO] Khởi tạo Groq Client cho dịch vụ Speech-to-Text ---")
+        self.groq_client = Groq(api_key=settings.GROQ_API_KEY)
 
     def get_video_id(self, url):
         # Regex thông minh để lấy Video ID từ mọi định dạng link YouTube
@@ -39,7 +39,20 @@ class VideoService:
                 print(f"Lỗi kết nối Java: {str(e)}")
 
     def transcribe_video(self, file_path: str):
-        # Whisper bóc băng file video/audio local
-        # fp16=False giúp chạy ổn định trên CPU
-        result = self.model_whisper.transcribe(file_path, fp16=False, language="vi")
-        return result.get("text", "").strip()
+        """
+        Gửi file audio/video trực tiếp lên Groq Cloud để bóc băng bằng Whisper-Large-v3.
+        Server Railway không tốn một giọt RAM nào để tính toán!
+        """
+        try:
+            print(f"--- [INFO] Đang gửi file {file_path} lên Groq API để transribe... ---")
+            with open(file_path, "rb") as file:
+                response = self.groq_client.audio.transcriptions.create(
+                    file=file,
+                    model="whisper-large-v3", 
+                    language="vi",            
+                    response_format="text"    
+                )
+            return response.strip()
+        except Exception as e:
+            print(f"Lỗi khi gọi Groq Whisper API: {str(e)}")
+            return ""
