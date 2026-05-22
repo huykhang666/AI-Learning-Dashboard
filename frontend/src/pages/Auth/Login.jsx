@@ -147,11 +147,14 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
 
   const [gLoading, setGLoading] = useState(false);
 
+  // 1. Tạo biến lấy link từ Vercel, nếu chạy dưới máy (local) thì tự fallback về 8080
+  const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
   const handleGoogleLogin = () => {
     setGLoading(true);
     setTimeout(() => {
-      window.location.href =
-        "http://localhost:8080/oauth2/authorization/google";
+      // ĐÃ SỬA: Thay thế link cứng bằng biến động để lên mây bốc đúng link Railway
+      window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
     }, 1500);
   };
 
@@ -167,7 +170,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
     setLoading(true);
     try {
       const delay = new Promise((resolve) => setTimeout(resolve, 1200));
-      const apiCall = fetch("http://localhost:8080/api/v1/auth/login", {
+      const apiCall = fetch(`${BASE_API_URL}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password: pass }),
@@ -334,7 +337,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               disabled={gLoading}
               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition duration-200 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-3 mb-5"
             >
-              {}
+              { }
               {gLoading ? (
                 <div
                   style={{

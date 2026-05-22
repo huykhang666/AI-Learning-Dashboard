@@ -310,8 +310,8 @@ export default function PageRegister({ onGoLogin }) {
   const handleGoogleRegister = () => {
     setGLoading(true);
     setTimeout(() => {
-      window.location.href =
-        "http://localhost:8080/oauth2/authorization/google";
+      const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
     }, 1500);
   };
 
