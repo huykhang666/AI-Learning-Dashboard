@@ -1,22 +1,25 @@
-# Sử dụng bản Python slim để dung lượng image nhẹ (tầm 100-200MB thay vì 1GB)
+# Sử dụng Python phiên bản 3.10 dạng slim để dung lượng nhẹ và chạy AI ổn định
 FROM python:3.10-slim
 
+# Thiết lập thư mục làm việc bên trong container
 WORKDIR /app
 
-# Cài đặt các thư viện hệ thống cần thiết (đặc biệt nếu Khang dùng xử lý âm thanh/video)
+# Cài đặt các thư viện hệ thống bắt buộc (đặc biệt là ffmpeg để Whisper xử lý âm thanh)
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy file requirements trước để tận dụng Docker Cache (build nhanh hơn ở những lần sau)
+# Copy file requirements trước để tận dụng Docker Cache, giúp các lần build sau nhanh hơn
 COPY requirements.txt .
+
+# Tiến hành cài đặt các thư viện Python (FastAPI, Uvicorn, OpenAI Whisper, v.v.)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy toàn bộ code AI vào container
+# Copy toàn bộ mã nguồn của folder ai-service vào container
 COPY . .
 
-# FastAPI mặc định chạy port 8000
+# Khai báo mở cổng 8000 đúng theo cấu hình của FastAPI
 EXPOSE 8000
 
-# Lệnh khởi chạy server (Quan trọng: dùng --host 0.0.0.0 để các container khác truy cập được)
+# Lệnh khởi chạy chính thức, trỏ thẳng vào file main.py nằm trong thư mục app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
