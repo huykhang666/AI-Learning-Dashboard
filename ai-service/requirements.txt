@@ -7,3 +7,4 @@ chromadb
 python-dotenv
 tiktoken
 openai-whisper
+yt-dlp
