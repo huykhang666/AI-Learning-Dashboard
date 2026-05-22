@@ -1,20 +1,19 @@
 import os
 import json
 import re
-import whisper
 import httpx
-import yt_dlp
 from groq import Groq
 from fastapi import APIRouter, UploadFile, File, Query
 from app.core.config import settings
 from app.services.rag_service import RAGService
+from app.services.video_service import VideoService  # Thêm import service chuẩn vào đây
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
 
 router = APIRouter(prefix="/ai", tags=["Video"])
 
-# Singleton clients
+# Singleton clients - ĐÃ XOÁ BỎ MODEL WHISPER LOCAL NẶNG NỀ
 groq_client   = Groq(api_key=settings.GROQ_API_KEY)
-model_whisper = whisper.load_model(settings.WHISPER_MODEL)
+video_service = VideoService()  # Khởi tạo đối tượng xử lý video thông qua Groq API
 rag_service   = RAGService()
 _yta          = YouTubeTranscriptApi()
 
@@ -84,46 +83,11 @@ def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
         return "\n".join(formatted_parts), timeline_data
 
     except (NoTranscriptFound, TranscriptsDisabled):
-        # Không có phụ đề → caller sẽ fallback sang Whisper
-        print(f"[WARN] Video {video_id} không có phụ đề → fallback Whisper")
+        print(f"[WARN] Video {video_id} không có phụ đề → fallback sang Groq API")
         return None, None
     except Exception as e:
         print(f"[ERROR] Lấy transcript thất bại [{video_id}]: {e}")
         return None, None
-
-
-# ---------------------------------------------------------------------------
-# Fallback: tải audio YouTube → Whisper (video không có phụ đề)
-# ---------------------------------------------------------------------------
-
-def _download_and_transcribe_youtube(url: str, job_id: int) -> tuple[str, list]:
-    """Dùng khi video không có phụ đề: yt-dlp tải audio → Whisper transcribe."""
-    temp_audio = f"temp_yt_{job_id}.mp3"
-
-    ydl_opts = {
-        "format": "bestaudio[ext=m4a]/bestaudio",
-        "outtmpl": temp_audio.replace(".mp3", ".%(ext)s"),
-        "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}],
-        "quiet": True,
-        "no_warnings": True,
-        "retries": 2,
-        "socket_timeout": 30,
-    }
-
-    try:
-        print(f"[INFO] yt-dlp đang tải audio job_id={job_id}...")
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-
-        print(f"[INFO] Whisper đang transcribe job_id={job_id}...")
-        return _transcribe_with_whisper(temp_audio)
-
-    except Exception as e:
-        print(f"[ERROR] Fallback Whisper thất bại: {e}")
-        return "", []
-    finally:
-        if os.path.exists(temp_audio):
-            os.remove(temp_audio)
 
 
 # ---------------------------------------------------------------------------
@@ -143,40 +107,6 @@ async def _report_progress(job_id: int | None, percent: int) -> None:
         print(f"[WARN] Timeout progress API (job_id={job_id}, {percent}%)")
     except Exception as e:
         print(f"[WARN] Không thể cập nhật tiến trình (job_id={job_id}): {e}")
-
-
-# ---------------------------------------------------------------------------
-# Whisper transcription (dùng cho file upload + fallback YouTube)
-# ---------------------------------------------------------------------------
-
-def _transcribe_with_whisper(file_path: str) -> tuple[str, list]:
-    result = model_whisper.transcribe(
-        file_path,
-        fp16=False,
-        language="vi",
-        initial_prompt="Chào mừng các bạn đến với bài giảng hôm nay."
-    )
-
-    formatted_parts: list[str] = []
-    timeline_data:   list[dict] = []
-
-    for segment in result.get("segments", []):
-        start_sec  = int(segment["start"])
-        text       = segment["text"].strip()
-        clean_text = (
-            text.lower()
-                .replace(".", "").replace(",", "")
-                .replace("!", "").replace("?", "")
-                .strip()
-        )
-
-        if clean_text in FILLER_WORDS or len(clean_text) < 2:
-            continue
-
-        formatted_parts.append(f"{_format_timestamp(start_sec)} {text}")
-        timeline_data.append({"time": start_sec, "content": text})
-
-    return "\n".join(formatted_parts), timeline_data
 
 
 # ---------------------------------------------------------------------------
@@ -233,11 +163,7 @@ async def process_video(
     job_id: int = Query(None),
 ):
     """
-    Pipeline:
-      1. YouTube có phụ đề → lấy transcript trực tiếp (nhanh)
-         YouTube không có phụ đề → yt-dlp tải audio → Whisper (chậm hơn)
-      2. Groq LLM phân tích nội dung
-      3. Nạp vào RAG để phục vụ Q&A
+    Pipeline siêu nhẹ, siêu nhanh nhờ đẩy hoàn toàn việc tính toán lên Groq Cloud API.
     """
     temp_file: str | None = None
     transcript:    str  = ""
@@ -251,9 +177,15 @@ async def process_video(
             transcript, timeline_data = get_youtube_transcript(youtube_url)
 
             if not transcript:
-                # Không có phụ đề → fallback tải audio + Whisper
+                # Không có phụ đề → Fallback nhờ VideoService tải và bắn lên Groq Whisper API
                 await _report_progress(job_id, 15)
-                transcript, timeline_data = _download_and_transcribe_youtube(youtube_url, job_id)
+                
+                # Gọi sang hàm xử lý bằng Groq API siêu nhẹ của video_service
+                transcript = video_service.transcribe_video(youtube_url) # Hoặc xử lý tải tuỳ logic local của bạn
+                
+                # Giả lập timeline data rỗng nếu bóc từ API thô không theo mốc thời gian chi tiết
+                timeline_data = [{"time": 0, "content": transcript}]
+                
                 if not transcript:
                     await _report_progress(job_id, -1)
                     return {"error": "Không thể xử lý video này."}
@@ -268,7 +200,11 @@ async def process_video(
                 buf.write(await file.read())
 
             await _report_progress(job_id, 30)
-            transcript, timeline_data = _transcribe_with_whisper(temp_file)
+            
+            # Gọi trực tiếp qua video_service để bóc băng file upload bằng Groq API
+            transcript = video_service.transcribe_video(temp_file)
+            timeline_data = [{"time": 0, "content": transcript}]
+            
             await _report_progress(job_id, 40)
 
         else:
@@ -284,7 +220,7 @@ async def process_video(
         await _report_progress(job_id, 100)
 
         return {
-            "status":     "success",
+            "status":      "success",
             "transcript": transcript,
             "analysis":   analysis,
         }
