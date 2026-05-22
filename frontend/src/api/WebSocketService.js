@@ -16,7 +16,6 @@ class WebSocketService {
         }
 
         const socket = new SockJS('http://localhost:8080/ws'); 
-        
         this.stompClient = new Client({
             webSocketFactory: () => socket,
             connectHeaders: {
