@@ -28,7 +28,7 @@
   },
   "sidebar": {
     "dashboard": "Tổng quan",
-    "my_courses": "Khóa học của tôi",
+    "courses": "Khóa học của tôi",
     "history": "Lịch sử",
     "analytics": "Phân tích",
     "premium": "Premium",
@@ -40,7 +40,7 @@
     "plan": {
       "free": "Gói Miễn Phí"
     },
-    "badge": {
+    "badges": {
       "free": "MIỄN PHÍ"
     }
   },
@@ -274,6 +274,139 @@
       "vnpay": "VNPay",
       "visa": "Visa / MasterCard",
       "atm": "ATM nội địa"
+    },
+    "gateways": {
+      "vnpay": {
+        "description": "Ví VNPay · Thẻ ATM · QR Code",
+        "note": "Bảo mật chuẩn quốc tế PCI DSS"
+      },
+      "momo": {
+        "description": "Ví điện tử MoMo",
+        "note": "Thanh toán nhanh qua ứng dụng MoMo"
+      }
+    },
+    "header": {
+      "badge": "Bảng giá dịch vụ",
+      "title": "Chọn gói phù hợp",
+      "description": "Nâng cấp để trải nghiệm học tập không giới hạn cùng AI.",
+      "trusted_partners": "Đối tác thanh toán tin cậy"
+    },
+    "modal": {
+      "connecting_gateway": "Đang kết nối cổng thanh toán",
+      "do_not_close": "Vui lòng không tắt trang...",
+      "confirm_order": "Xác nhận đơn hàng",
+      "selected_plan": "Gói đã chọn",
+      "payment_method": "Phương thức thanh toán",
+      "terms_note": "Bằng việc nhấn xác nhận, bạn đồng ý với Điều khoản dịch vụ. Bạn sẽ được chuyển hướng an toàn đến cổng {{gateway}}.",
+      "processing": "Đang xử lý...",
+      "start_payment": "Tiến hành thanh toán",
+      "cancel": "Hủy giao dịch",
+      "one_time": "Một lần"
+    },
+    "alerts": {
+      "login_required": "Vui lòng đăng nhập để tiếp tục thanh toán!",
+      "user_not_found": "Không tìm thấy thông tin người dùng. Hãy thử đăng nhập lại!",
+      "service_busy": "Hệ thống bận!",
+      "payment_error": "Lỗi chi tiết tại Pricing:",
+      "parse_user_error": "Không thể parse object user"
+    }
+  },
+  "payment_result": {
+    "success": {
+      "title": "Thanh toán thành công!",
+      "button": "Về Dashboard",
+      "redirect": "Tự động chuyển hướng sau {{count}} giây"
+    },
+    "failed": {
+      "title": "Thanh toán thất bại",
+      "button": "Thử lại"
+    }
+  },
+  "user_profile_modal": {
+    "tabs": {
+      "profile": "Thông tin cá nhân",
+      "billing": "Lịch sử thanh toán"
+    },
+    "defaults": {
+      "avatar": "NK"
+    },
+    "success": {
+      "update_account": "Cập nhật thông tin tài khoản thành công!"
+    },
+    "errors": {
+      "load_history": "Lỗi khi tải lịch sử giao dịch:",
+      "invalid_image": "Vui lòng chọn file định dạng ảnh (png, jpg, jpeg...)!",
+      "download_invoice": "Hệ thống không thể xuất hóa đơn!"
+    },
+    "billing": {
+      "loading": "Đang tải lịch sử đơn hàng...",
+      "empty": "Bạn chưa thực hiện giao dịch thanh toán nào.",
+      "table": {
+        "order_id": "Mã đơn",
+        "plan": "Gói dịch vụ",
+        "amount": "Số tiền",
+        "gateway": "Cổng",
+        "time": "Thời gian",
+        "status": "Trạng thái",
+        "action": "Hành động"
+      },
+      "plan_monthly": "Premium 1 Tháng",
+      "plan_yearly": "Premium 1 Năm",
+      "status": {
+        "success": "Thành công",
+        "pending": "Chờ duyệt",
+        "failed": "Thất bại"
+      },
+      "download_invoice": "Tải hóa đơn"
+    }
+  },
+  "auth": {
+    "login": {
+      "back": "← Quay lại",
+      "right": {
+        "title": "Chào mừng trở lại!",
+        "subtitle": "Đăng nhập để tiếp tục hành trình học tập",
+        "divider": "hoặc đăng nhập với email",
+        "remember": "Ghi nhớ đăng nhập",
+        "forgot_password": "Quên mật khẩu?",
+        "button": "Đăng nhập",
+        "signing_in": "Đang đăng nhập...",
+        "no_account": "Chưa có tài khoản?",
+        "sign_up": "Đăng ký ngay"
+      },
+      "google": {
+        "button": "Đăng nhập với Google",
+        "connecting": "Đang kết nối Google..."
+      },
+      "left": {
+        "title_line1": "Học thông minh hơn",
+        "title_line2": "với sức mạnh của AI",
+        "description": "Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời mọi câu hỏi.",
+        "features": {
+          "whisper": "AI Whisper bóc băng tự động",
+          "summary": "Tóm tắt nội dung thông minh",
+          "chat": "Chatbot hỏi đáp theo bài giảng"
+        },
+        "stats": {
+          "users": "Người dùng",
+          "videos": "Video xử lý",
+          "satisfaction": "Hài lòng"
+        }
+      },
+      "form": {
+        "username": "Username",
+        "username_placeholder": "Nhập username",
+        "password": "Mật khẩu",
+        "password_placeholder": "••••••••"
+      },
+      "errors": {
+        "username_required": "Vui lòng nhập username",
+        "password_required": "Vui lòng nhập mật khẩu",
+        "invalid_credentials": "Tài khoản hoặc mật khẩu không đúng!",
+        "server_unreachable": "Không thể kết nối tới Server.",
+        "decode_token": "Không decode được token:",
+        "login_error": "Login error:"
+      }
     }
   },
   "about": {
@@ -404,6 +537,159 @@
       "save_time": "Tiết kiệm thời gian"
     },
     "cta": "Nâng cấp ngay"
+  },
+  "admin": {
+    "dashboard": {
+      "badge": "Tổng quan admin",
+      "title": "Tổng quan hệ thống",
+      "loading": "Đang tải dữ liệu...",
+      "ready": "Dữ liệu đã sẵn sàng",
+      "stats": {
+        "total_users": "Tổng người dùng",
+        "total_sessions": "Tổng phiên học",
+        "total_revenue": "Tổng doanh thu"
+      }
+    },
+    "layout": {
+      "brand_tag": "Trung tâm điều khiển",
+      "brand_name": "AI Learning Admin",
+      "workspace_tag": "Khu làm việc admin",
+      "workspace_description": "Quản lý dashboard, user và giao dịch thanh toán trong một giao diện tập trung.",
+      "area_tag": "Khu vực admin",
+      "logout": "Đăng xuất",
+      "navigation": {
+        "dashboard": "Dashboard",
+        "users": "Người dùng",
+        "payments": "Thanh toán"
+      },
+      "titles": {
+        "dashboard": "Dashboard",
+        "users": "Quản lý người dùng",
+        "payments": "Quản lý thanh toán"
+      },
+      "aria": {
+        "open_sidebar": "Mở thanh điều hướng",
+        "close_sidebar": "Đóng thanh điều hướng",
+        "close_overlay": "Đóng lớp phủ thanh điều hướng"
+      }
+    },
+    "user_management": {
+      "badge": "Người dùng",
+      "title": "Quản lý người dùng",
+      "search_placeholder": "Tìm theo tên, email, role...",
+      "user_id": "ID #",
+      "loading": "Đang xử lý...",
+      "table": {
+        "user": "Người dùng",
+        "email": "Email",
+        "role": "Vai trò",
+        "status": "Trạng thái",
+        "premium": "Premium",
+        "actions": "Hành động"
+      },
+      "roles": {
+        "user": "Người dùng",
+        "admin": "Quản trị viên",
+        "moderator": "Điều hành viên"
+      },
+      "status": {
+        "active": "Đang hoạt động",
+        "blocked": "Bị chặn"
+      },
+      "premium": {
+        "pro": "Pro",
+        "free": "Free",
+        "enable": "Cấp Pro",
+        "disable": "Hủy Pro"
+      },
+      "buttons": {
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "cancel": "Hủy",
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "deleting": "Đang xóa...",
+        "loading": "..."
+      },
+      "modals": {
+        "edit_title": "Chỉnh sửa thông tin người dùng",
+        "edit_description": "Cập nhật tên và vai trò của người dùng",
+        "name_label": "Tên",
+        "name_placeholder": "Nhập tên người dùng",
+        "role_label": "Vai trò",
+        "delete_title": "Xác nhận xóa người dùng",
+        "delete_description": "Bạn có chắc muốn xóa người dùng này? Hành động này không thể hoàn tác."
+      },
+      "messages": {
+        "nameRequired": "Tên không được để trống",
+        "updateSuccess": "Cập nhật thông tin người dùng thành công!",
+        "updateFailed": "Cập nhật thông tin thất bại",
+        "deleteSuccess": "Xóa người dùng thành công!",
+        "deleteFailed": "Xóa người dùng thất bại",
+        "premiumEnableSuccess": "Cấp Pro thành công!",
+        "premiumDisableSuccess": "Hủy Pro thành công!",
+        "premiumUpdateFailed": "Cập nhật trạng thái Premium thất bại"
+      }
+    }
+    ,"payment_management": {
+      "badge": "Thanh toán",
+      "title": "Quản lý thanh toán",
+      "search_placeholder": "Tìm theo mã giao dịch, user, gateway...",
+      "payment_record": "Bản ghi thanh toán",
+      "table": {
+        "transaction": "Giao dịch",
+        "user": "Người dùng",
+        "amount": "Số tiền",
+        "gateway": "Cổng",
+        "status": "Trạng thái",
+        "date": "Ngày"
+      },
+      "status": {
+        "success": "Thành công",
+  "header": {
+    "search_placeholder": "Tìm kiếm khóa học, video, ghi chú...",
+    "time_ago": "Vừa xong",
+    "default_user_name": "Người dùng",
+    "account_label": "Tài khoản",
+    "aria": {
+      "open_menu": "Mở menu"
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "mark_read": "Đánh dấu đã đọc",
+      "empty": "Bạn không có thông báo nào",
+      "welcome": "Chào mừng bạn quay trở lại với AI-Learning-Dashboard!",
+      "system_processed": "Hệ thống vừa xử lý xong yêu cầu của bạn."
+    },
+    "user_menu": {
+      "profile": "Thông tin cá nhân",
+      "billing": "Lịch sử thanh toán",
+      "logout": "Đăng xuất"
+    }
+  },
+  "sidebar": {
+    "loading": "Đang tải...",
+    "error_loading": "Lỗi lấy thông tin Sidebar:",
+    "default_name": "Nguyễn Khang",
+    "dashboard": "Tổng quan",
+    "courses": "Khóa học",
+    "history": "Lịch sử",
+    "analytics": "Phân tích",
+    "premium": "Premium",
+    "help": "Hỗ trợ",
+    "plan": {
+      "free": "Free Plan",
+      "premium": "Premium Plan"
+    },
+    "badges": {
+      "pro": "PRO",
+      "free": "FREE"
+    }
+  },
+        "pending": "Đang chờ",
+        "failed": "Thất bại"
+      }
+    }
   },
   "footer": {
     "ready_title": "Sẵn sàng bắt đầu chưa?",
