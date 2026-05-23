@@ -14,8 +14,26 @@
   "header": {
     "title": "Nền tảng học tập",
     "subtitle": "Học mọi lúc, mọi nơi",
-    "search_placeholder": "Tìm kiếm khóa học...",
-    "upgrade": "Nâng cấp"
+    "search_placeholder": "Tìm kiếm khóa học, video, ghi chú...",
+    "upgrade": "Nâng cấp",
+    "time_ago": "Vừa xong",
+    "default_user_name": "Người dùng",
+    "account_label": "Tài khoản",
+    "aria": {
+      "open_menu": "Mở menu"
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "mark_read": "Đánh dấu đã đọc",
+      "empty": "Bạn không có thông báo nào",
+      "welcome": "Chào mừng bạn quay trở lại với AI-Learning-Dashboard!",
+      "system_processed": "Hệ thống vừa xử lý xong yêu cầu của bạn."
+    },
+    "user_menu": {
+      "profile": "Thông tin cá nhân",
+      "billing": "Lịch sử thanh toán",
+      "logout": "Đăng xuất"
+    }
   },
   "hero": {
     "made_for": "Dành cho sinh viên Việt Nam",
@@ -27,6 +45,9 @@
     "cta_feature": "Xem tính năng"
   },
   "sidebar": {
+    "loading": "Đang tải...",
+    "error_loading": "Lỗi lấy thông tin Sidebar:",
+    "default_name": "Nguyễn Khang",
     "dashboard": "Tổng quan",
     "courses": "Khóa học của tôi",
     "history": "Lịch sử",
@@ -38,10 +59,12 @@
     "progress": "Tiến độ",
     "settings": "Cài đặt",
     "plan": {
-      "free": "Gói Miễn Phí"
+      "free": "Gói Miễn Phí",
+      "premium": "Premium Plan"
     },
     "badges": {
-      "free": "MIỄN PHÍ"
+      "free": "MIỄN PHÍ",
+      "pro": "PRO"
     }
   },
   "history": {
@@ -630,8 +653,8 @@
         "premiumDisableSuccess": "Hủy Pro thành công!",
         "premiumUpdateFailed": "Cập nhật trạng thái Premium thất bại"
       }
-    }
-    ,"payment_management": {
+    },
+    "payment_management": {
       "badge": "Thanh toán",
       "title": "Quản lý thanh toán",
       "search_placeholder": "Tìm theo mã giao dịch, user, gateway...",
@@ -646,46 +669,6 @@
       },
       "status": {
         "success": "Thành công",
-  "header": {
-    "search_placeholder": "Tìm kiếm khóa học, video, ghi chú...",
-    "time_ago": "Vừa xong",
-    "default_user_name": "Người dùng",
-    "account_label": "Tài khoản",
-    "aria": {
-      "open_menu": "Mở menu"
-    },
-    "notifications": {
-      "title": "Thông báo",
-      "mark_read": "Đánh dấu đã đọc",
-      "empty": "Bạn không có thông báo nào",
-      "welcome": "Chào mừng bạn quay trở lại với AI-Learning-Dashboard!",
-      "system_processed": "Hệ thống vừa xử lý xong yêu cầu của bạn."
-    },
-    "user_menu": {
-      "profile": "Thông tin cá nhân",
-      "billing": "Lịch sử thanh toán",
-      "logout": "Đăng xuất"
-    }
-  },
-  "sidebar": {
-    "loading": "Đang tải...",
-    "error_loading": "Lỗi lấy thông tin Sidebar:",
-    "default_name": "Nguyễn Khang",
-    "dashboard": "Tổng quan",
-    "courses": "Khóa học",
-    "history": "Lịch sử",
-    "analytics": "Phân tích",
-    "premium": "Premium",
-    "help": "Hỗ trợ",
-    "plan": {
-      "free": "Free Plan",
-      "premium": "Premium Plan"
-    },
-    "badges": {
-      "pro": "PRO",
-      "free": "FREE"
-    }
-  },
         "pending": "Đang chờ",
         "failed": "Thất bại"
       }
