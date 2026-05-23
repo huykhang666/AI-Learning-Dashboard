@@ -15,7 +15,8 @@ class WebSocketService {
             return;
         }
 
-        const socket = new SockJS('http://localhost:8080/ws'); 
+        const socket = new SockJS(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ws`); 
+        
         this.stompClient = new Client({
             webSocketFactory: () => socket,
             connectHeaders: {

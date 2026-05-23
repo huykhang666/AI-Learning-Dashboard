@@ -1,16 +1,15 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/api/payment';
+const BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/payment`;
 
 export const paymentApi = {
-    // 1. Hàm tạo URL thanh toán (Giữ nguyên vẹn của Khang)
     createPaymentUrl: async (paymentRequest) => {
         const token = localStorage.getItem('accessToken');
         
         try {
             const response = await axios.post(
                 `${BASE_URL}/create-url`,
-                paymentRequest, // Body: { userId, amount, planType, gateway }
+                paymentRequest,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -29,7 +28,6 @@ export const paymentApi = {
         }
     },
 
-    // 🌟 2. HÀM MỚI: Lấy danh sách lịch sử giao dịch nạp Premium
     getTransactionHistory: async () => {
         const token = localStorage.getItem('accessToken');
         
@@ -50,7 +48,6 @@ export const paymentApi = {
         }
     },
 
-    // 🌟 3. HÀM MỚI: Gọi endpoint tải file PDF hóa đơn dạng Blob stream
     downloadInvoice: async (paymentId) => {
         const token = localStorage.getItem('accessToken');
         

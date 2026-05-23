@@ -1,13 +1,13 @@
 import axios from "axios";
 
 /* ========================
-   1. AXIOS CLIENT JAVA
+   1. AXIOS CLIENT JAVA (ĐÃ SỬA THÀNH BIẾN ĐỘNG)
 ======================== */
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1`,
 });
 
-// Interceptor gắn token
+// Interceptor gắn token (Giữ nguyên)
 axiosClient.interceptors.request.use((config) => {
   const token =
     localStorage.getItem("accessToken") ||
@@ -21,17 +21,17 @@ axiosClient.interceptors.request.use((config) => {
 });
 
 /* ========================
-   2. AXIOS CLIENT PYTHON (AI)
+   2. AXIOS CLIENT PYTHON (AI) 
 ======================== */
 const aiClient = axios.create({
   baseURL: "http://localhost:8000/ai",
 });
 
 /* ========================
-   3. COURSE / MESSAGE API (JAVA)
+   3. COURSE / MESSAGE API (JAVA) 
 ======================== */
 export const courseDetailApi = {
-  // Lấy chi tiết bài học theo session ID
+  // Lấy chi tiết bài học theosession ID
   getById: async (id) => {
     try {
       const response = await axiosClient.get(`/history/${id}`);
@@ -71,7 +71,6 @@ export const courseDetailApi = {
   },
 
   // Cập nhật tiến độ xem video — gọi POST /progress/update
-  // Backend nhận: { sessionId, currentSecond }
   updateProgress: async (sessionId, currentSecond) => {
     try {
       const response = await axiosClient.post("/progress/update", {
@@ -80,18 +79,18 @@ export const courseDetailApi = {
       });
       return response.data;
     } catch (error) {
-      // Không throw — lỗi tracking không được ảnh hưởng UX
       console.warn("[CourseDetailApi] updateProgress failed silently:", error);
     }
   },
+
   saveDuration: async (id, data) => {
-  try {
-    const response = await axiosClient.patch(`/history/${id}/duration`, data);
-    return response.data;
-  } catch (error) {
-    console.warn('[CourseDetailApi] saveDuration failed:', error);
-  }
-},
+    try {
+      const response = await axiosClient.patch(`/history/${id}/duration`, data);
+      return response.data;
+    } catch (error) {
+      console.warn('[CourseDetailApi] saveDuration failed:', error);
+    }
+  },
 };
 
 /* ========================
