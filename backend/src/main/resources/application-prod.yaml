@@ -5,7 +5,19 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 24h
+      fail-on-read-error: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
   security:
     oauth2:
       client:
