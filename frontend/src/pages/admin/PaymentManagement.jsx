@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, CreditCard, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { adminApi } from "../../api/AdminApi.js";
 
 const fallbackPayments = [
@@ -17,8 +18,22 @@ function formatCurrency(value) {
 }
 
 export default function PaymentManagement() {
+  const { t } = useTranslation();
   const [payments, setPayments] = useState(fallbackPayments);
   const [query, setQuery] = useState("");
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "Success":
+        return t("admin.payment_management.status.success");
+      case "Pending":
+        return t("admin.payment_management.status.pending");
+      case "Failed":
+        return t("admin.payment_management.status.failed");
+      default:
+        return status;
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -74,10 +89,10 @@ export default function PaymentManagement() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-blue-700">
               <CreditCard className="h-3.5 w-3.5" />
-              Payments
+              {t("admin.payment_management.badge")}
             </div>
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-              Quản lý thanh toán
+              {t("admin.payment_management.title")}
             </h2>
           </div>
 
@@ -87,7 +102,7 @@ export default function PaymentManagement() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
-              placeholder="Tìm theo mã giao dịch, user, gateway..."
+              placeholder={t("admin.payment_management.search_placeholder")}
             />
           </label>
         </div>
@@ -98,7 +113,7 @@ export default function PaymentManagement() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['Transaction', 'User', 'Amount', 'Gateway', 'Status', 'Date'].map((heading) => (
+                {[t("admin.payment_management.table.transaction"), t("admin.payment_management.table.user"), t("admin.payment_management.table.amount"), t("admin.payment_management.table.gateway"), t("admin.payment_management.table.status"), t("admin.payment_management.table.date")].map((heading) => (
                   <th
                     key={heading}
                     className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-gray-500"
@@ -118,7 +133,7 @@ export default function PaymentManagement() {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">{payment.id}</p>
-                        <p className="text-xs text-gray-500">Payment record</p>
+                        <p className="text-xs text-gray-500">{t("admin.payment_management.payment_record")}</p>
                       </div>
                     </div>
                   </td>
@@ -129,7 +144,11 @@ export default function PaymentManagement() {
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center gap-1 rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-700">
                       <ArrowUpRight className="h-3.5 w-3.5" />
-                      {payment.gateway}
+                      {payment.gateway === "VNPAY"
+                        ? t("pricing.payment_methods.vnpay")
+                        : payment.gateway === "MOMO"
+                          ? t("pricing.payment_methods.momo")
+                          : payment.gateway}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -142,7 +161,7 @@ export default function PaymentManagement() {
                             : "bg-rose-50 text-rose-700"
                       }`}
                     >
-                      {payment.status}
+                          {getStatusLabel(payment.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">{payment.createdAt}</td>

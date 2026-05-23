@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useTranslation } from "react-i18next";
 
 const T = {
   primary: "#2563EB",
@@ -128,6 +129,7 @@ const Field = ({
 );
 
 export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -160,8 +162,8 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
 
   const handleLogin = async () => {
     const e = {};
-    if (!username) e.username = "Vui lòng nhập username";
-    if (!pass) e.pass = "Vui lòng nhập mật khẩu";
+    if (!username) e.username = t("auth.login.errors.username_required");
+    if (!pass) e.pass = t("auth.login.errors.password_required");
     if (Object.keys(e).length) {
       setErrors(e);
       return;
@@ -190,18 +192,18 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
             localStorage.setItem("user", JSON.stringify({ id: autoId }));
           }
         } catch (decodeErr) {
-          console.warn("Không decode được token:", decodeErr);
+          console.warn(t("auth.login.errors.decode_token"), decodeErr);
         }
 
         onLogin();
       } else {
         setErrors({
-          username: data.message || "Tài khoản hoặc mật khẩu không đúng!",
+          username: data.message || t("auth.login.errors.invalid_credentials"),
         });
       }
     } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ username: "Không thể kết nối tới Server." });
+      console.error(t("auth.login.errors.login_error"), error);
+      setErrors({ username: t("auth.login.errors.server_unreachable") });
     } finally {
       setLoading(false);
     }
@@ -228,7 +230,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               window.location.href = "/";
             }}
           >
-            ← Quay lại
+            {t("auth.login.back")}
           </button>
           <div
             style={{
@@ -272,9 +274,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
           </div>
           <div className="z-10 text-center max-w-[340px] w-full">
             <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">
-              Học thông minh hơn
+              {t("auth.login.left.title_line1")}
               <br />
-              với sức mạnh của AI{" "}
+              {t("auth.login.left.title_line2")} {" "}
               <FaBolt
                 size={22}
                 color="#F59E0B"
@@ -282,14 +284,13 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               />
             </h2>
             <p className="text-sm text-white/80 leading-relaxed mb-6">
-              Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời
-              mọi câu hỏi.
+              {t("auth.login.left.description")}
             </p>
             <div className="flex flex-col gap-2.5 mb-7">
               {[
-                [Mic, "AI Whisper bóc băng tự động"],
-                [Sparkles, "Tóm tắt nội dung thông minh"],
-                [MessageSquare, "Chatbot hỏi đáp theo bài giảng"],
+                [Mic, t("auth.login.left.features.whisper")],
+                [Sparkles, t("auth.login.left.features.summary")],
+                [MessageSquare, t("auth.login.left.features.chat")],
               ].map(([Icon, txt]) => (
                 <div
                   key={txt}
@@ -304,9 +305,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
             </div>
             <div className="flex flex-wrap justify-center gap-8">
               {[
-                ["2K+", "Người dùng"],
-                ["50K+", "Video xử lý"],
-                ["98%", "Hài lòng"],
+                ["2K+", t("auth.login.left.stats.users")],
+                ["50K+", t("auth.login.left.stats.videos")],
+                ["98%", t("auth.login.left.stats.satisfaction")],
               ].map(([v, l]) => (
                 <div key={l} className="min-w-[90px] text-center">
                   <div className="text-2xl font-black text-white">{v}</div>
@@ -327,10 +328,10 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
         >
           <div className="w-full max-w-md">
             <h1 className="text-3xl font-extrabold text-slate-900 mb-1">
-              Chào mừng trở lại!
+              {t("auth.login.right.title")}
             </h1>
             <p className="text-sm text-slate-500 font-medium mb-6">
-              Đăng nhập để tiếp tục hành trình học tập
+              {t("auth.login.right.subtitle")}
             </p>
             <button
               onClick={handleGoogleLogin}
@@ -353,20 +354,20 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 <GIcon />
               )}
 
-              {gLoading ? "Đang kết nối Google..." : "Đăng nhập với Google"}
+              {gLoading ? t("auth.login.google.connecting") : t("auth.login.google.button")}
             </button>
 
             <div className="flex items-center gap-2.5 mb-5">
               <div className="h-px flex-1 bg-slate-200"></div>
               <span className="text-xs text-slate-400 uppercase tracking-[0.16em]">
-                hoặc đăng nhập với email
+                {t("auth.login.right.divider")}
               </span>
               <div className="h-px flex-1 bg-slate-200"></div>
             </div>
             <Field
-              label="Username"
+              label={t("auth.login.form.username")}
               type="text"
-              placeholder="Nhập username"
+              placeholder={t("auth.login.form.username_placeholder")}
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value);
@@ -375,9 +376,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               error={errors.username}
             />
             <Field
-              label="Mật khẩu"
+              label={t("auth.login.form.password")}
               type={showPass ? "text" : "password"}
-              placeholder="••••••••"
+              placeholder={t("auth.login.form.password_placeholder")}
               value={pass}
               onChange={(e) => {
                 setPass(e.target.value);
@@ -436,7 +437,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 <span
                   style={{ fontSize: 12, color: T.textMid, fontWeight: 500 }}
                 >
-                  Ghi nhớ đăng nhập
+                  {t("auth.login.right.remember")}
                 </span>
               </label>
               <span
@@ -447,7 +448,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                   fontWeight: 700,
                 }}
               >
-                Quên mật khẩu?
+                {t("auth.login.right.forgot_password")}
               </span>
             </div>
             <button
@@ -491,7 +492,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                   }}
                 />
               )}
-              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+              {loading ? t("auth.login.right.signing_in") : t("auth.login.right.button")}
             </button>
             <p
               style={{
@@ -503,12 +504,12 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 fontWeight: 500,
               }}
             >
-              Chưa có tài khoản?{" "}
+              {t("auth.login.right.no_account")} {" "}
               <span
                 onClick={handleGoRegister}
                 style={{ color: T.primary, fontWeight: 700, cursor: "pointer" }}
               >
-                Đăng ký ngay
+                {t("auth.login.right.sign_up")}
               </span>
             </p>
           </div>

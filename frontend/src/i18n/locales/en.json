@@ -274,6 +274,292 @@
       "vnpay": "VNPay",
       "visa": "Visa / MasterCard",
       "atm": "Domestic ATM"
+    },
+    "gateways": {
+      "vnpay": {
+        "description": "VNPay Wallet · ATM card · QR Code",
+        "note": "PCI DSS international security standard"
+      },
+      "momo": {
+        "description": "MoMo e-wallet",
+        "note": "Fast checkout through the MoMo app"
+      }
+    },
+    "header": {
+      "badge": "Service pricing",
+      "title": "Choose the right plan",
+      "description": "Upgrade for unlimited learning with AI.",
+      "trusted_partners": "Trusted payment partners"
+    },
+    "modal": {
+      "connecting_gateway": "Connecting payment gateway",
+      "do_not_close": "Please do not close the page...",
+      "confirm_order": "Confirm order",
+      "selected_plan": "Selected plan",
+      "payment_method": "Payment method",
+      "terms_note": "By confirming, you agree to the Terms of Service. You will be securely redirected to {{gateway}}.",
+      "processing": "Processing...",
+      "start_payment": "Proceed to payment",
+      "cancel": "Cancel transaction",
+      "one_time": "One-time"
+    },
+    "alerts": {
+      "login_required": "Please sign in to continue payment!",
+      "user_not_found": "User information not found. Please sign in again!",
+      "service_busy": "System is busy!",
+      "payment_error": "Pricing error details:",
+      "parse_user_error": "Unable to parse user object"
+    }
+  },
+  "payment_result": {
+    "success": {
+      "title": "Payment successful!",
+      "button": "Go to Dashboard",
+      "redirect": "Automatically redirecting in {{count}} seconds"
+    },
+    "failed": {
+      "title": "Payment failed",
+      "button": "Try again"
+    }
+  },
+  "user_profile_modal": {
+    "tabs": {
+      "profile": "Profile information",
+      "billing": "Payment history"
+    },
+    "defaults": {
+      "avatar": "NK"
+    },
+    "success": {
+      "update_account": "Account information updated successfully!"
+    },
+    "errors": {
+      "load_history": "Failed to load transaction history:",
+      "invalid_image": "Please choose an image file (png, jpg, jpeg...)!",
+      "download_invoice": "The system could not export the invoice!"
+    },
+    "billing": {
+      "loading": "Loading order history...",
+      "empty": "You have not made any payment transactions yet.",
+      "table": {
+        "order_id": "Order ID",
+        "plan": "Plan",
+        "amount": "Amount",
+        "gateway": "Gateway",
+        "time": "Time",
+        "status": "Status",
+        "action": "Action"
+      },
+      "plan_monthly": "Premium Monthly",
+      "plan_yearly": "Premium Yearly",
+      "status": {
+        "success": "Success",
+        "pending": "Pending",
+        "failed": "Failed"
+      },
+      "download_invoice": "Download invoice"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "badge": "Admin overview",
+      "title": "System overview",
+      "loading": "Loading data...",
+      "ready": "Data is ready",
+      "stats": {
+        "total_users": "Total users",
+        "total_sessions": "Total sessions",
+        "total_revenue": "Total revenue"
+      }
+    },
+    "layout": {
+      "brand_tag": "Control Center",
+      "brand_name": "AI Learning Admin",
+      "workspace_tag": "Admin workspace",
+      "workspace_description": "Manage dashboards, users, and payments in one focused interface.",
+      "area_tag": "Admin area",
+      "logout": "Log out",
+      "navigation": {
+        "dashboard": "Dashboard",
+        "users": "Users",
+        "payments": "Payments"
+      },
+      "titles": {
+        "dashboard": "Dashboard",
+        "users": "User Management",
+        "payments": "Payment Management"
+      },
+      "aria": {
+        "open_sidebar": "Open navigation sidebar",
+        "close_sidebar": "Close navigation sidebar",
+        "close_overlay": "Close navigation overlay"
+      }
+    },
+    "user_management": {
+      "badge": "Users",
+      "title": "User Management",
+      "search_placeholder": "Search by name, email, role...",
+      "user_id": "ID #",
+      "loading": "Processing...",
+      "table": {
+        "user": "User",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "premium": "Premium",
+        "actions": "Actions"
+      },
+      "roles": {
+        "user": "User",
+        "admin": "Admin",
+        "moderator": "Moderator"
+      },
+      "status": {
+        "active": "Active",
+        "blocked": "Blocked"
+      },
+      "premium": {
+        "pro": "Pro",
+        "free": "Free",
+        "enable": "Upgrade Pro",
+        "disable": "Remove Pro"
+      },
+      "buttons": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "deleting": "Deleting...",
+        "loading": "..."
+      },
+      "modals": {
+        "edit_title": "Edit user information",
+        "edit_description": "Update the user's name and role",
+        "name_label": "Name",
+        "name_placeholder": "Enter user name",
+        "role_label": "Role",
+        "delete_title": "Confirm user deletion",
+        "delete_description": "Are you sure you want to delete this user? This action cannot be undone."
+      },
+      "messages": {
+        "nameRequired": "Name cannot be empty",
+        "updateSuccess": "User information updated successfully!",
+        "updateFailed": "Failed to update user information",
+        "deleteSuccess": "User deleted successfully!",
+        "deleteFailed": "Failed to delete user",
+        "premiumEnableSuccess": "Pro access granted successfully!",
+        "premiumDisableSuccess": "Pro access removed successfully!",
+        "premiumUpdateFailed": "Failed to update Premium status"
+      }
+    }
+    ,"payment_management": {
+      "badge": "Payments",
+      "title": "Payment Management",
+      "search_placeholder": "Search by transaction ID, user, gateway...",
+      "payment_record": "Payment record",
+      "table": {
+        "transaction": "Transaction",
+        "user": "User",
+        "amount": "Amount",
+        "gateway": "Gateway",
+        "status": "Status",
+        "date": "Date"
+      },
+      "status": {
+        "success": "Success",
+        "pending": "Pending",
+        "failed": "Failed"
+      }
+    }
+  },
+  "header": {
+    "search_placeholder": "Search courses, videos, notes...",
+    "time_ago": "Just now",
+    "default_user_name": "User",
+    "account_label": "Account",
+    "aria": {
+      "open_menu": "Open menu"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "mark_read": "Mark as read",
+      "empty": "You have no notifications",
+      "welcome": "Welcome back to AI-Learning-Dashboard!",
+      "system_processed": "The system has finished processing your request."
+    },
+    "user_menu": {
+      "profile": "Profile information",
+      "billing": "Payment history",
+      "logout": "Log out"
+    }
+  },
+  "sidebar": {
+    "loading": "Loading...",
+    "error_loading": "Failed to load Sidebar info:",
+    "default_name": "Nguyen Khang",
+    "dashboard": "Overview",
+    "courses": "Courses",
+    "history": "History",
+    "analytics": "Analytics",
+    "premium": "Premium",
+    "help": "Support",
+    "plan": {
+      "free": "Free Plan",
+      "premium": "Premium Plan"
+    },
+    "badges": {
+      "pro": "PRO",
+      "free": "FREE"
+    }
+  },
+  "auth": {
+    "login": {
+      "back": "← Back",
+      "right": {
+        "title": "Welcome back!",
+        "subtitle": "Sign in to continue your learning journey",
+        "divider": "or sign in with email",
+        "remember": "Remember me",
+        "forgot_password": "Forgot password?",
+        "button": "Sign in",
+        "signing_in": "Signing in...",
+        "no_account": "No account yet?",
+        "sign_up": "Sign up now"
+      },
+      "google": {
+        "button": "Sign in with Google",
+        "connecting": "Connecting to Google..."
+      },
+      "left": {
+        "title_line1": "Learn smarter",
+        "title_line2": "with the power of AI",
+        "description": "Upload lecture videos, and AI will automatically transcribe, summarize, and answer your questions.",
+        "features": {
+          "whisper": "AI Whisper automatic transcription",
+          "summary": "Smart content summaries",
+          "chat": "Lecture-based chatbot Q&A"
+        },
+        "stats": {
+          "users": "Users",
+          "videos": "Processed videos",
+          "satisfaction": "Satisfaction"
+        }
+      },
+      "form": {
+        "username": "Username",
+        "username_placeholder": "Enter username",
+        "password": "Password",
+        "password_placeholder": "••••••••"
+      },
+      "errors": {
+        "username_required": "Please enter username",
+        "password_required": "Please enter password",
+        "invalid_credentials": "Incorrect username or password!",
+        "server_unreachable": "Unable to connect to the server.",
+        "decode_token": "Unable to decode token:",
+        "login_error": "Login error:"
+      }
     }
   },
   "about": {

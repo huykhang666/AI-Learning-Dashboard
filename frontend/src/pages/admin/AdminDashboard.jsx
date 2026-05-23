@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Users, Layers3, Landmark, TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { adminApi } from "../../api/AdminApi.js";
 
 const fallbackMetrics = {
@@ -17,6 +18,7 @@ function formatCurrency(value) {
 }
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const [metrics, setMetrics] = useState(fallbackMetrics);
   const [loading, setLoading] = useState(true);
 
@@ -52,19 +54,19 @@ export default function AdminDashboard() {
 
   const statCards = [
     {
-      label: "Tổng user",
+      label: t("admin.dashboard.stats.total_users"),
       value: metrics.totalUsers.toLocaleString("vi-VN"),
       icon: Users,
       accent: "from-cyan-500 to-blue-500",
     },
     {
-      label: "Tổng session",
+      label: t("admin.dashboard.stats.total_sessions"),
       value: metrics.totalSessions.toLocaleString("vi-VN"),
       icon: Layers3,
       accent: "from-emerald-500 to-teal-500",
     },
     {
-      label: "Tổng doanh thu",
+      label: t("admin.dashboard.stats.total_revenue"),
       value: formatCurrency(metrics.totalRevenue),
       icon: Landmark,
       accent: "from-amber-500 to-orange-500",
@@ -78,16 +80,16 @@ export default function AdminDashboard() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-blue-700">
               <TrendingUp className="h-3.5 w-3.5" />
-              Admin overview
+              {t("admin.dashboard.badge")}
             </div>
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-              Tổng quan hệ thống
+              {t("admin.dashboard.title")}
             </h2>
           </div>
 
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-700 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-sm">
             <TrendingUp className="h-4 w-4" />
-            {loading ? "Đang tải dữ liệu..." : "Dữ liệu đã sẵn sàng"}
+            {loading ? t("admin.dashboard.loading") : t("admin.dashboard.ready")}
           </div>
         </div>
       </section>

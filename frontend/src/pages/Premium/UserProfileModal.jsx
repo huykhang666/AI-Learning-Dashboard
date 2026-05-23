@@ -30,7 +30,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
         const data = await paymentApi.getTransactionHistory();
         setHistory(data || []);
       } catch (error) {
-        console.error("Lỗi khi tải lịch sử giao dịch:", error);
+        console.error(t("user_profile_modal.errors.load_history"), error);
       } finally {
         setIsLoadingHistory(false);
       }
@@ -58,7 +58,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
     if (file) {
       // Kiểm tra định dạng tệp nạp vào phải là hình ảnh
       if (!file.type.startsWith("image/")) {
-        alert("Vui lòng chọn file định dạng ảnh (png, jpg, jpeg...)!");
+        alert(t("user_profile_modal.errors.invalid_image"));
         return;
       }
       
@@ -75,7 +75,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
   };
 
   const handleSaveChanges = () => {
-    let shortName = "NK";
+    let shortName = t("user_profile_modal.defaults.avatar");
     if (formData.name) {
       const words = formData.name.trim().split(" ");
       if (words.length > 0) {
@@ -97,7 +97,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
     });
     window.dispatchEvent(updateEvent);
 
-    alert("Cập nhật thông tin tài khoản thành công!");
+    alert(t("user_profile_modal.success.update_account"));
     onClose(); 
   };
 
@@ -114,7 +114,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      alert("Hệ thống không thể xuất hóa đơn!");
+      alert(t("user_profile_modal.errors.download_invoice"));
     }
   };
 
@@ -137,7 +137,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
                 : "text-slate-500 hover:bg-slate-50"
             }`}
           >
-            <FaUser size={12} /> Thông tin cá nhân
+            <FaUser size={12} /> {t("user_profile_modal.tabs.profile")}
           </button>
           <button
             onClick={() => setActiveTab("billing")}
@@ -147,7 +147,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
                 : "text-slate-500 hover:bg-slate-50"
             }`}
           >
-            <FaReceipt size={12} /> Lịch sử thanh toán
+            <FaReceipt size={12} /> {t("user_profile_modal.tabs.billing")}
           </button>
         </div>
 
@@ -234,24 +234,24 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
             {isLoadingHistory ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <div className="w-7 h-7 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-2"></div>
-                <p className="text-gray-400 text-xs font-medium">Đang tải lịch sử đơn hàng...</p>
+                <p className="text-gray-400 text-xs font-medium">{t("user_profile_modal.billing.loading")}</p>
               </div>
             ) : history.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/50">
-                <p className="text-xs text-gray-400 font-medium italic">Bạn chưa thực hiện giao dịch thanh toán nào.</p>
+                <p className="text-xs text-gray-400 font-medium italic">{t("user_profile_modal.billing.empty")}</p>
               </div>
             ) : (
               <div className="overflow-x-auto w-full rounded-xl border border-slate-100">
                 <table className="w-full text-left border-collapse min-w-[650px]">
                   <thead>
                     <tr className="text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-slate-50 border-b border-slate-100">
-                      <th className="py-2.5 px-3">Mã đơn</th>
-                      <th className="py-2.5 px-3">Gói dịch vụ</th>
-                      <th className="py-2.5 px-3">Số tiền</th>
-                      <th className="py-2.5 px-3">Cổng</th>
-                      <th className="py-2.5 px-3">Thời gian</th>
-                      <th className="py-2.5 px-3">Trạng thái</th>
-                      <th className="py-2.5 px-3 text-center">Hành động</th>
+                      <th className="py-2.5 px-3">{t("user_profile_modal.billing.table.order_id")}</th>
+                      <th className="py-2.5 px-3">{t("user_profile_modal.billing.table.plan")}</th>
+                      <th className="py-2.5 px-3">{t("user_profile_modal.billing.table.amount")}</th>
+                      <th className="py-2.5 px-3">{t("user_profile_modal.billing.table.gateway")}</th>
+                      <th className="py-2.5 px-3">{t("user_profile_modal.billing.table.time")}</th>
+                      <th className="py-2.5 px-3">{t("user_profile_modal.billing.table.status")}</th>
+                      <th className="py-2.5 px-3 text-center">{t("user_profile_modal.billing.table.action")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs text-gray-600 font-medium">
@@ -261,7 +261,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
                           #{item.paymentId.substring(0, 8).toUpperCase()}
                         </td>
                         <td className="py-3 px-3 text-gray-900 font-bold">
-                          {item.planType === "PREMIUM_YEARLY" ? "Premium 1 Năm" : "Premium 1 Tháng"}
+                          {item.planType === "PREMIUM_YEARLY" ? t("user_profile_modal.billing.plan_yearly") : t("user_profile_modal.billing.plan_monthly")}
                         </td>
                         <td className="py-3 px-3 text-slate-900 font-extrabold">
                           {item.amount.toLocaleString()} {item.currency}
@@ -279,15 +279,15 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
                         <td className="py-3 px-3">
                           {item.status === "SUCCESS" ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-green-50 text-green-600 px-2 py-0.5 rounded-full border border-green-100">
-                              Thành công
+                              {t("user_profile_modal.billing.status.success")}
                             </span>
                           ) : item.status === "PENDING" ? (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full border border-amber-100 animate-pulse">
-                              Chờ duyệt
+                              {t("user_profile_modal.billing.status.pending")}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100">
-                              Thất bại
+                              {t("user_profile_modal.billing.status.failed")}
                             </span>
                           )}
                         </td>
@@ -297,7 +297,7 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
                               onClick={() => handleDownloadInvoice(item.paymentId)}
                               className="inline-flex items-center justify-center gap-1 text-[10px] font-bold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-100 px-2 py-1 rounded-xl transition-all"
                             >
-                              Tải hóa đơn
+                              {t("user_profile_modal.billing.download_invoice")}
                             </button>
                           ) : "-"}
                         </td>
