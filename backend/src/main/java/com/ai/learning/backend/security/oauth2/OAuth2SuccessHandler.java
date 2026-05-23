@@ -7,6 +7,7 @@ import com.ai.learning.backend.security.jwt.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
@@ -23,6 +24,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
+
+    @Value("${OAUTH2_REDIRECT_URI:http://localhost:5173/oauth2/callback}")
+    private String oauth2RedirectUri;
 
     @Override
     public void onAuthenticationSuccess(
@@ -133,13 +137,20 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String refreshToken = jwtUtils.generateRefreshToken(user);
 
         // =========================
-        // REDIRECT FRONTEND
+        // REDIRECT FRONTEND 
         // =========================
-        String targetUrl =
-                "http://localhost:5173/oauth2/callback"
-                        + "?token=" + accessToken
-                        + "&refreshToken=" + refreshToken
-                        + "&userId=" + user.getUserId();
+
+        String baseRedirectUrl = oauth2RedirectUri;
+        if (!baseRedirectUrl.contains("/callback") && baseRedirectUrl.endsWith("/redirect")) {
+            baseRedirectUrl = baseRedirectUrl.replace("/redirect", "/callback");
+        } else if (!baseRedirectUrl.contains("/callback")) {
+            baseRedirectUrl = baseRedirectUrl + "/callback";
+        }
+
+        String targetUrl = baseRedirectUrl
+                + "?token=" + accessToken
+                + "&refreshToken=" + refreshToken
+                + "&userId=" + user.getUserId();
 
 
         getRedirectStrategy().sendRedirect(
