@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { FaBolt, FaTimes } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import { userService } from "../../api/UserService";
 
 
 const SidebarInner = ({ showClose, onMobileClose, usageData, userData }) => {
+  const { t } = useTranslation();
   // Kiểm tra trạng thái Premium
   const isPremium = userData?.isPremium;
 
@@ -31,17 +33,17 @@ const SidebarInner = ({ showClose, onMobileClose, usageData, userData }) => {
 
       <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto mt-4">
         {[
-          { label: "Tổng quan", key: "dashboard", path: "/app/dash" },
-          { label: "Khóa học", key: "courses", path: "/app/courses" },
-          { label: "Lịch sử", key: "History", path: "/app/history" },
-          { label: "Phân tích", key: "analytics", path: "/app/analytics" },
+          { label: t("sidebar.dashboard"), key: "dashboard", path: "/app/dash" },
+          { label: t("sidebar.courses"), key: "courses", path: "/app/courses" },
+          { label: t("sidebar.history"), key: "history", path: "/app/history" },
+          { label: t("sidebar.analytics"), key: "analytics", path: "/app/analytics" },
           {
-            label: "Premium",
+            label: t("sidebar.premium"),
             key: "premium",
             path: "/app/premium",
-            badge: isPremium ? "PRO" : "FREE"
+            badge: isPremium ? t("sidebar.badges.pro") : t("sidebar.badges.free")
           },
-          { label: "Hỗ trợ", key: "help", path: "/app/help" },
+          { label: t("sidebar.help"), key: "help", path: "/app/help" },
         ].map((item) => (
           <NavLink
             key={item.key}
@@ -78,7 +80,8 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const [usageData, setUsageData] = useState({ used: 0, total: 4 });
-  const [userData, setUserData] = useState({ name: "Đang tải...", plan: "Free Plan", avatar: ".." });
+  const { t } = useTranslation();
+  const [userData, setUserData] = useState({ name: t("sidebar.loading"), plan: t("sidebar.plan.free"), avatar: ".." });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -91,9 +94,9 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
         const fullName = `${res.firstname || ''} ${res.lastname || ''}`.trim();
 
         setUserData({
-          fullName: fullName || "Nguyễn Khang",
+          fullName: fullName || t("sidebar.default_name"),
           isPremium: res.is_premium === true || res.isPremium === true || res.premium === true,
-          plan: (res.is_premium || res.isPremium || res.premium) ? "Premium Plan" : "Free Plan",
+          plan: (res.is_premium || res.isPremium || res.premium) ? t("sidebar.plan.premium") : t("sidebar.plan.free"),
           avatar: (res.firstname || "U").charAt(0).toUpperCase()
         });
 
@@ -102,7 +105,7 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
           total: 4
         });
       } catch (err) {
-        console.error("Lỗi lấy thông tin Sidebar:", err);
+        console.error(t("sidebar.error_loading"), err);
       }
     };
     fetchInfo();

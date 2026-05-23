@@ -37,7 +37,7 @@ export default function Header({
   
   // CÁC STATE PHỤC VỤ BIẾN CHUÔNG THÀNH REALTIME DROPDOWN:
   const [notifications, setNotifications] = useState([
-    { id: 1, message: "Chào mừng bạn quay trở lại với AI-Learning-Dashboard!", createdAt: "Vừa xong", isRead: true }
+    { id: 1, message: t("header.notifications.welcome"), createdAt: t("header.time_ago"), isRead: true }
   ]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -49,7 +49,7 @@ export default function Header({
   const userMenuRef = useRef(null);
 
   const [localUserData, setLocalUserData] = useState({
-    fullName: userData?.fullName || "Nguyễn Huy Khang",
+    fullName: userData?.fullName || t("header.default_user_name"),
     avatar: userData?.avatar || "NK",
     isImage: false,
     isPremium: userData?.isPremium || false 
@@ -58,7 +58,7 @@ export default function Header({
   useEffect(() => {
     if (userData) {
       setLocalUserData({
-        fullName: userData.fullName || "Nguyễn Huy Khang",
+        fullName: userData.fullName || t("header.default_user_name"),
         avatar: userData.avatar || "NK",
         isImage: false,
         isPremium: userData.isPremium || false
@@ -79,8 +79,8 @@ export default function Header({
       
       const formattedNoti = {
         id: newNoti.id || Date.now(),
-        message: newNoti.message || "Hệ thống vừa xử lý xong yêu cầu của bạn.",
-        createdAt: "Vừa xong",
+        message: newNoti.message || t("header.notifications.system_processed"),
+        createdAt: t("header.time_ago"),
         isRead: false
       };
 
@@ -138,7 +138,7 @@ export default function Header({
       {isMobile && (
         <button
           onClick={onMenuOpen}
-          aria-label="Mở menu"
+          aria-label={t("header.aria.open_menu")}
           className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-indigo-600 hover:bg-indigo-50 border border-gray-200 transition"
         >
           <IconMenu />
@@ -186,19 +186,19 @@ export default function Header({
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-1 overflow-hidden transition-all duration-200">
               <div className="px-4 py-2.5 border-b border-gray-50 flex justify-between items-center bg-slate-50/50">
-                <span className="text-sm font-semibold text-gray-800">Thông báo</span>
+                <span className="text-sm font-semibold text-gray-800">{t("header.notifications.title")}</span>
                 <span 
                   className="text-[11px] text-indigo-600 font-medium cursor-pointer hover:underline" 
                   onClick={() => setNotifications(p => p.map(n => ({ ...n, isRead: true })))}
                 >
-                  Đánh dấu đã đọc
+                  {t("header.notifications.mark_read")}
                 </span>
               </div>
               
               <div className="max-h-[300px] overflow-y-auto divide-y divide-gray-50">
                 {notifications.length === 0 ? (
                   <div className="px-4 py-8 text-center text-xs text-gray-400">
-                    Bạn không có thông báo nào
+                    {t("header.notifications.empty")}
                   </div>
                 ) : (
                   notifications.map((noti) => (
@@ -259,7 +259,7 @@ export default function Header({
             <div className="absolute right-0 md:-right-4 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-150">
               <div className="px-4 py-2.5 border-b border-gray-50 bg-slate-50/40 flex justify-between items-center">
                 <div className="min-w-0 flex-1 pr-2">
-                  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Tài khoản</p>
+                  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{t("header.account_label")}</p>
                   <p className="text-sm font-bold text-gray-800 truncate mt-0.5">{localUserData.fullName}</p>
                 </div>
                 {/* Badge trạng thái hiển thị bằng chữ bên trong khối Popup */}
@@ -280,7 +280,7 @@ export default function Header({
                 }}
                 className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-slate-50 flex items-center gap-2.5 transition-colors"
               >
-                <FaUser className="text-gray-400" size={12} /> Thông tin cá nhân
+                <FaUser className="text-gray-400" size={12} /> {t("header.user_menu.profile")}
               </button>
 
               <button 
@@ -291,7 +291,7 @@ export default function Header({
                 }}
                 className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2.5 transition-colors"
               >
-                <FaReceipt className="text-blue-500/80" size={12} /> Lịch sử thanh toán
+                <FaReceipt className="text-blue-500/80" size={12} /> {t("header.user_menu.billing")}
               </button>
 
               <hr className="my-1 border-gray-100" />
@@ -300,7 +300,7 @@ export default function Header({
                 onClick={onLogout} 
                 className="w-full text-left px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
               >
-                <FaSignOutAlt size={12} /> Đăng xuất
+                <FaSignOutAlt size={12} /> {t("header.user_menu.logout")}
               </button>
             </div>
           )}
