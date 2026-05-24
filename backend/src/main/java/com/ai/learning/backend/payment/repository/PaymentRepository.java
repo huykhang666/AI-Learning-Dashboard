@@ -1,5 +1,6 @@
 package com.ai.learning.backend.payment.repository;
 
+import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.payment.entity.Payment;
 import com.ai.learning.backend.payment.entity.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,5 @@ public interface PaymentRepository extends JpaRepository<Payment,UUID> {
     Optional<Payment> findByGatewayTransactionId(String gatewayTransactionId);
     List<Payment> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
     List<Payment> findByUser_UsernameOrderByCreatedAtDesc(String username);
+    List<Payment> findByUser(User user);
 }

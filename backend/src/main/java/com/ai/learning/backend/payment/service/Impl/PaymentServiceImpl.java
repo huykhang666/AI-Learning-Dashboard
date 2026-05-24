@@ -1,5 +1,8 @@
 package com.ai.learning.backend.payment.service.Impl;
 
+import com.ai.learning.backend.entity.User;
+import com.ai.learning.backend.exception.AppException;
+import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.payment.dto.request.MomoRequest;
 import com.ai.learning.backend.payment.dto.request.PaymentRequest;
 import com.ai.learning.backend.payment.dto.request.VNPayRequest;
@@ -13,6 +16,7 @@ import com.ai.learning.backend.payment.service.MomoService;
 import com.ai.learning.backend.payment.service.PaymentService;
 import com.ai.learning.backend.payment.service.SubscriptionService;
 import com.ai.learning.backend.payment.service.VNPayService;
+import com.ai.learning.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
     SubscriptionService subscriptionService;
     SubscriptionRepository subscriptionRepository;
     PaymentRepository paymentRepository;
+    UserRepository userRepository;
     @Override
     public VNPayResponse initiateVNPay(PaymentRequest request, HttpServletRequest httpRequest) {
         try {
@@ -77,8 +82,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> getMyTransactionHistory() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return paymentRepository.findByUser_UsernameOrderByCreatedAtDesc(username);
+    public List<Payment> getMyTransactionHistory(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return paymentRepository.findByUser(user);
     }
 }

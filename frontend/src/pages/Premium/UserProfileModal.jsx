@@ -21,14 +21,14 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
     email: "huukhang@email.com",
   });
 
-  // Lắp bẫy lắng nghe thay đổi tab để fetch lịch sử giao dịch
   useEffect(() => {
     if (!isOpen || activeTab !== "billing") return;
     const fetchHistory = async () => {
       try {
         setIsLoadingHistory(true);
-        const data = await paymentApi.getTransactionHistory();
-        setHistory(data || []);
+        const res = await paymentApi.getTransactionHistory();
+        const historyData = res?.data || res;
+        setHistory(Array.isArray(historyData) ? historyData : []);
       } catch (error) {
         console.error(t("user_profile_modal.errors.load_history"), error);
       } finally {
@@ -56,13 +56,11 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Kiểm tra định dạng tệp nạp vào phải là hình ảnh
       if (!file.type.startsWith("image/")) {
         alert(t("user_profile_modal.errors.invalid_image"));
         return;
       }
       
-      // Tạo đường dẫn blob tạm thời để hiển thị xem trước ngay lập tức
       const previewUrl = URL.createObjectURL(file);
       setAvatarPreview(previewUrl);
       
@@ -103,8 +101,12 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
 
   const handleDownloadInvoice = async (paymentId) => {
     try {
-      const responseBlob = await paymentApi.downloadInvoice(paymentId);
-      const url = window.URL.createObjectURL(new Blob([responseBlob], { type: "application/pdf" }));
+      const response = await paymentApi.downloadInvoice(paymentId);
+      
+      // Lấy trực tiếp cục blob data từ response trả về của Axios
+      const pdfBlob = response?.data || response;
+      const url = window.URL.createObjectURL(new Blob([pdfBlob], { type: "application/pdf" }));
+      
       const link = document.createElement("a");
       link.href = url;
       const shortId = paymentId.substring(0, 8).toUpperCase();

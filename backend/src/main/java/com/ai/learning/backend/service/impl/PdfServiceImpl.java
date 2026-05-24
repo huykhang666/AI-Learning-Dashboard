@@ -5,9 +5,11 @@ import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
@@ -48,126 +50,210 @@ public class PdfServiceImpl implements PdfService {
 
     @Override
     public ByteArrayInputStream exportInvoiceToPdf(Payment payment) {
-        Document document = new Document(PageSize.A4, 36, 36, 54, 36);
+        Document document = new Document(PageSize.A4, 40, 40, 60, 40);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try {
-            PdfWriter.getInstance(document, out);
+            PdfWriter writer = PdfWriter.getInstance(document, out);
             document.open();
 
-            Font brandFont = new Font(Font.HELVETICA, 24, Font.BOLD, new Color(63, 81, 181)); // Màu xanh Indigo chủ đạo
-            Font sectionHeadingFont = new Font(Font.HELVETICA, 12, Font.BOLD, Color.DARK_GRAY);
-            Font boldFont = new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
-            Font normalFont = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
-            Font totalFont = new Font(Font.HELVETICA, 12, Font.BOLD, new Color(211, 47, 47)); // Màu đỏ tiền tệ
+            String regularPath = "/fonts/Roboto-Regular.ttf";
+            String boldPath = "/fonts/Roboto-Bold.ttf";
 
+            byte[] regularBytes = new ClassPathResource("fonts/Roboto-Regular.ttf").getInputStream().readAllBytes();
 
-            Paragraph title = new Paragraph("FLY SPEECH", brandFont);
-            title.setAlignment(Element.ALIGN_LEFT);
-            document.add(title);
-
-            Paragraph companyInfo = new Paragraph(
-                    "AI-Powered Learning Dashboard\n" +
-                            "Email: support@flyspeech.com\n" +
-                            "Website: localhost:3000\n" +
-                            "------------------------------------------------------------------------------------------------------------------------",
-                    normalFont
+            BaseFont bfRegular = BaseFont.createFont(
+                    "Roboto-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, regularBytes, null
             );
-            companyInfo.setSpacingAfter(15);
-            document.add(companyInfo);
+            BaseFont bfBold = bfRegular;
 
+            // Bảng màu
+            Color indigo      = new Color(63, 81, 181);
+            Color indigoLight = new Color(232, 234, 252);
+            Color red         = new Color(198, 40, 40);
+            Color redLight    = new Color(255, 235, 235);
+            Color gray        = new Color(97, 97, 97);
+            Color darkGray    = new Color(33, 33, 33);
+            Color tableHeader = new Color(225, 228, 250);
+            Color rowAlt      = new Color(245, 246, 255);
 
+            // Fonts
+            Font fontBrand    = new Font(bfBold,    26, Font.NORMAL, indigo);
+            Font fontSubtitle = new Font(bfRegular, 10, Font.NORMAL, gray);
+            Font fontH2       = new Font(bfBold,    11, Font.NORMAL, darkGray);
+            Font fontBold     = new Font(bfBold,    10, Font.NORMAL, darkGray);
+            Font fontNormal   = new Font(bfRegular, 10, Font.NORMAL, darkGray);
+            Font fontSmall    = new Font(bfRegular,  9, Font.NORMAL, gray);
+            Font fontTotal    = new Font(bfBold,    13, Font.NORMAL, red);
+            Font fontTableH   = new Font(bfBold,    10, Font.NORMAL, indigo);
+            Font fontWhite    = new Font(bfBold,    14, Font.NORMAL, Color.WHITE);
+
+            // ── HEADER BANNER ──
+            PdfPTable banner = new PdfPTable(1);
+            banner.setWidthPercentage(100);
+            banner.setSpacingAfter(0);
+
+            PdfPCell bannerCell = new PdfPCell();
+            bannerCell.setBackgroundColor(indigo);
+            bannerCell.setPadding(20);
+            bannerCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph brandLine = new Paragraph("AI LEARNING DASHBOARD", fontWhite);
+            brandLine.setAlignment(Element.ALIGN_CENTER);
+            bannerCell.addElement(brandLine);
+
+            Paragraph tagline = new Paragraph("Nền tảng học tập thông minh với AI",
+                    new Font(bfRegular, 10, Font.NORMAL, indigoLight));
+            tagline.setAlignment(Element.ALIGN_CENTER);
+            bannerCell.addElement(tagline);
+
+            banner.addCell(bannerCell);
+            document.add(banner);
+
+            // ── TIÊU ĐỀ HÓA ĐƠN ──
+            PdfPTable titleBar = new PdfPTable(1);
+            titleBar.setWidthPercentage(100);
+            titleBar.setSpacingAfter(16);
+
+            PdfPCell titleCell = new PdfPCell();
+            titleCell.setBackgroundColor(indigoLight);
+            titleCell.setPadding(10);
+            titleCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph invoiceTitle = new Paragraph("HÓA ĐƠN THANH TOÁN",
+                    new Font(bfBold, 14, Font.NORMAL, indigo));
+            invoiceTitle.setAlignment(Element.ALIGN_CENTER);
+            titleCell.addElement(invoiceTitle);
+            titleBar.addCell(titleCell);
+            document.add(titleBar);
+
+            // ── THÔNG TIN 2 CỘT ──
             PdfPTable infoTable = new PdfPTable(2);
             infoTable.setWidthPercentage(100);
-            infoTable.setSpacingAfter(20);
+            infoTable.setSpacingAfter(16);
 
-            // Cột trái: Người mua
+            // Cột trái: Khách hàng
             PdfPCell leftCell = new PdfPCell();
-            leftCell.setBorder(Rectangle.NO_BORDER);
-            leftCell.addElement(new Paragraph("BILL TO:", sectionHeadingFont));
-            String customerName = (payment.getUser().getFirstName() != null ? payment.getUser().getFirstName() : "") + " " +
-                    (payment.getUser().getLastName() != null ? payment.getUser().getLastName() : payment.getUser().getUsername());
-            leftCell.addElement(new Paragraph("Customer: " + customerName, normalFont));
-            leftCell.addElement(new Paragraph("Account: " + payment.getUser().getUsername(), normalFont));
+            leftCell.setBorder(Rectangle.BOX);
+            leftCell.setBorderColor(indigoLight);
+            leftCell.setBackgroundColor(new Color(250, 250, 255));
+            leftCell.setPadding(12);
+
+            leftCell.addElement(new Paragraph("THÔNG TIN KHÁCH HÀNG", fontH2));
+            leftCell.addElement(new Paragraph(" ", fontSmall));
+            String customerName =
+                    (payment.getUser().getFirstName() != null ? payment.getUser().getFirstName() : "") + " " +
+                            (payment.getUser().getLastName()  != null ? payment.getUser().getLastName()  : payment.getUser().getUsername());
+            leftCell.addElement(new Paragraph("Họ tên:     " + customerName.trim(), fontNormal));
+            leftCell.addElement(new Paragraph("Tài khoản:  " + payment.getUser().getUsername(), fontNormal));
+            leftCell.addElement(new Paragraph("Email:      " + payment.getUser().getEmail(), fontNormal));
             infoTable.addCell(leftCell);
 
-            // Cột phải: Chi tiết hóa đơn ngân hàng
+            // Cột phải: Chi tiết hóa đơn
             PdfPCell rightCell = new PdfPCell();
-            rightCell.setBorder(Rectangle.NO_BORDER);
-            rightCell.addElement(new Paragraph("INVOICE DETAILS:", sectionHeadingFont));
-            rightCell.addElement(new Paragraph("Invoice ID: " + payment.getPaymentId().toString().substring(0, 8).toUpperCase(), boldFont));
-            rightCell.addElement(new Paragraph("Gateway: " + payment.getGateway().name(), normalFont));
-            if(payment.getGatewayTransactionId() != null) {
-                rightCell.addElement(new Paragraph("Trans No: " + payment.getGatewayTransactionId(), normalFont));
+            rightCell.setBorder(Rectangle.BOX);
+            rightCell.setBorderColor(indigoLight);
+            rightCell.setBackgroundColor(new Color(250, 250, 255));
+            rightCell.setPadding(12);
+
+            rightCell.addElement(new Paragraph("CHI TIẾT HÓA ĐƠN", fontH2));
+            rightCell.addElement(new Paragraph(" ", fontSmall));
+            rightCell.addElement(new Paragraph("Mã hóa đơn:      " + payment.getPaymentId().toString().substring(0, 8).toUpperCase(), fontBold));
+            rightCell.addElement(new Paragraph("Cổng thanh toán: " + payment.getGateway().name(), fontNormal));
+            if (payment.getGatewayTransactionId() != null) {
+                rightCell.addElement(new Paragraph("Mã giao dịch:    " + payment.getGatewayTransactionId(), fontNormal));
             }
-            rightCell.addElement(new Paragraph("Date: " + payment.getCreatedAt().toString(), normalFont));
+            rightCell.addElement(new Paragraph("Ngày thanh toán: " +
+                    payment.getCreatedAt().toString().replace("T", " ").substring(0, 19), fontNormal));
             infoTable.addCell(rightCell);
 
             document.add(infoTable);
 
+            // ── BẢNG DỊCH VỤ ──
             PdfPTable itemTable = new PdfPTable(3);
             itemTable.setWidthPercentage(100);
             itemTable.setWidths(new int[]{5, 3, 3});
-            itemTable.setSpacingAfter(15);
+            itemTable.setSpacingAfter(12);
 
-            Color headerBg = new Color(245, 245, 247);
+            // Header bảng
+            String[] headers = {"Mô tả dịch vụ", "Gói đăng ký", "Thành tiền"};
+            int[] aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_RIGHT};
+            for (int i = 0; i < headers.length; i++) {
+                PdfPCell h = new PdfPCell(new Phrase(headers[i], fontTableH));
+                h.setBackgroundColor(tableHeader);
+                h.setPadding(9);
+                h.setHorizontalAlignment(aligns[i]);
+                h.setBorderColor(indigo);
+                itemTable.addCell(h);
+            }
 
-            PdfPCell h1 = new PdfPCell(new Phrase("Service Description", sectionHeadingFont));
-            h1.setBackgroundColor(headerBg); h1.setPadding(8);
-
-            PdfPCell h2 = new PdfPCell(new Phrase("Plan Duration", sectionHeadingFont));
-            h2.setBackgroundColor(headerBg); h2.setPadding(8); h2.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-            PdfPCell h3 = new PdfPCell(new Phrase("Subtotal", sectionHeadingFont));
-            h3.setBackgroundColor(headerBg); h3.setPadding(8); h3.setHorizontalAlignment(Element.ALIGN_RIGHT);
-
-            itemTable.addCell(h1); itemTable.addCell(h2); itemTable.addCell(h3);
-
-            // Đổ data động từ bản ghi thanh toán vào bảng dịch vụ
-            String desc = payment.getOrderInfo() != null ? payment.getOrderInfo() : "Upgrade Account to Premium Plan";
-            PdfPCell cellDesc = new PdfPCell(new Phrase(desc, normalFont));
-            cellDesc.setPadding(8);
-            itemTable.addCell(cellDesc);
-
+            // Row dữ liệu
+            String desc = payment.getOrderInfo() != null ? payment.getOrderInfo() : "Nâng cấp tài khoản lên gói Premium";
             String duration = payment.getPlanType() != null ? payment.getPlanType().name() : "PREMIUM";
-            PdfPCell cellDuration = new PdfPCell(new Phrase(duration, normalFont));
-            cellDuration.setPadding(8); cellDuration.setHorizontalAlignment(Element.ALIGN_CENTER);
-            itemTable.addCell(cellDuration);
+            String currencyName = payment.getCurrency() != null ? payment.getCurrency().name() : "VND";
+            String price = String.format("%,.0f %s", payment.getAmount().doubleValue(), currencyName);
 
-            String price = payment.getAmount() + " " + payment.getCurrency().name();
-            PdfPCell cellPrice = new PdfPCell(new Phrase(price, normalFont));
-            cellPrice.setPadding(8); cellPrice.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            itemTable.addCell(cellPrice);
+            String[] values = {desc, duration, price};
+            for (int i = 0; i < values.length; i++) {
+                PdfPCell c = new PdfPCell(new Phrase(values[i], fontNormal));
+                c.setPadding(9);
+                c.setBackgroundColor(rowAlt);
+                c.setHorizontalAlignment(aligns[i]);
+                c.setBorderColor(indigoLight);
+                itemTable.addCell(c);
+            }
 
             document.add(itemTable);
 
-
+            // ── TỔNG TIỀN ──
             PdfPTable totalTable = new PdfPTable(2);
             totalTable.setWidthPercentage(100);
-            totalTable.setWidths(new int[]{7, 4});
+            totalTable.setWidths(new int[]{6, 5});
+            totalTable.setSpacingAfter(24);
 
-            PdfPCell dummyCell = new PdfPCell();
-            dummyCell.setBorder(Rectangle.NO_BORDER);
-            totalTable.addCell(dummyCell);
+            PdfPCell emptyCell = new PdfPCell();
+            emptyCell.setBorder(Rectangle.NO_BORDER);
+            totalTable.addCell(emptyCell);
 
             PdfPCell totalCell = new PdfPCell();
-            totalCell.setPadding(10);
-            totalCell.setBackgroundColor(new Color(253, 242, 242));
+            totalCell.setPadding(14);
+            totalCell.setBackgroundColor(redLight);
+            totalCell.setBorderColor(red);
 
-            Paragraph totalPara = new Paragraph("TOTAL PAID: " + price, totalFont);
+            Paragraph totalPara = new Paragraph("TỔNG THANH TOÁN: " + price, fontTotal);
             totalPara.setAlignment(Element.ALIGN_RIGHT);
             totalCell.addElement(totalPara);
-
             totalTable.addCell(totalCell);
             document.add(totalTable);
 
-            Paragraph footer = new Paragraph("\n\nThank you for choosing FlySpeech! Premium features are now fully unlocked.", normalFont);
-            footer.setAlignment(Element.ALIGN_CENTER);
-            document.add(footer);
+            // ── FOOTER ──
+            PdfPTable footerTable = new PdfPTable(1);
+            footerTable.setWidthPercentage(100);
+
+            PdfPCell footerCell = new PdfPCell();
+            footerCell.setBackgroundColor(indigo);
+            footerCell.setPadding(14);
+            footerCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph footerText = new Paragraph(
+                    "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\n" +
+                            "Tài khoản của bạn đã được kích hoạt đầy đủ tính năng Premium.",
+                    new Font(bfRegular, 10, Font.NORMAL, Color.WHITE)
+            );
+            footerText.setAlignment(Element.ALIGN_CENTER);
+            footerCell.addElement(footerText);
+
+            Paragraph contact = new Paragraph("support@ailearning.com  |  localhost:5173",
+                    new Font(bfRegular, 9, Font.NORMAL, indigoLight));
+            contact.setAlignment(Element.ALIGN_CENTER);
+            footerCell.addElement(contact);
+
+            footerTable.addCell(footerCell);
+            document.add(footerTable);
 
             document.close();
         } catch (Exception ex) {
-            System.out.println("Lỗi sinh PDF hóa đơn OpenPDF: " + ex.getMessage());
+            ex.printStackTrace();
         }
 
         return new ByteArrayInputStream(out.toByteArray());

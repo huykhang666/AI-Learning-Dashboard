@@ -1,18 +1,29 @@
 import axios from 'axios';
 
-const BASE_URL = `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/payment`;
+const BASE_URL = "http://localhost:8080/api/payment";
+const apiClient = axios.create({
+    baseURL: BASE_URL,
+});
+
+apiClient.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 
 export const paymentApi = {
     createPaymentUrl: async (paymentRequest) => {
-        const token = localStorage.getItem('accessToken');
+        // Giữ nguyên dòng đọc token gốc của ní
+        const token = localStorage.getItem('accessToken'); 
         
         try {
-            const response = await axios.post(
-                `${BASE_URL}/create-url`,
+            const response = await apiClient.post(
+                `/create-url`,
                 paymentRequest,
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 }
@@ -29,17 +40,9 @@ export const paymentApi = {
     },
 
     getTransactionHistory: async () => {
-        const token = localStorage.getItem('accessToken');
-        
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('access_token');        
         try {
-            const response = await axios.get(
-                `${BASE_URL}/history`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await apiClient.get(`/history`);
             return response.data;
         } catch (error) {
             const serverMessage = error.response?.data?.message || "Không thể lấy lịch sử giao dịch";
@@ -49,15 +52,12 @@ export const paymentApi = {
     },
 
     downloadInvoice: async (paymentId) => {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken'); 
         
         try {
-            const response = await axios.get(
-                `${BASE_URL}/invoice/${paymentId}`,
+            const response = await apiClient.get(
+                `/invoice/${paymentId}`,
                 {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     responseType: 'blob' 
                 }
             );

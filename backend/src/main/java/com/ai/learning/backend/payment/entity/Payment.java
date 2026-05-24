@@ -1,6 +1,7 @@
 package com.ai.learning.backend.payment.entity;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.enums.SessionStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class Payment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
  
     private Long amount;

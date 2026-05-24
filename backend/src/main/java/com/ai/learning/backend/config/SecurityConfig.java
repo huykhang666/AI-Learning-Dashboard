@@ -59,6 +59,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain apiSecurity(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource));
+
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
@@ -72,7 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/transactions/**").hasRole("USER")
                         .requestMatchers("/api/v1/transactions/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/messages/**").hasRole("USER")
-                        .requestMatchers("/api/payment/**").permitAll()
+                        .requestMatchers("/api/payment/**").authenticated()
                         .anyRequest().authenticated()
                 );
 
@@ -93,7 +95,6 @@ public class SecurityConfig {
                 exception.accessDeniedHandler(new CustomAccessDeniedHandler())
         );
 
-        httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource));
         return httpSecurity.build();
     }
 
@@ -131,6 +132,4 @@ public class SecurityConfig {
                                     .bearerFormat("JWT")));
         }
     }
-
-
 }

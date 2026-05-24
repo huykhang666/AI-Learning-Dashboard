@@ -16,5 +16,5 @@ public interface PaymentService {
     VNPayResponse initiateVNPay(PaymentRequest request, HttpServletRequest httpRequest);
     MomoResponse initiateMoMo(PaymentRequest request);
     SubscriptionResponse getMySubscription(String email);
-    List<Payment> getMyTransactionHistory();
+    List<Payment> getMyTransactionHistory(String username);
 }

@@ -1,5 +1,8 @@
 package com.ai.learning.backend.payment.controller;
 
+import com.ai.learning.backend.entity.User;
+import com.ai.learning.backend.exception.AppException;
+import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.payment.dto.request.PaymentRequest;
 import com.ai.learning.backend.payment.dto.response.IpnResponse;
 import com.ai.learning.backend.payment.dto.response.MomoResponse;
@@ -8,6 +11,7 @@ import com.ai.learning.backend.payment.entity.Payment;
 import com.ai.learning.backend.payment.entity.PaymentGateway;
 import com.ai.learning.backend.payment.service.Impl.*;
 import com.ai.learning.backend.payment.repository.PaymentRepository;
+import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.PdfService;
 import com.ai.learning.backend.payment.constant.VNPayParams;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -40,6 +45,7 @@ public class PaymentController {
     MomoIpnHandlerImpl momoIpnHandler;
     PaymentRepository paymentRepository;
     PdfService pdfService;
+    UserRepository userRepository;
 
     @PostMapping("/create-url")
     public ResponseEntity<?> createPaymentUrl(
@@ -56,14 +62,20 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay-return")
-    public void vnpayReturn(
-            @RequestParam Map<String, String> params,
-            HttpServletResponse response) throws IOException {
+    public void vnpayReturn(@RequestParam Map<String, String> params, HttpServletResponse response) throws IOException {
+        try {
+            vnPayIpnHandler.handle(params);
+            System.out.println("=== [VNPay Return] Đã gọi handler xử lý cập nhật Database thành công ===");
+        } catch (Exception e) {
+            System.out.println("=== [VNPay Return] Lỗi khi xử lý cập nhật DB: " + e.getMessage() + " ===");
+        }
 
         String code = params.get(VNPayParams.RESPONSE_CODE);
-        response.sendRedirect("00".equals(code)
-                ? "http://localhost:3000/payment/success"
-                : "http://localhost:3000/payment/failed");
+        if ("00".equals(code)) {
+            response.sendRedirect("http://localhost:5173/payment/success");
+        } else {
+            response.sendRedirect("http://localhost:5173/payment/failed");
+        }
     }
 
     @GetMapping("/vnpay-ipn")
@@ -77,13 +89,19 @@ public class PaymentController {
     }
 
     @GetMapping("/subscriptions/me")
-    public ResponseEntity<?> getMySubscription(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(paymentService.getMySubscription(userDetails.getUsername()));
+    public ResponseEntity<?> getMySubscription(@AuthenticationPrincipal Jwt jwt) {
+        User user = userRepository.findByUsername(jwt.getSubject())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return ResponseEntity.ok(paymentService.getMySubscription(user.getEmail()));
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<Payment>> getTransactionHistory() {
-        return ResponseEntity.ok(paymentService.getMyTransactionHistory());
+    public ResponseEntity<List<Payment>> getTransactionHistory(@AuthenticationPrincipal Jwt jwt) {
+        if (jwt == null) {
+            return ResponseEntity.status(401).build();
+        }
+        String username = jwt.getSubject(); // lấy từ "sub" claim
+        return ResponseEntity.ok(paymentService.getMyTransactionHistory(username));
     }
 
     @GetMapping("/invoice/{paymentId}")
@@ -92,6 +110,9 @@ public class PaymentController {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với mã: " + paymentId));
 
         ByteArrayInputStream pdfStream = pdfService.exportInvoiceToPdf(payment);
+
+        System.out.println("=== PDF Stream size: " + pdfStream.available() + " bytes ===");
+
         InputStreamResource resource = new InputStreamResource(pdfStream);
 
         return ResponseEntity.ok()
