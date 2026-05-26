@@ -54,7 +54,8 @@ public class SecurityConfig {
             "/api/uploads/video",
             "/uploads/**",
             "/api/jobs/**",
-            "/api/v1/sessions/**"
+            "/api/v1/sessions/**",
+            "/actuator/health"
     };
 
     @Bean
@@ -75,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/transactions/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/messages/**").hasRole("USER")
                         .requestMatchers("/api/payment/**").authenticated()
+                        .requestMatchers("/actuator/**").authenticated()
                         .anyRequest().authenticated()
                 );
 
