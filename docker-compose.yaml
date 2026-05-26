@@ -4,7 +4,6 @@ networks:
   ai-network:
     driver: bridge
 
-
 services:
   db:
     image: postgres:15-alpine
@@ -88,9 +87,18 @@ services:
       - redis_data:/data
     command: [ "redis-server", "--appendonly", "yes" ]
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ai-learning-dashboard-prometheus
+    networks:
+      - ai-network
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
 volumes:
   postgres_data:
   redis_data:
-
-
-
