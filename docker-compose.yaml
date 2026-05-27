@@ -42,14 +42,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ai_learning_dashboard
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       AI_SERVICE_URL: http://ai-service:8000
       APP_DIR_UPLOADS: /app/uploads
-    volumes:
-      - ./uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -93,12 +91,27 @@ services:
     networks:
       - ai-network
     volumes:
-      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ai-learning-dashboard-grafana
+    networks:
+      - ai-network
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+
 volumes:
   postgres_data:
   redis_data:
+  grafana-storage:

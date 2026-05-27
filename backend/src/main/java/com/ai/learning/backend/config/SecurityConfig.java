@@ -55,7 +55,8 @@ public class SecurityConfig {
             "/uploads/**",
             "/api/jobs/**",
             "/api/v1/sessions/**",
-            "/actuator/health"
+            "/actuator/health",
+            "/actuator/prometheus"
     };
 
     @Bean
@@ -64,6 +65,8 @@ public class SecurityConfig {
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
@@ -76,7 +79,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/transactions/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/messages/**").hasRole("USER")
                         .requestMatchers("/api/payment/**").authenticated()
-                        .requestMatchers("/actuator/**").authenticated()
                         .anyRequest().authenticated()
                 );
 
