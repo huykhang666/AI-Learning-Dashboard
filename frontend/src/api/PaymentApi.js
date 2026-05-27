@@ -15,7 +15,6 @@ apiClient.interceptors.request.use((config) => {
 
 export const paymentApi = {
     createPaymentUrl: async (paymentRequest) => {
-        // Giữ nguyên dòng đọc token gốc của ní
         const token = localStorage.getItem('accessToken'); 
         
         try {

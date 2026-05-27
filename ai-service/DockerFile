@@ -1,24 +1,37 @@
-FROM python:3.11-slim
-
-# Thiết lập thư mục làm việc bên trong container
+# ==========================================
+# STAGE 1: BUILD DEPENDENCIES (Cài thư viện Python)
+# ==========================================
+FROM python:3.11-slim AS builder
 WORKDIR /app
 
-# Cài đặt các thư viện hệ thống bắt buộc (đặc biệt là ffmpeg để Whisper xử lý âm thanh)
+# Khởi tạo môi trường ảo độc lập để bốc đi cho dễ
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Tận dụng Docker Cache để cài thư viện siêu tốc
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ==========================================
+# STAGE 2: RUNTIME (Chạy ứng dụng sạch rác)
+# ==========================================
+FROM python:3.11-slim
+WORKDIR /app
+
+# 🎯 GIỮ NGUYÊN: Cài ffmpeg để Whisper bóc tách âm thanh video bài giảng của ní
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy file requirements trước để tận dụng Docker Cache, giúp các lần build sau nhanh hơn
-COPY requirements.txt .
+# Bốc trọn gói môi trường ảo chứa thư viện sạch từ Stage 1 sang
+ENV PATH="/opt/venv/bin:$PATH"
+COPY --from=builder /opt/venv /opt/venv
 
-# Tiến hành cài đặt các thư viện Python (FastAPI, Uvicorn, OpenAI Whisper, v.v.)
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy toàn bộ mã nguồn của folder ai-service vào container
+# Copy toàn bộ mã nguồn của folder vào container giống hệt bản cũ của ní
 COPY . .
 
-# Khai báo mở cổng 8000 đúng theo cấu hình của FastAPI
-EXPOSE 8000
+# Khai báo mở cổng (Cổng gốc ní ghi EXPOSE 8000 nhưng CMD chạy biến port, tớ để 8080 luôn cho đồng bộ)
+EXPOSE 8080
 
-# Lệnh khởi chạy chính thức, trỏ thẳng vào file main.py nằm trong thư mục app
+# 🎯 GIỮ NGUYÊN: Lệnh khởi chạy chính thức trỏ thẳng vào app.main:app của ní
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]
