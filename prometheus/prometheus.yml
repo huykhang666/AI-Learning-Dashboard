@@ -6,7 +6,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'flyspeech-spring-actuator'
+  - job_name: 'ai-learning-spring-actuator'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['192.168.1.29:8080']
+      - targets: ['ai-learning-backend:8080'] 

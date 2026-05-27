@@ -7,7 +7,7 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────
-  # Compile nhanh Backend (không cần DB)
+  # Compile nhanh Backend
   # ─────────────────────────────────────────────
   compile-backend:
     name: "Backend — Compile check"
@@ -19,7 +19,6 @@ jobs:
           java-version: "17"
           distribution: "temurin"
           cache: maven
-      # compile-only, không chạy test → nhanh hơn CI
       - run: ./mvnw compile -B -q
 
   # ─────────────────────────────────────────────

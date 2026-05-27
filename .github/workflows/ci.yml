@@ -8,7 +8,7 @@ on:
 
 jobs:
   # ─────────────────────────────────────────────
-  # 1. BACKEND — Spring Boot (trong thư mục backend/)
+  # 1. BACKEND — Spring Boot
   # ─────────────────────────────────────────────
   backend:
     name: "Backend — Maven Build & Test"
@@ -31,7 +31,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend   # ← pom.xml nằm trong backend/
+        working-directory: backend
 
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +59,7 @@ jobs:
           path: backend/target/surefire-reports/
 
   # ─────────────────────────────────────────────
-  # 2. FRONTEND — React/Vite (trong thư mục frontend/)
+  # 2. FRONTEND — React/Vite
   # ─────────────────────────────────────────────
   frontend:
     name: "Frontend — Vite Build"
@@ -88,7 +88,7 @@ jobs:
           VITE_API_URL: http://localhost:8080/api/v1
 
   # ─────────────────────────────────────────────
-  # 3. AI SERVICE — FastAPI (trong thư mục ai-service/)
+  # 3. AI SERVICE — FastAPI
   # ─────────────────────────────────────────────
   ai-service:
     name: "AI Service — Python Test"

@@ -24,15 +24,15 @@ services:
       timeout: 5s
       retries: 5
 
-  ai-service:
-    build: ./ai-service
-    container_name: ai-fastapi
-    networks:
-      - ai-network
-    volumes:
-      - ./ai-service/storage:/app/storage
-      - ./uploads:/app/uploads
-    restart: unless-stopped
+  # ai-service:
+  #   build: ./ai-service
+  #   container_name: ai-fastapi
+  #   networks:
+  #     - ai-network
+  #   volumes:
+  #     - ./ai-service/storage:/app/storage
+  #     - ./uploads:/app/uploads
+  #   restart: unless-stopped
 
   backend:
     build: ./backend
@@ -46,17 +46,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ai_learning_dashboard
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      AI_SERVICE_URL: http://ai-service:8000
+      AI_SERVICE_URL: http://host.docker.internal:8000
       APP_DIR_UPLOADS: /app/uploads
     depends_on:
       db:
         condition: service_healthy
-    healthcheck:
-      test:
-        ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     restart: unless-stopped
     env_file:
       - .env
@@ -72,13 +66,14 @@ services:
     ports:
       - "80:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     container_name: redis_flyspeech
+    networks:
+      - ai-network
     ports:
       - "6379:6379"
     volumes:

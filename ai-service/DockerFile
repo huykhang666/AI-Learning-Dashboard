@@ -1,5 +1,5 @@
 # ==========================================
-# STAGE 1: BUILD DEPENDENCIES (Cài thư viện Python)
+# STAGE 1: BUILD DEPENDENCIES 
 # ==========================================
 FROM python:3.11-slim AS builder
 WORKDIR /app
@@ -13,12 +13,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ==========================================
-# STAGE 2: RUNTIME (Chạy ứng dụng sạch rác)
+# STAGE 2: RUNTIME
 # ==========================================
 FROM python:3.11-slim
 WORKDIR /app
 
-# 🎯 GIỮ NGUYÊN: Cài ffmpeg để Whisper bóc tách âm thanh video bài giảng của ní
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
@@ -27,11 +26,9 @@ RUN apt-get update && apt-get install -y \
 ENV PATH="/opt/venv/bin:$PATH"
 COPY --from=builder /opt/venv /opt/venv
 
-# Copy toàn bộ mã nguồn của folder vào container giống hệt bản cũ của ní
 COPY . .
 
-# Khai báo mở cổng (Cổng gốc ní ghi EXPOSE 8000 nhưng CMD chạy biến port, tớ để 8080 luôn cho đồng bộ)
+# Khai báo mở cổng
 EXPOSE 8080
 
-# 🎯 GIỮ NGUYÊN: Lệnh khởi chạy chính thức trỏ thẳng vào app.main:app của ní
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8080}"]

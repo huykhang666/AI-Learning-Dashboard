@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # ── 1. DATABASE ─────────────────────────────────
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: ai-learning-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: your_secure_password
+      POSTGRES_DB: ai_learning_dashboard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - ai-learning-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d ai_learning_dashboard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── 2. CACHE ───────────────────────────────
+  redis-cache:
+    image: redis:7-alpine
+    container_name: ai-learning-redis
+    restart: always
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai-learning-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── 3. BACKEND (Spring Boot) ────────────────────────────
+  ai-learning-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-learning-backend
+    restart: always
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ai_learning_dashboard
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=your_secure_password
+      - SPRING_DATA_REDIS_HOST=redis-cache
+      - SPRING_DATA_REDIS_PORT=6379
+    expose:
+      - "8080"
+    networks:
+      - ai-learning-network
+
+  # ── 4. AI SERVICE (FastAPI) ───────────────────────────
+  ai-learning-ai:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: ai-learning-ai
+    restart: always
+    environment:
+      - PORT=8080
+    expose:
+      - "8080"
+    volumes:
+      - ai_model_cache:/root/.cache
+    networks:
+      - ai-learning-network
+
+  # ── 5. PROMETHEUS ───────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: ai-learning-prometheus
+    restart: always
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    expose:
+      - "9090"
+    networks:
+      - ai-learning-network
+
+  # ── 6. GRAFANA ─────────────────────────────
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: ai-learning-grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - ai-learning-network
+
+  # ── 7. FRONTEND (Nginx) ─────────────────────
+  ai-learning-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: ai-learning-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - ai-learning-backend
+      - ai-learning-ai
+    networks:
+      - ai-learning-network
+
+networks:
+  ai-learning-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  ai_model_cache:
+  prometheus_data:
+  grafana_data:
