@@ -1,10 +1,10 @@
 import axios from "axios";
 
 /* ========================
-   1. AXIOS CLIENT JAVA 
+   1. AXIOS CLIENT JAVA (ĐÃ SỬA THÀNH BIẾN ĐỘNG)
 ======================== */
-const aiClient = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ai`, 
+const axiosClient = axios.create({
+  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1`,
 });
 
 // Interceptor gắn token (Giữ nguyên)
@@ -24,7 +24,7 @@ axiosClient.interceptors.request.use((config) => {
    2. AXIOS CLIENT PYTHON (AI) 
 ======================== */
 const aiClient = axios.create({
-  baseURL: "http://localhost:8000/ai",
+  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ai`,
 });
 
 /* ========================
