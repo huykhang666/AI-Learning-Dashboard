@@ -1,10 +1,10 @@
 import axios from "axios";
 
 /* ========================
-   1. AXIOS CLIENT JAVA (ĐÃ SỬA THÀNH BIẾN ĐỘNG)
+   1. AXIOS CLIENT JAVA 
 ======================== */
-const axiosClient = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1`,
+const aiClient = axios.create({
+  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ai`, 
 });
 
 // Interceptor gắn token (Giữ nguyên)
