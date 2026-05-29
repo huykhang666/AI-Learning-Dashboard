@@ -31,6 +31,7 @@ services:
       - "6379"
     volumes:
       - redis_data:/data
+    command: [ "redis-server", "--appendonly", "yes" ]
     networks:
       - ai-learning-network
     healthcheck:
@@ -58,10 +59,17 @@ services:
       - SPRING_DATASOURCE_PASSWORD=your_secure_password
       - SPRING_DATA_REDIS_HOST=redis-cache
       - SPRING_DATA_REDIS_PORT=6379
+      - AI_SERVICE_URL=http://ai-learning-ai:8080
+      - APP_DIR_UPLOADS=/app/uploads
+    env_file:
+      - .env
     expose:
       - "8080"
     networks:
       - ai-learning-network
+    volumes:
+      - ./backend-logs:/app/logs
+      - ./uploads:/app/uploads
 
   # ── 4. AI SERVICE (FastAPI) ───────────────────────────
   ai-learning-ai:
@@ -76,6 +84,8 @@ services:
       - "8080"
     volumes:
       - ai_model_cache:/root/.cache
+      - ./ai-service/storage:/app/storage
+      - ./uploads:/app/uploads
     networks:
       - ai-learning-network
 
@@ -89,6 +99,8 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     expose:
       - "9090"
+    depends_on:
+      - ai-learning-backend
     networks:
       - ai-learning-network
 
@@ -99,8 +111,12 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
     networks:
       - ai-learning-network
 
