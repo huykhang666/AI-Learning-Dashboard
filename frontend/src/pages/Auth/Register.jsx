@@ -313,7 +313,7 @@ export default function PageRegister({ onGoLogin }) {
       const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
       window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
     }, 1500);
-};
+  };
 
   const handleRegister = async () => {
     const e = {};
@@ -350,9 +350,14 @@ export default function PageRegister({ onGoLogin }) {
         setErrors({ apiError: data.message || "Tài khoản đã tồn tại" });
       }
     } catch (error) {
-      setErrors({
-        apiError: error.response?.data?.message || "Không thể kết nối server",
-      });
+      const msg = error.message || "";
+      if (msg.includes("email already exists") || msg.includes("already exists")) {
+        setErrors({ apiError: "Email này đã được đăng ký. Vui lòng dùng email khác hoặc đăng nhập!" });
+      } else if (msg.includes("username")) {
+        setErrors({ apiError: "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác!" });
+      } else {
+        setErrors({ apiError: "Không thể kết nối server. Vui lòng thử lại!" });
+      }
     } finally {
       setLoading(false);
     }
