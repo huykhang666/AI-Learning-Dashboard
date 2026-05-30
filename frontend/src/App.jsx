@@ -214,7 +214,7 @@ function AppRoutes() {
       <Route path="/payment/success" element={<PaymentSuccessPage />} />
       <Route path="/payment/failed" element={<PaymentFailedPage />} />
 
-      <Route path="/login/oauth2/code/google" element={<OAuth2RedirectHandler />} />
+      <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
 
       <Route
         path="/admin"
