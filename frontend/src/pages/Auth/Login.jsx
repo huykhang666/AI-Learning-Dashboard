@@ -130,6 +130,7 @@ const Field = ({
 
 export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   const { t } = useTranslation();
+  const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -149,13 +150,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
 
   const [gLoading, setGLoading] = useState(false);
 
-  // 1. Tạo biến lấy link từ Vercel, nếu chạy dưới máy (local) thì tự fallback về 8080
-  const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
-
   const handleGoogleLogin = () => {
     setGLoading(true);
     setTimeout(() => {
-      // ĐÃ SỬA: Thay thế link cứng bằng biến động để lên mây bốc đúng link Railway
       window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
     }, 1500);
   };

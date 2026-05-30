@@ -313,7 +313,7 @@ export default function PageRegister({ onGoLogin }) {
       const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
       window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
     }, 1500);
-  };
+};
 
   const handleRegister = async () => {
     const e = {};
