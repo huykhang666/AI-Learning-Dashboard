@@ -2,20 +2,12 @@ import os
 import json
 import re
 import httpx
+import subprocess
 from groq import Groq
 from fastapi import APIRouter, UploadFile, File, Query
 from app.core.config import settings
 from app.services.rag_service import RAGService
-from app.services.video_service import VideoService  
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
-
-import re
-import httpx
-import os
-import subprocess
-from groq import Groq
-from app.core.config import settings
-from youtube_transcript_api import YouTubeTranscriptApi
 
 class VideoService:
     def __init__(self):
@@ -72,7 +64,7 @@ class VideoService:
 
     def transcribe_video(self, file_path: str):
         try:
-            print(f"--- [INFO] Đang gửi file {file_path} lên Groq API để transribe... ---")
+            print(f"--- [INFO] Đang gửi file {file_path} lên Groq API để transcribe... ---")
             with open(file_path, "rb") as file:
                 response = self.groq_client.audio.transcriptions.create(
                     file=file,
@@ -85,11 +77,53 @@ class VideoService:
             print(f"Lỗi khi gọi Groq Whisper API: {str(e)}")
             return ""
 
+    def transcribe_video_verbose(self, file_path: str):
+        """
+        Gọi Groq Whisper với định dạng verbose_json để băm nhỏ video thành từng câu kèm giây chuẩn đét
+        """
+        try:
+            print(f"--- [INFO] Đang gửi file {file_path} lên Groq API (Verbose JSON)... ---")
+            with open(file_path, "rb") as file:
+                response = self.groq_client.audio.transcriptions.create(
+                    file=file,
+                    model="whisper-large-v3",
+                    language="vi",
+                    response_format="verbose_json"
+                )
+            
+            segments_data = []
+            full_text_parts = []
+            
+            if hasattr(response, "segments") and response.segments:
+                for seg in response.segments:
+                    text_val = seg.get("text", "").strip()
+                    if not text_val:
+                        continue
+                        
+                    start_time = int(seg.get("start", 0))
+                    m, s = divmod(start_time, 60)
+                    timestamp_str = f"[{m:02d}:{s:02d}]"
+                    
+                    full_text_parts.append(f"{timestamp_str} {text_val}")
+                    segments_data.append({
+                        "time": start_time,
+                        "content": text_val
+                    })
+            else:
+                text_val = getattr(response, "text", "").strip()
+                full_text_parts.append(text_val)
+                segments_data.append({"time": 0, "content": text_val})
+                
+            return "\n".join(full_text_parts), segments_data
+            
+        except Exception as e:
+            print(f"Lỗi khi gọi Groq Verbose Whisper API: {str(e)}")
+            return "", []
+
 router = APIRouter(prefix="/ai", tags=["Video"])
 
-# Singleton clients - ĐÃ XOÁ BỎ MODEL WHISPER LOCAL NẶNG NỀ
 groq_client   = Groq(api_key=settings.GROQ_API_KEY)
-video_service = VideoService()  # Khởi tạo đối tượng xử lý video thông qua Groq API
+video_service = VideoService()
 rag_service   = RAGService()
 _yta          = YouTubeTranscriptApi()
 
@@ -101,24 +135,13 @@ FILLER_WORDS = {
     "à ừ", "ờ ừ"
 }
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def _extract_video_id(url: str) -> str | None:
     match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
     return match.group(1) if match else None
 
-
 def _format_timestamp(seconds: int) -> str:
     m, s = divmod(seconds, 60)
     return f"[{m:02d}:{s:02d}]"
-
-
-# ---------------------------------------------------------------------------
-# Lấy transcript từ YouTube API (video có phụ đề)
-# ---------------------------------------------------------------------------
 
 def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
     video_id = _extract_video_id(url)
@@ -165,11 +188,6 @@ def get_youtube_transcript(url: str) -> tuple[str | None, list | None]:
         print(f"[ERROR] Lấy transcript thất bại [{video_id}]: {e}")
         return None, None
 
-
-# ---------------------------------------------------------------------------
-# Progress reporting
-# ---------------------------------------------------------------------------
-
 async def _report_progress(job_id: int | None, percent: int) -> None:
     if not job_id:
         return
@@ -183,11 +201,6 @@ async def _report_progress(job_id: int | None, percent: int) -> None:
         print(f"[WARN] Timeout progress API (job_id={job_id}, {percent}%)")
     except Exception as e:
         print(f"[WARN] Không thể cập nhật tiến trình (job_id={job_id}): {e}")
-
-
-# ---------------------------------------------------------------------------
-# AI analysis
-# ---------------------------------------------------------------------------
 
 def _analyse_transcript(transcript: str) -> dict:
     response = groq_client.chat.completions.create(
@@ -227,11 +240,6 @@ def _analyse_transcript(transcript: str) -> dict:
         print(f"[WARN] Không thể parse JSON từ Groq: {e}")
         return {"summary": "", "key_points": [], "keywords": []}
 
-
-# ---------------------------------------------------------------------------
-# Route handler
-# ---------------------------------------------------------------------------
-
 @router.post("/process-video")
 async def process_video(
     file: UploadFile = File(None),
@@ -249,12 +257,10 @@ async def process_video(
     try:
         await _report_progress(job_id, 5)
 
-        # CỨU NGUY: Nếu Java truyền nhầm đường dẫn file cục bộ vào tham số youtube_url
         is_local_file_path = youtube_url and ("uploads" in youtube_url or youtube_url.endswith(".mp4") or youtube_url.startswith("/"))
 
         # --- Bước 1: Lấy transcript ---
         if youtube_url and not is_local_file_path:
-            # ĐÚNG LUỒNG: Xử lý link YouTube thật sự
             transcript, timeline_data = get_youtube_transcript(youtube_url)
 
             if not transcript:
@@ -275,18 +281,14 @@ async def process_video(
             await _report_progress(job_id, 40)
 
         elif (file and file.filename) or is_local_file_path:
-            # ĐÚNG LUỒNG: Xử lý file upload cục bộ
             if is_local_file_path:
-                # ÉP ĐƯỜNG DẪN WINDOWS: Loại bỏ tất cả dấu gạch chéo ở đầu chuỗi
                 clean_path = youtube_url.lstrip("/")
                 
-                # Lấy đường dẫn thư mục cha (Thư mục chứa cả ai-service và backend Java của đồ án)
-                # Đoạn này giúp Python lùi lại 1 cấp thư mục để tìm sang mục 'uploads' của Java
                 current_dir = os.getcwd()
                 project_root = os.path.dirname(current_dir)
                 possible_path_1 = os.path.join(current_dir, clean_path)
                 possible_path_2 = os.path.join(project_root, clean_path)
-                possible_path_3 = os.path.join(project_root, "backend", clean_path) # Thử nếu ní đặt tên thư mục java là backend
+                possible_path_3 = os.path.join(project_root, "backend", clean_path) 
 
                 if os.path.exists(possible_path_1):
                     temp_file = possible_path_1
@@ -295,7 +297,6 @@ async def process_video(
                 elif os.path.exists(possible_path_3):
                     temp_file = possible_path_3
                 else:
-                    # Fallback cuối cùng: Ép đường dẫn tuyệt đối tương đối
                     temp_file = os.path.abspath(clean_path)
             else:
                 safe_name = re.sub(r"[^\w.\-]", "_", file.filename)
@@ -305,16 +306,14 @@ async def process_video(
 
             await _report_progress(job_id, 30)
             
-            # Gọi trực tiếp sang Groq API để bóc băng file video cục bộ
-            transcript = video_service.transcribe_video(temp_file)
-            timeline_data = [{"time": 0, "content": transcript}]
+            # 🔥 ĐỔI TẠI ĐÂY: Gọi hàm verbose_json để băm nhỏ timeline theo giây
+            transcript, timeline_data = video_service.transcribe_video_verbose(temp_file)
             
             await _report_progress(job_id, 40)
 
         else:
             return {"error": "Cần cung cấp youtube_url hoặc file upload."}
 
-        # 🚀 CHÈN ĐOẠN NÀY VÀO ĐỂ CỨU NGUY CHROMADB KHÔNG BỊ NỔ TUNG:
         if not transcript or transcript.strip() == "":
             await _report_progress(job_id, -1)
             return {
@@ -338,6 +337,5 @@ async def process_video(
         }
 
     finally:
-        # Chỉ xóa file tạm nếu nó là file do FastAPI sinh ra (bắt đầu bằng temp_), tránh xóa nhầm file upload gốc của Java
         if temp_file and os.path.exists(temp_file) and os.path.basename(temp_file).startswith("temp_"):
             os.remove(temp_file)
