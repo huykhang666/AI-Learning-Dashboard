@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.File;
+
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +57,10 @@ public class AIIntegrationServiceImpl implements AIIntegrationService {
             MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
 
             if (filePath != null && !filePath.isEmpty() && !filePath.startsWith("http")) {
-                bodyBuilder.part("file", new org.springframework.core.io.FileSystemResource(new java.io.File(filePath)));
+                String actualPath = filePath.startsWith("/uploads/")
+                        ? filePath.substring(1)
+                        : filePath;
+                bodyBuilder.part("file", new org.springframework.core.io.FileSystemResource(new File(actualPath)));
             }
 
             AiAnalysisResponse response = aiWebClient.post()

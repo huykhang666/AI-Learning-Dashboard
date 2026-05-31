@@ -77,22 +77,21 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         userService.canUpload(currentUser.getUserId());
 
-        //Create temp entity
         FileMetadata entity = FileMetadata.builder()
                 .storageProvider(request.getStorageProvider())
                 .user(currentUser)
                 .build();
 
+        String videoUrl;
 
-
-        //Logic Hybrid
-        if(request.getStorageProvider() == StorageProvider.YOUTUBE) {
-            entity.setFileUrl(request.getVideoUrl());
+        if (request.getStorageProvider() == StorageProvider.YOUTUBE) {
+            videoUrl = request.getVideoUrl();
+            entity.setFileUrl(videoUrl);
             entity.setFileType("video/youtube");
             entity.setSize(0L);
             entity.setFileName("YouTube Video");
         } else {
-            if(multipartFile== null || multipartFile.isEmpty()) {
+            if (multipartFile == null || multipartFile.isEmpty()) {
                 throw new AppException(ErrorCode.UPLOAD_FAILED);
             }
 
@@ -102,7 +101,8 @@ public class FileStorageServiceImpl implements FileStorageService {
                 Files.createDirectories(targetPath.getParent());
                 Files.copy(multipartFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-                entity.setFileUrl((targetPath.toString()));
+                videoUrl = "/uploads/" + fileName;
+                entity.setFileUrl(videoUrl);
                 entity.setFileType(multipartFile.getContentType());
                 entity.setSize(multipartFile.getSize());
                 entity.setFileName(multipartFile.getOriginalFilename());
@@ -118,12 +118,11 @@ public class FileStorageServiceImpl implements FileStorageService {
                 .fileMetadata(saved)
                 .title(request.getTitle() != null ? request.getTitle() : saved.getFileName())
                 .description(request.getDescription() != null ? request.getDescription() : "Mô tả bài học")
-                .videoUrl(request.getVideoUrl())
+                .videoUrl(videoUrl)
                 .status(SessionStatus.PROCESSING)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // Dùng saveAndFlush ở đây
         LearningSession savedSession = sessionRepository.saveAndFlush(session);
 
         saved.setLearningSession(savedSession);
@@ -137,7 +136,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         ProcessJob savedJob = processJobRepository.saveAndFlush(job);
 
-
         savedSession.setProcessJob(savedJob);
         sessionRepository.saveAndFlush(savedSession);
 
@@ -148,7 +146,6 @@ public class FileStorageServiceImpl implements FileStorageService {
         return fileMetadataMapper.toResponse(saved);
     }
 
-    //Retrieve all video metadata for the current user
     @Override
     public List<FileMetadataResponse> getMyVideos() {
         String identity = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -162,7 +159,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         }
 
-        return  fileMetadataRepository.findByUser_UserId(userId).stream()
+        return fileMetadataRepository.findByUser_UserId(userId).stream()
                 .map(fileMetadataMapper::toResponse)
                 .toList();
     }

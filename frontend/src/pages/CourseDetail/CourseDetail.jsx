@@ -50,10 +50,10 @@ const CourseDetail = () => {
     }
 
     try {
-      const token = localStorage.getItem('accessToken'); 
+      const token = localStorage.getItem('accessToken');
       if (!token) {
         alert("Không tìm thấy Token! Bạn đã đăng nhập chưa?");
-        return; 
+        return;
       }
       const summaryText = Array.isArray(courseData.summary)
         ? courseData.summary.join(".\n\n") // Nếu là mảng thì nối các câu lại, xuống dòng
@@ -61,12 +61,12 @@ const CourseDetail = () => {
       const response = await fetch(`http://localhost:8080/api/summaries/${id}/export-pdf`, {
         method: 'POST', // ĐỔI THÀNH POST
         headers: {
-           'Authorization': `Bearer ${token}`,
-           'Content-Type': 'application/json' // Báo cho Backend biết đây là gói dữ liệu JSON
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' // Báo cho Backend biết đây là gói dữ liệu JSON
         },
         body: JSON.stringify({
-           title: courseData.title || "Tóm tắt bài học",
-           summary: summaryText
+          title: courseData.title || "Tóm tắt bài học",
+          summary: summaryText
         })
       });
 
@@ -78,7 +78,7 @@ const CourseDetail = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `tom-tat-${id}.pdf`; 
+      a.download = `tom-tat-${id}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -161,7 +161,6 @@ const CourseDetail = () => {
           onReady: async (event) => {
             isReadyRef.current = true;
 
-            // Lưu duration ngay khi player sẵn sàng
             const duration = Math.floor(event.target.getDuration());
             if (duration > 0) {
               await courseDetailApi.saveDuration(id, { duration });
@@ -210,7 +209,7 @@ const CourseDetail = () => {
   }, []);
 
   if (loading) return <LoadingScreen />;
-  
+
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
       {/* HEADER */}
@@ -241,6 +240,12 @@ const CourseDetail = () => {
           <div className="w-full h-[600px] bg-[#0B0A1A] rounded-2xl relative shadow-lg overflow-hidden mb-6">
             {courseData?.videoId ? (
               <div ref={playerRef} className="w-full h-full" />
+            ) : courseData?.videoUrl ? (
+              <video
+                src={courseData.videoUrl.startsWith('http') ? courseData.videoUrl : `http://localhost:8080${courseData.videoUrl}`}
+                controls
+                className="w-full h-full"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-500">
                 {t("course_detail.loading_video")}
@@ -275,11 +280,10 @@ const CourseDetail = () => {
               <button
                 key={tab}
                 onClick={() => setMidTab(tab)}
-                className={`pb-4 text-sm transition-all uppercase tracking-tighter ${
-                  midTab === tab
-                    ? "text-blue-600 font-black border-b-4 border-blue-600"
-                    : "text-slate-300 font-bold hover:text-slate-500"
-                }`}
+                className={`pb-4 text-sm transition-all uppercase tracking-tighter ${midTab === tab
+                  ? "text-blue-600 font-black border-b-4 border-blue-600"
+                  : "text-slate-300 font-bold hover:text-slate-500"
+                  }`}
               >
                 {tab === "TRANSCRIPT"
                   ? t("course_detail.transcript")

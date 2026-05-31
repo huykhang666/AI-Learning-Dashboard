@@ -24,7 +24,9 @@ axiosClient.interceptors.request.use((config) => {
    2. AXIOS CLIENT PYTHON (AI) 
 ======================== */
 const aiClient = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ai`,
+  baseURL: import.meta.env.VITE_API_URL 
+    ? `${import.meta.env.VITE_API_URL}/ai`
+    : "http://localhost:8000/ai",
 });
 
 /* ========================

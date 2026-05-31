@@ -6,8 +6,84 @@ from groq import Groq
 from fastapi import APIRouter, UploadFile, File, Query
 from app.core.config import settings
 from app.services.rag_service import RAGService
-from app.services.video_service import VideoService  # Thêm import service chuẩn vào đây
+from app.services.video_service import VideoService  
 from youtube_transcript_api import YouTubeTranscriptApi, NoTranscriptFound, TranscriptsDisabled
+
+import re
+import httpx
+import os
+import subprocess
+from groq import Groq
+from app.core.config import settings
+from youtube_transcript_api import YouTubeTranscriptApi
+
+class VideoService:
+    def __init__(self):
+        print("--- [INFO] Khởi tạo Groq Client cho dịch vụ Speech-to-Text ---")
+        self.groq_client = Groq(api_key=settings.GROQ_API_KEY)
+
+    def get_video_id(self, url):
+        video_id = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
+        return video_id.group(1) if video_id else None
+
+    def download_audio(self, url: str) -> str:
+        """Download audio từ YouTube bằng yt-dlp"""
+        output_path = "/tmp/audio_%(id)s.mp3"
+        cookies_path = "/app/cookies.txt"
+        
+        cmd = [
+            "yt-dlp",
+            "-x", "--audio-format", "mp3",
+            "--audio-quality", "0",
+            "-o", output_path,
+        ]
+        
+        if os.path.exists(cookies_path):
+            cmd += ["--cookies", cookies_path]
+        
+        cmd.append(url)
+        
+        try:
+            subprocess.run(cmd, check=True, capture_output=True)
+            video_id = self.get_video_id(url)
+            return f"/tmp/audio_{video_id}.mp3"
+        except Exception as e:
+            print(f"Lỗi download audio: {e}")
+            return None
+
+    def get_youtube_transcript(self, url):
+        try:
+            video_id = self.get_video_id(url)
+            if not video_id: return None
+            transcript_list = YouTubeTranscriptApi().fetch(video_id, languages=['vi', 'en'])
+            return " ".join([t.text for t in transcript_list])
+        except Exception as e:
+            print(f"Không lấy được phụ đề YouTube: {str(e)}")
+            return None
+
+    async def report_progress(self, job_id: int, percent: int):
+        if job_id:
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client_http:
+                    url = f"{settings.JAVA_URL}/update-progress/{job_id}"
+                    await client_http.patch(url, params={"value": percent})
+            except Exception as e:
+                print(f"Lỗi kết nối Java: {str(e)}")
+
+    def transcribe_video(self, file_path: str):
+        try:
+            print(f"--- [INFO] Đang gửi file {file_path} lên Groq API để transribe... ---")
+            with open(file_path, "rb") as file:
+                response = self.groq_client.audio.transcriptions.create(
+                    file=file,
+                    model="whisper-large-v3",
+                    language="vi",
+                    response_format="text"
+                )
+            return response.strip()
+        except Exception as e:
+            print(f"Lỗi khi gọi Groq Whisper API: {str(e)}")
+            return ""
 
 router = APIRouter(prefix="/ai", tags=["Video"])
 
@@ -163,7 +239,8 @@ async def process_video(
     job_id: int = Query(None),
 ):
     """
-    Pipeline siêu nhẹ, siêu nhanh nhờ đẩy hoàn toàn việc tính toán lên Groq Cloud API.
+    Pipeline xử lý thông minh: Tự động phân biệt Link YouTube thật và File cục bộ truyền sai param,
+    hỗ trợ tự động chuyển đổi đường dẫn mượt mà trên cả Windows local lẫn Linux Production.
     """
     temp_file: str | None = None
     transcript:    str  = ""
@@ -172,18 +249,23 @@ async def process_video(
     try:
         await _report_progress(job_id, 5)
 
+        # CỨU NGUY: Nếu Java truyền nhầm đường dẫn file cục bộ vào tham số youtube_url
+        is_local_file_path = youtube_url and ("uploads" in youtube_url or youtube_url.endswith(".mp4") or youtube_url.startswith("/"))
+
         # --- Bước 1: Lấy transcript ---
-        if youtube_url:
+        if youtube_url and not is_local_file_path:
+            # ĐÚNG LUỒNG: Xử lý link YouTube thật sự
             transcript, timeline_data = get_youtube_transcript(youtube_url)
 
             if not transcript:
-                # Không có phụ đề → Fallback nhờ VideoService tải và bắn lên Groq Whisper API
                 await _report_progress(job_id, 15)
                 
-                # Gọi sang hàm xử lý bằng Groq API siêu nhẹ của video_service
-                transcript = video_service.transcribe_video(youtube_url) # Hoặc xử lý tải tuỳ logic local của bạn
+                audio_path = video_service.download_audio(youtube_url)
+                if audio_path:
+                    transcript = video_service.transcribe_video(audio_path)
+                else:
+                    transcript = ""
                 
-                # Giả lập timeline data rỗng nếu bóc từ API thô không theo mốc thời gian chi tiết
                 timeline_data = [{"time": 0, "content": transcript}]
                 
                 if not transcript:
@@ -192,16 +274,38 @@ async def process_video(
 
             await _report_progress(job_id, 40)
 
-        elif file and file.filename:
-            safe_name = re.sub(r"[^\w.\-]", "_", file.filename)
-            temp_file = f"temp_{safe_name}"
+        elif (file and file.filename) or is_local_file_path:
+            # ĐÚNG LUỒNG: Xử lý file upload cục bộ
+            if is_local_file_path:
+                # ÉP ĐƯỜNG DẪN WINDOWS: Loại bỏ tất cả dấu gạch chéo ở đầu chuỗi
+                clean_path = youtube_url.lstrip("/")
+                
+                # Lấy đường dẫn thư mục cha (Thư mục chứa cả ai-service và backend Java của đồ án)
+                # Đoạn này giúp Python lùi lại 1 cấp thư mục để tìm sang mục 'uploads' của Java
+                current_dir = os.getcwd()
+                project_root = os.path.dirname(current_dir)
+                possible_path_1 = os.path.join(current_dir, clean_path)
+                possible_path_2 = os.path.join(project_root, clean_path)
+                possible_path_3 = os.path.join(project_root, "backend", clean_path) # Thử nếu ní đặt tên thư mục java là backend
 
-            with open(temp_file, "wb") as buf:
-                buf.write(await file.read())
+                if os.path.exists(possible_path_1):
+                    temp_file = possible_path_1
+                elif os.path.exists(possible_path_2):
+                    temp_file = possible_path_2
+                elif os.path.exists(possible_path_3):
+                    temp_file = possible_path_3
+                else:
+                    # Fallback cuối cùng: Ép đường dẫn tuyệt đối tương đối
+                    temp_file = os.path.abspath(clean_path)
+            else:
+                safe_name = re.sub(r"[^\w.\-]", "_", file.filename)
+                temp_file = f"temp_{safe_name}"
+                with open(temp_file, "wb") as buf:
+                    buf.write(await file.read())
 
             await _report_progress(job_id, 30)
             
-            # Gọi trực tiếp qua video_service để bóc băng file upload bằng Groq API
+            # Gọi trực tiếp sang Groq API để bóc băng file video cục bộ
             transcript = video_service.transcribe_video(temp_file)
             timeline_data = [{"time": 0, "content": transcript}]
             
@@ -209,6 +313,14 @@ async def process_video(
 
         else:
             return {"error": "Cần cung cấp youtube_url hoặc file upload."}
+
+        # 🚀 CHÈN ĐOẠN NÀY VÀO ĐỂ CỨU NGUY CHROMADB KHÔNG BỊ NỔ TUNG:
+        if not transcript or transcript.strip() == "":
+            await _report_progress(job_id, -1)
+            return {
+                "status": "error", 
+                "message": f"Không tìm thấy file tại đường dẫn '{temp_file}' hoặc bóc băng thất bại, transcript rỗng không thể nạp vào RAG."
+            }
 
         # --- Bước 2: Groq phân tích ---
         await _report_progress(job_id, 70)
@@ -226,5 +338,6 @@ async def process_video(
         }
 
     finally:
-        if temp_file and os.path.exists(temp_file):
+        # Chỉ xóa file tạm nếu nó là file do FastAPI sinh ra (bắt đầu bằng temp_), tránh xóa nhầm file upload gốc của Java
+        if temp_file and os.path.exists(temp_file) and os.path.basename(temp_file).startswith("temp_"):
             os.remove(temp_file)
