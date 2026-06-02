@@ -306,7 +306,6 @@ async def process_video(
 
             await _report_progress(job_id, 30)
             
-            # 🔥 ĐỔI TẠI ĐÂY: Gọi hàm verbose_json để băm nhỏ timeline theo giây
             transcript, timeline_data = video_service.transcribe_video_verbose(temp_file)
             
             await _report_progress(job_id, 40)
