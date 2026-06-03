@@ -14,7 +14,7 @@ import {
     Unlock,
     ShieldCheck
 } from 'lucide-react';
-import courseApi from '../../api/CourseApi';
+import { courseApi } from '../../api/CourseApi'
 import styles from './CourseLanding.module.css';
 
 export default function CourseLanding() {

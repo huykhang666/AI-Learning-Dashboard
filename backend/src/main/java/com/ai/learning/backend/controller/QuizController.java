@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/courses/{courseId}/quizzes")
+@RequestMapping("/api/v1/courses/{courseId}/quizzes")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class QuizController {

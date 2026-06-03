@@ -1,6 +1,5 @@
 package com.ai.learning.backend.dto.response;
 import lombok.*;
-
 import java.util.List;
 
 @Data
@@ -8,7 +7,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuizResponse {
-    private Long quizId;
+    private Long id;
     private String question;
     private String explanation;
     private List<OptionDto> options;
@@ -18,7 +17,7 @@ public class QuizResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OptionDto {
-        private Long quizOptionId;
+        private Long id;
         private String content;
     }
 }

@@ -8,9 +8,11 @@ import com.ai.learning.backend.repository.QuizRepository;
 import com.ai.learning.backend.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
+
+    @Qualifier("aiWebClient")
     private final WebClient aiWebClient;
 
     @Override
@@ -44,21 +48,23 @@ public class QuizServiceImpl implements QuizService {
         try {
             Map<String, String> requestBody = Map.of("transcript", transcriptText);
 
-            Map[] aiResponse = aiWebClient.post()
-                    .uri("/api/v1/ai/generate-quiz")
+            // 1. SỬA ĐƯỜNG DẪN: Đổi từ "/api/v1/ai/generate-quiz" thành "/ai/generate-quiz" cho khớp Python
+            // 2. SỬA ÉP KIỂU: Dùng ParameterizedTypeReference để hứng List<Map> an toàn tuyệt đối, tránh lỗi Jackson
+            List<Map<String, Object>> aiResponse = aiWebClient.post()
+                    .uri("/ai/generate-quiz")
                     .bodyValue(requestBody)
                     .retrieve()
-                    .bodyToMono(Map[].class)
+                    .bodyToMono(new ParameterizedTypeReference<List<Map<String, Object>>>() {})
                     .block();
 
-            if (aiResponse == null || aiResponse.length == 0) {
+            if (aiResponse == null || aiResponse.isEmpty()) {
                 log.warn("[QuizService] AI Service trả về danh sách câu hỏi rỗng.");
                 return Collections.emptyList();
             }
 
             List<Quiz> savedQuizzes = new ArrayList<>();
 
-            for (Map quizMap : aiResponse) {
+            for (Map<String, Object> quizMap : aiResponse) {
                 Quiz quiz = Quiz.builder()
                         .courseId(courseId)
                         .question((String) quizMap.get("question"))
@@ -66,7 +72,7 @@ public class QuizServiceImpl implements QuizService {
                         .build();
 
                 List<String> optionsStr = (List<String>) quizMap.get("options");
-                int correctIdx = (int) quizMap.get("correct_index");
+                int correctIdx = (Integer) quizMap.get("correct_index");
 
                 List<QuizOption> options = new ArrayList<>();
                 for (int i = 0; i < optionsStr.size(); i++) {
@@ -124,12 +130,12 @@ public class QuizServiceImpl implements QuizService {
 
     private QuizResponse mapToResponse(Quiz quiz) {
         return QuizResponse.builder()
-                .quizId(quiz.getId())
+                .id(quiz.getId())
                 .question(quiz.getQuestion())
                 .explanation(quiz.getExplanation())
                 .options(quiz.getOptions().stream()
                         .map(o -> QuizResponse.OptionDto.builder()
-                                .quizOptionId(o.getId())
+                                .id(o.getId())
                                 .content(o.getContent())
                                 .build())
                         .collect(Collectors.toList()))

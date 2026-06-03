@@ -1,22 +1,18 @@
 import axios from "axios";
 
 /* ========================
-   1. AXIOS CLIENT JAVA (ĐÃ SỬA THÀNH BIẾN ĐỘNG)
+   1. AXIOS CLIENT JAVA
 ======================== */
 const axiosClient = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1`,
 });
 
-// Interceptor gắn token (Giữ nguyên)
+// Interceptor gắn token 
 axiosClient.interceptors.request.use((config) => {
-  const token =
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("token");
-
+  const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 
@@ -30,10 +26,10 @@ const aiClient = axios.create({
 });
 
 /* ========================
-   3. COURSE / MESSAGE API (JAVA) 
+   3. COURSE DETAIL / MESSAGE / QUIZ API (JAVA) 
 ======================== */
 export const courseDetailApi = {
-  // Lấy chi tiết bài học theosession ID
+  // Lấy chi tiết bài học theo session ID
   getById: async (id) => {
     try {
       const response = await axiosClient.get(`/history/${id}`);
@@ -72,7 +68,7 @@ export const courseDetailApi = {
     }
   },
 
-  // Cập nhật tiến độ xem video — gọi POST /progress/update
+  // Cập nhật tiến độ xem video
   updateProgress: async (sessionId, currentSecond) => {
     try {
       const response = await axiosClient.post("/progress/update", {
@@ -93,6 +89,32 @@ export const courseDetailApi = {
       console.warn('[CourseDetailApi] saveDuration failed:', error);
     }
   },
+
+  // --- 📝 API LẤY HOẶC TỰ ĐỘNG TẠO QUIZ QUA JAVA ENDPOINT ---
+  getOrGenerateQuiz: async (courseId, transcriptText) => {
+    try {
+      const response = await axiosClient.post(`/courses/${courseId}/quizzes/fetch`, {
+        transcript: transcriptText
+      });
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] getOrGenerateQuiz error:", error);
+      throw error;
+    }
+  },
+
+  // --- 📝 API NỘP BÀI CHẤM ĐIỂM TRỰC TUYẾN BẢO MẬT ---
+  submitQuizAnswers: async (courseId, answersMap) => {
+    try {
+      const response = await axiosClient.post(`/courses/${courseId}/quizzes/submit`, {
+        answers: answersMap
+      });
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] submitQuizAnswers error:", error);
+      throw error;
+    }
+  }
 };
 
 /* ========================

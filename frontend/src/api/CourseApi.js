@@ -1,25 +1,28 @@
-import axios from 'axios';
+import axios from "axios";
 
-const api = axios.create({
-    baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1`,
-    headers: { 'Content-Type': 'application/json' }
+const axiosClient = axios.create({
+  baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/v1`,
 });
 
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+axiosClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Đây mới là courseApi chuẩn có chứa hàm getCourseDetail cho CourseLanding.jsx gọi nè ní!
+export const courseApi = {
+  getCourseDetail: async (courseId, userId) => {
+    try {
+      const response = await axiosClient.get(`/courses/${courseId}`, {
+        params: { userId: userId }
+      });
+      return response; 
+    } catch (error) {
+      console.error("[CourseApi] getCourseDetail error:", error);
+      throw error;
     }
-    return config;
-});
-
-const courseApi = {
-    getAll: (userId) => api.get(`/courses?userId=${userId}`),
-
-    getCourseDetail: (courseId, userId) => api.get(`/courses/${courseId}?userId=${userId}`),
-    getTransactions: (userId) => api.get(`/transactions/user/${userId}`),
-
-    updateProgress: (data) => api.patch('/enrollments/progress', null, { params: data })
+  }
 };
-
-export default courseApi;

@@ -48,8 +48,8 @@ const CourseDetail = () => {
   // --- 📝 BỘ STATE QUẢN LÝ QUIZ TRẮC NGHIỆM TỰ ĐỘNG ---
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [quizLoading, setQuizLoading] = useState(false);
-  const [quizzes, setQuizzes] = useState([]); // Chứa danh sách mảng các câu hỏi
-  const [userAnswers, setUserAnswers] = useState({}); // Lưu đáp án người dùng tick chọn { câu_hỏi_id: đáp_án_id }
+  const [quizzes, setQuizzes] = useState([]); // Chứa danh sách mảng các câu hỏi từ DB
+  const [userAnswers, setUserAnswers] = useState({}); // Lưu đáp án chọn { quizId: optionId }
   const [quizResult, setQuizResult] = useState(null); // Lưu kết quả điểm số sau khi nộp bài
 
   const playerRef = useRef(null);
@@ -106,53 +106,60 @@ const CourseDetail = () => {
     }
   };
 
-  // --- 💡 CÁC HÀM XỬ LÝ LOGIC QUIZ MOCKUP (DỌN ĐƯỜNG CHO API) ---
-  const handleOpenQuiz = () => {
+  // --- 💡 CÁC HÀM XỬ LÝ LOGIC QUIZ GỌI API THẬT ---
+  const handleOpenQuiz = async () => {
     setIsQuizModalOpen(true);
     setUserAnswers({});
     setQuizResult(null);
     
-    setQuizzes([
-      {
-        question: "Trong bài giảng, giảng viên Lý Hồ Phương có bao nhiêu năm kinh nghiệm làm việc?",
-        options: ["10 năm", "15 năm", "Trên 18 năm", "20 năm"],
-        correct_index: 2,
-        explanation: "Dựa vào nội dung bản ghi chữ, giảng viên Lý Hồ Phương giới thiệu mình đã có trên 18 năm kinh nghiệm làm việc tại các công ty IT Việt Nam và nước ngoài."
-      },
-      {
-        question: "Dịch vụ nào của AWS được định nghĩa là Simple Storage Service trong bài học?",
-        options: ["EC2", "S3", "EBS", "VPC"],
-        correct_index: 1,
-        explanation: "Dịch vụ lưu trữ dữ liệu Simple Storage Service viết tắt chính là S3."
-      }
-    ]);
+    if (!courseData || !courseData.transcript) {
+      alert("Dữ liệu bản ghi chữ (transcript) chưa sẵn sàng để tạo Quiz!");
+      return;
+    }
+
+    try {
+      setQuizLoading(true);
+      // Gộp mảng các dòng transcript thành một chuỗi văn bản thuần để AI đọc hiểu
+      const transcriptText = Array.isArray(courseData.transcript)
+        ? courseData.transcript.map(item => item.text || item.content).join(" ")
+        : courseData.transcript;
+
+      const data = await courseDetailApi.getOrGenerateQuiz(id, transcriptText);
+      setQuizzes(data);
+    } catch (error) {
+      console.error("Lỗi tải bộ câu hỏi Quiz từ Backend:", error);
+      alert("Không thể khởi tạo bộ câu hỏi trắc nghiệm lúc này!");
+    } finally {
+      setQuizLoading(false);
+    }
   };
 
-  const handleSelectOption = (questionIdx, optionIdx) => {
+  const handleSelectOption = (quizId, optionId) => {
     if (quizResult?.isSubmitted) return; 
     setUserAnswers(prev => ({
       ...prev,
-      [questionIdx]: optionIdx
+      [quizId]: optionId
     }));
   };
 
-  const handleSubmitQuiz = () => {
-    let correct = 0;
-    quizzes.forEach((quiz, idx) => {
-      if (userAnswers[idx] === quiz.correct_index) {
-        correct++;
-      }
-    });
-
-    const wrong = quizzes.length - correct;
-    const score = ((correct / quizzes.length) * 10).toFixed(1);
-
-    setQuizResult({
-      score,
-      correctCount: correct,
-      wrongCount: wrong,
-      isSubmitted: true
-    });
+  const handleSubmitQuiz = async () => {
+    try {
+      setQuizLoading(true);
+      const result = await courseDetailApi.submitQuizAnswers(id, userAnswers);
+      
+      setQuizResult({
+        score: result.score,
+        correctCount: result.correctCount,
+        wrongCount: result.wrongCount,
+        isSubmitted: true,
+        correctAnswers: result.correctAnswers // Nhận Map { quizId: correctOptionId } từ backend
+      });
+    } catch (error) {
+      console.error("Lỗi nộp bài chấm điểm:", error);
+      alert("Nộp bài thất bại, vui lòng kiểm tra lại kết nối!");
+    } finally {
+      setQuizLoading(false);
+    }
   };
 
   // Gửi tiến độ lên server, debounce 5s, chỉ khi đang PLAYING
@@ -487,9 +494,16 @@ const CourseDetail = () => {
               </button>
             </div>
 
-            {/* Modal Body (Nội dung câu hỏi) */}
+            {/* Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
               
+              {quizLoading && quizzes.length === 0 && (
+                <div className="h-full flex flex-col items-center justify-center space-y-3 py-12">
+                  <Zap size={40} className="text-amber-500 animate-bounce" fill="currentColor" />
+                  <p className="text-sm font-medium text-slate-500 animate-pulse">FlySpeech AI đang phân tích bài giảng và tạo bộ đề thi, vui lòng đợi giây lát...</p>
+                </div>
+              )}
+
               {/* Nếu đã nộp bài thành công -> Hiển thị Bảng điểm kết quả lên đầu */}
               {quizResult?.isSubmitted && (
                 <div className="p-6 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-center justify-around text-center animate-in fade-in duration-300">
@@ -514,10 +528,10 @@ const CourseDetail = () => {
                 </div>
               )}
 
-              {/* Danh sách kết xuất vòng lặp các câu hỏi */}
-              {quizzes.map((quiz, qIdx) => {
+              {/* Danh sách các câu hỏi từ API */}
+              {!quizLoading && quizzes.map((quiz, qIdx) => {
                 return (
-                  <div key={qIdx} className="border border-slate-100 rounded-2xl p-5 bg-slate-50/30 shadow-sm space-y-4">
+                  <div key={quiz.id || qIdx} className="border border-slate-100 rounded-2xl p-5 bg-slate-50/30 shadow-sm space-y-4">
                     <h4 className="font-bold text-base text-slate-900 flex items-start gap-2">
                       <span className="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded mt-0.5 shrink-0">Câu {qIdx + 1}</span>
                       {quiz.question}
@@ -525,15 +539,15 @@ const CourseDetail = () => {
 
                     {/* 4 Lựa chọn phương án A, B, C, D */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {quiz.options.map((option, oIdx) => {
-                        const isChosen = userAnswers[qIdx] === oIdx;
-                        const isCorrect = quiz.correct_index === oIdx;
+                      {quiz.options?.map((option, oIdx) => {
+                        const isChosen = userAnswers[quiz.id] === option.id;
+                        const isCorrect = quizResult?.correctAnswers?.[quiz.id] === option.id;
 
                         // Định dạng CSS trạng thái click thông minh
                         let optionStyle = "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300";
                         if (isChosen) optionStyle = "border-blue-500 bg-blue-50/60 text-blue-700 font-semibold";
                         
-                        // Nếu đã ấn nút Nộp Bài: Đổi màu hiển thị kết quả đúng sai rạch ròi
+                        // Đổi màu hiển thị kết quả đúng sai sau khi nộp bài
                         if (quizResult?.isSubmitted) {
                           if (isCorrect) {
                             optionStyle = "border-green-500 bg-green-50 text-green-700 font-bold";
@@ -546,14 +560,14 @@ const CourseDetail = () => {
 
                         return (
                           <button
-                            key={oIdx}
-                            disabled={quizResult?.isSubmitted}
-                            onClick={() => handleSelectOption(qIdx, oIdx)}
+                            key={option.id || oIdx}
+                            disabled={quizResult?.isSubmitted || quizLoading}
+                            onClick={() => handleSelectOption(quiz.id, option.id)}
                             className={`w-full text-left p-3.5 border rounded-xl text-sm transition-all flex items-center justify-between gap-2 group ${optionStyle}`}
                           >
                             <span className="flex items-center gap-2">
                               <CircleDot size={14} className={`shrink-0 ${isChosen ? 'text-blue-600' : 'text-slate-300 group-hover:text-slate-400'}`} />
-                              <span>{String.fromCharCode(65 + oIdx)}. {option}</span>
+                              <span>{String.fromCharCode(65 + oIdx)}. {option.content}</span>
                             </span>
                             {quizResult?.isSubmitted && isCorrect && <CheckCircle2 size={16} className="text-green-600 shrink-0" />}
                             {quizResult?.isSubmitted && isChosen && !isCorrect && <XCircle size={16} className="text-red-500 shrink-0" />}
@@ -562,7 +576,7 @@ const CourseDetail = () => {
                       })}
                     </div>
 
-                    {/* Nếu đã nộp bài thành công -> Show lời giải thích chuyên môn của AI */}
+                    {/* Show lời giải thích của AI */}
                     {quizResult?.isSubmitted && (
                       <div className="p-4 bg-amber-50/60 border border-amber-100 rounded-xl text-xs text-amber-800 leading-relaxed animate-in slide-in-from-top-2 flex items-start gap-2">
                         <HelpCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
@@ -576,22 +590,23 @@ const CourseDetail = () => {
               })}
             </div>
 
-            {/* Modal Footer (Các nút bấm nộp/đóng tác vụ) */}
+            {/* Modal Footer */}
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
               <button 
                 onClick={() => setIsQuizModalOpen(false)} 
+                disabled={quizLoading}
                 className="px-5 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-200 transition-colors"
               >
                 {quizResult?.isSubmitted ? "Đóng lại" : "Hủy bỏ"}
               </button>
               
-              {!quizResult?.isSubmitted && (
+              {!quizResult?.isSubmitted && quizzes.length > 0 && (
                 <button 
                   onClick={handleSubmitQuiz}
-                  disabled={Object.keys(userAnswers).length === 0}
+                  disabled={Object.keys(userAnswers).length === 0 || quizLoading}
                   className="px-6 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shadow-blue-100 hover:scale-[1.02] active:scale-95"
                 >
-                  Nộp bài chấm điểm
+                  {quizLoading ? "Đang xử lý..." : "Nộp bài chấm điểm"}
                 </button>
               )}
             </div>
