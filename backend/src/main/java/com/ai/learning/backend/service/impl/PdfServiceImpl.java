@@ -1,4 +1,5 @@
 package com.ai.learning.backend.service.impl;
+import com.ai.learning.backend.dto.QuizExportDto;
 import com.ai.learning.backend.payment.entity.Payment;
 import com.ai.learning.backend.service.PdfService;
 import com.lowagie.text.*;
@@ -254,6 +255,214 @@ public class PdfServiceImpl implements PdfService {
             document.close();
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    @Override
+    public ByteArrayInputStream exportQuizToPdf(
+            String videoTitle,
+            java.util.List<QuizExportDto> quizzes) {
+        Document document = new Document(PageSize.A4, 40, 40, 60, 40);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            byte[] regularBytes = new ClassPathResource("fonts/Roboto-Regular.ttf").getInputStream().readAllBytes();
+            byte[] boldBytes    = new ClassPathResource("fonts/Roboto-Bold.ttf").getInputStream().readAllBytes();
+
+            BaseFont bfRegular = BaseFont.createFont(
+                    "Roboto-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, regularBytes, null);
+            BaseFont bfBold = BaseFont.createFont(
+                    "Roboto-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, boldBytes, null);
+
+            // ── MÀU SẮC ──
+            Color indigo      = new Color(63, 81, 181);
+            Color indigoLight = new Color(232, 234, 252);
+            Color gold        = new Color(180, 130, 0);
+            Color goldLight   = new Color(255, 249, 220);
+            Color gray        = new Color(97, 97, 97);
+            Color darkGray    = new Color(33, 33, 33);
+            Color green       = new Color(27, 130, 80);
+            Color greenLight  = new Color(220, 255, 235);
+            Color rowAlt      = new Color(245, 246, 255);
+
+            // ── FONTS ──
+            Font fontWhite    = new Font(bfBold,    14, Font.NORMAL, Color.WHITE);
+            Font fontWhiteSm  = new Font(bfRegular, 10, Font.NORMAL, new Color(232, 234, 252));
+            Font fontTitle    = new Font(bfBold,    14, Font.NORMAL, indigo);
+            Font fontVideoTitle = new Font(bfBold,  11, Font.NORMAL, darkGray);
+            Font fontQ        = new Font(bfBold,    11, Font.NORMAL, darkGray);
+            Font fontOption   = new Font(bfRegular, 10, Font.NORMAL, darkGray);
+            Font fontCorrect  = new Font(bfBold,    10, Font.NORMAL, green);
+            Font fontExplain  = new Font(bfRegular,  9, Font.ITALIC, gray);
+            Font fontFooter   = new Font(bfRegular, 10, Font.NORMAL, Color.WHITE);
+            Font fontFooterSm = new Font(bfRegular,  9, Font.NORMAL, new Color(232, 234, 252));
+            Font fontIndex    = new Font(bfBold,    11, Font.NORMAL, Color.WHITE);
+
+            // ══════════════════════════════════════
+            // HEADER BANNER
+            // ══════════════════════════════════════
+            PdfPTable banner = new PdfPTable(1);
+            banner.setWidthPercentage(100);
+            banner.setSpacingAfter(0);
+
+            PdfPCell bannerCell = new PdfPCell();
+            bannerCell.setBackgroundColor(indigo);
+            bannerCell.setPadding(20);
+            bannerCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph brandLine = new Paragraph("AI LEARNING DASHBOARD", fontWhite);
+            brandLine.setAlignment(Element.ALIGN_CENTER);
+            bannerCell.addElement(brandLine);
+
+            Paragraph tagline = new Paragraph("Bộ câu hỏi trắc nghiệm tự động từ bài giảng", fontWhiteSm);
+            tagline.setAlignment(Element.ALIGN_CENTER);
+            bannerCell.addElement(tagline);
+            banner.addCell(bannerCell);
+            document.add(banner);
+
+            // ══════════════════════════════════════
+            // TIÊU ĐỀ VIDEO
+            // ══════════════════════════════════════
+            PdfPTable titleBar = new PdfPTable(1);
+            titleBar.setWidthPercentage(100);
+            titleBar.setSpacingAfter(16);
+
+            PdfPCell titleCell = new PdfPCell();
+            titleCell.setBackgroundColor(indigoLight);
+            titleCell.setPadding(10);
+            titleCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph quizTitle = new Paragraph("BÀI KIỂM TRA TRẮC NGHIỆM", fontTitle);
+            quizTitle.setAlignment(Element.ALIGN_CENTER);
+            titleCell.addElement(quizTitle);
+
+            Paragraph videoTitlePara = new Paragraph("Nguồn: " + videoTitle, fontVideoTitle);
+            videoTitlePara.setAlignment(Element.ALIGN_CENTER);
+            titleCell.addElement(videoTitlePara);
+
+            titleBar.addCell(titleCell);
+            document.add(titleBar);
+
+            // ══════════════════════════════════════
+            // DANH SÁCH CÂU HỎI
+            // ══════════════════════════════════════
+            String[] optionLabels = {"A", "B", "C", "D"};
+
+            for (int qi = 0; qi < quizzes.size(); qi++) {
+                QuizExportDto quiz = quizzes.get(qi);
+
+                // ── Khối câu hỏi ──
+                PdfPTable qTable = new PdfPTable(new float[]{1, 11});
+                qTable.setWidthPercentage(100);
+                qTable.setSpacingAfter(4);
+                qTable.setSpacingBefore(qi == 0 ? 0 : 10);
+
+                // Số thứ tự
+                PdfPCell indexCell = new PdfPCell();
+                indexCell.setBackgroundColor(indigo);
+                indexCell.setBorder(Rectangle.NO_BORDER);
+                indexCell.setPadding(8);
+                indexCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                Paragraph indexPara = new Paragraph(String.valueOf(qi + 1), fontIndex);
+                indexPara.setAlignment(Element.ALIGN_CENTER);
+                indexCell.addElement(indexPara);
+                qTable.addCell(indexCell);
+
+                // Nội dung câu hỏi
+                PdfPCell qCell = new PdfPCell();
+                qCell.setBackgroundColor(rowAlt);
+                qCell.setBorder(Rectangle.NO_BORDER);
+                qCell.setPadding(10);
+                qCell.addElement(new Paragraph(quiz.getQuestion(), fontQ));
+                qTable.addCell(qCell);
+                document.add(qTable);
+
+                // ── Các đáp án ──
+                for (int i = 0; i < quiz.getOptions().size(); i++) {
+                    boolean isCorrect = (i == quiz.getCorrectIndex());
+
+                    PdfPTable optTable = new PdfPTable(new float[]{1, 11});
+                    optTable.setWidthPercentage(97);
+                    optTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    optTable.setSpacingAfter(2);
+
+                    // Label A/B/C/D
+                    PdfPCell labelCell = new PdfPCell();
+                    labelCell.setBackgroundColor(isCorrect ? green : new Color(200, 200, 210));
+                    labelCell.setBorder(Rectangle.NO_BORDER);
+                    labelCell.setPadding(6);
+                    labelCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                    Font labelFont = new Font(bfBold, 10, Font.NORMAL, Color.WHITE);
+                    Paragraph labelPara = new Paragraph(optionLabels[i], labelFont);
+                    labelPara.setAlignment(Element.ALIGN_CENTER);
+                    labelCell.addElement(labelPara);
+                    optTable.addCell(labelCell);
+
+                    // Nội dung đáp án
+                    PdfPCell optCell = new PdfPCell();
+                    optCell.setBackgroundColor(isCorrect ? greenLight : Color.WHITE);
+                    optCell.setBorder(Rectangle.BOX);
+                    optCell.setBorderColor(isCorrect ? green : new Color(220, 220, 230));
+                    optCell.setPadding(7);
+
+                    Font usedFont = isCorrect ? fontCorrect : fontOption;
+                    String prefix = isCorrect ? "✓ " : "";
+                    optCell.addElement(new Paragraph(prefix + quiz.getOptions().get(i), usedFont));
+                    optTable.addCell(optCell);
+                    document.add(optTable);
+                }
+
+                // ── Giải thích ──
+                PdfPTable explainTable = new PdfPTable(1);
+                explainTable.setWidthPercentage(97);
+                explainTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                explainTable.setSpacingAfter(6);
+
+                PdfPCell explainCell = new PdfPCell();
+                explainCell.setBackgroundColor(goldLight);
+                explainCell.setBorderColor(gold);
+                explainCell.setPadding(8);
+                explainCell.addElement(new Paragraph("Giải thích: " + quiz.getExplanation(), fontExplain));
+                explainTable.addCell(explainCell);
+                document.add(explainTable);
+            }
+
+            // ══════════════════════════════════════
+            // FOOTER
+            // ══════════════════════════════════════
+            PdfPTable footerTable = new PdfPTable(1);
+            footerTable.setWidthPercentage(100);
+            footerTable.setSpacingBefore(20);
+
+            PdfPCell footerCell = new PdfPCell();
+            footerCell.setBackgroundColor(indigo);
+            footerCell.setPadding(14);
+            footerCell.setBorder(Rectangle.NO_BORDER);
+
+            Paragraph footerText = new Paragraph(
+                    "Bộ câu hỏi được tạo tự động bởi AI Learning Dashboard",
+                    fontFooter);
+            footerText.setAlignment(Element.ALIGN_CENTER);
+            footerCell.addElement(footerText);
+
+            Paragraph contact = new Paragraph(
+                    "© 2026 AI Learning Dashboard  |  huykhang666@gmail.com  |  http://ai-learning-dashboard.id.vn/",
+                    fontFooterSm);
+            contact.setAlignment(Element.ALIGN_CENTER);
+            footerCell.addElement(contact);
+
+            footerTable.addCell(footerCell);
+            document.add(footerTable);
+
+            document.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return new ByteArrayInputStream(out.toByteArray());
