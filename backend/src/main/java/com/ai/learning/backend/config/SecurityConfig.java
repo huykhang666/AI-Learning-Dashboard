@@ -56,7 +56,8 @@ public class SecurityConfig {
             "/api/jobs/**",
             "/api/v1/sessions/**",
             "/actuator/health",
-            "/actuator/prometheus"
+            "/actuator/prometheus",
+            "/api/v1/courses/**"
     };
 
     @Bean

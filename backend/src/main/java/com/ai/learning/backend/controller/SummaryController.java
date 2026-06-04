@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/api/summaries")
 public class SummaryController {

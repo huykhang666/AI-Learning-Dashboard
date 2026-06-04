@@ -6,50 +6,60 @@ import com.ai.learning.backend.entity.Quiz;
 import com.ai.learning.backend.entity.QuizOption;
 import com.ai.learning.backend.repository.QuizRepository;
 import com.ai.learning.backend.service.QuizService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class QuizServiceImpl implements QuizService {
-    private final QuizRepository quizRepository;
 
-    @Qualifier("aiWebClient")
+    private final QuizRepository quizRepository;
     private final WebClient aiWebClient;
+
+    @Autowired
+    public QuizServiceImpl(
+            QuizRepository quizRepository,
+            @Qualifier("aiWebClient") WebClient aiWebClient) {
+        this.quizRepository = quizRepository;
+        this.aiWebClient = aiWebClient;
+    }
 
     @Override
     @Transactional
     public List<QuizResponse> getOrCreateQuizzes(String courseId, String transcriptText) {
-        List<Quiz> existingQuizzes = quizRepository.findByCourseId(courseId);
+        try {
+            log.info("[QuizService] Đang tìm kiếm bộ câu hỏi cho courseId: {}", courseId);
+            List<Quiz> existingQuizzes = quizRepository.findByCourseId(courseId);
 
-        if (!existingQuizzes.isEmpty()) {
-            log.info("[QuizService] Tìm thấy bộ câu hỏi có sẵn trong DB cho courseId: {}", courseId);
-            return existingQuizzes.stream().map(this::mapToResponse).collect(Collectors.toList());
+            if (!existingQuizzes.isEmpty()) {
+                log.info("[QuizService] Tìm thấy bộ câu hỏi có sẵn trong DB cho courseId: {}", courseId);
+                return existingQuizzes.stream().map(this::mapToResponse).collect(Collectors.toList());
+            }
+
+            if (transcriptText != null && !transcriptText.isBlank()) {
+                log.info("[QuizService] DB trống. Đang bắn transcript sang AI Service qua WebClient cho courseId: {}", courseId);
+                return generateAndSaveQuizzes(courseId, transcriptText);
+            }
+
+            return Collections.emptyList();
+        } catch (Exception e) {
+            log.error("[QuizService] Lỗi nghiêm trọng tại getOrCreateQuizzes: ", e);
+            throw new RuntimeException("Lỗi hệ thống khi xử lý câu hỏi trắc nghiệm.", e);
         }
-
-        if (transcriptText != null && !transcriptText.isBlank()) {
-            log.info("[QuizService] DB trống. Đang bắn transcript sang AI Service qua WebClient cho courseId: {}", courseId);
-            return generateAndSaveQuizzes(courseId, transcriptText);
-        }
-
-        return Collections.emptyList();
     }
 
     private List<QuizResponse> generateAndSaveQuizzes(String courseId, String transcriptText) {
         try {
             Map<String, String> requestBody = Map.of("transcript", transcriptText);
 
-            // 1. SỬA ĐƯỜNG DẪN: Đổi từ "/api/v1/ai/generate-quiz" thành "/ai/generate-quiz" cho khớp Python
-            // 2. SỬA ÉP KIỂU: Dùng ParameterizedTypeReference để hứng List<Map> an toàn tuyệt đối, tránh lỗi Jackson
             List<Map<String, Object>> aiResponse = aiWebClient.post()
                     .uri("/ai/generate-quiz")
                     .bodyValue(requestBody)
@@ -90,42 +100,47 @@ public class QuizServiceImpl implements QuizService {
             return savedQuizzes.stream().map(this::mapToResponse).collect(Collectors.toList());
 
         } catch (Exception e) {
-            log.error("[QuizService] Lỗi khi gọi AI Service qua WebClient: {}", e.getMessage());
+            log.error("[QuizService] Lỗi khi gọi AI Service qua WebClient: ", e);
             return Collections.emptyList();
         }
     }
 
     @Override
     public Map<String, Object> gradeQuiz(String courseId, QuizSubmitRequest request) {
-        List<Quiz> quizzes = quizRepository.findByCourseId(courseId);
-        int totalQuestions = quizzes.size();
-        int correctCount = 0;
+        try {
+            List<Quiz> quizzes = quizRepository.findByCourseId(courseId);
+            int totalQuestions = quizzes.size();
+            int correctCount = 0;
 
-        Map<Long, Long> correctAnswersMap = new HashMap<>();
+            Map<Long, Long> correctAnswersMap = new HashMap<>();
 
-        for (Quiz q : quizzes) {
-            Long correctOptionId = q.getOptions().stream()
-                    .filter(QuizOption::isCorrect)
-                    .map(QuizOption::getId)
-                    .findFirst()
-                    .orElse(null);
+            for (Quiz q : quizzes) {
+                Long correctOptionId = q.getOptions().stream()
+                        .filter(QuizOption::isCorrect)
+                        .map(QuizOption::getId)
+                        .findFirst()
+                        .orElse(null);
 
-            correctAnswersMap.put(q.getId(), correctOptionId);
+                correctAnswersMap.put(q.getId(), correctOptionId);
 
-            Long userChosenOptionId = request.getAnswers().get(q.getId());
-            if (userChosenOptionId != null && userChosenOptionId.equals(correctOptionId)) {
-                correctCount++;
+                Long userChosenOptionId = request.getAnswers().get(q.getId());
+                if (userChosenOptionId != null && userChosenOptionId.equals(correctOptionId)) {
+                    correctCount++;
+                }
             }
+
+            double score = totalQuestions > 0 ? ((double) correctCount / totalQuestions) * 10 : 0;
+
+            return Map.of(
+                    "score", String.format("%.1f", score),
+                    "correctCount", correctCount,
+                    "wrongCount", (totalQuestions - correctCount),
+                    "correctAnswers", correctAnswersMap
+            );
+        } catch (Exception e) {
+            log.error("[QuizService] Lỗi khi chấm điểm bài làm: ", e);
+            throw new RuntimeException("Không thể hoàn tất chấm điểm lúc này.", e);
         }
-
-        double score = totalQuestions > 0 ? ((double) correctCount / totalQuestions) * 10 : 0;
-
-        return Map.of(
-                "score", String.format("%.1f", score),
-                "correctCount", correctCount,
-                "wrongCount", (totalQuestions - correctCount),
-                "correctAnswers", correctAnswersMap
-        );
     }
 
     private QuizResponse mapToResponse(Quiz quiz) {
