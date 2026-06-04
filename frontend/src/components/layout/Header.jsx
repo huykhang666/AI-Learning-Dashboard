@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
 import { FaUser, FaReceipt, FaSignOutAlt, FaCrown } from "react-icons/fa"; 
 import UserProfileModal from "../../pages/Premium/UserProfileModal";
+import { motion, AnimatePresence } from "motion/react";
 
 const IconMenu = () => (
   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round">
@@ -13,7 +14,7 @@ const IconMenu = () => (
 );
 
 const IconSearch = () => (
-  <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round">
+  <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" strokeWidth="2.2" fill="none" strokeLinecap="round">
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
@@ -35,7 +36,7 @@ export default function Header({
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   
-  // CÁC STATE PHỤC VỤ BIẾN CHUÔNG THÀNH REALTIME DROPDOWN:
+  // REALTIME DROPDOWN:
   const [notifications, setNotifications] = useState([
     { id: 1, message: t("header.notifications.welcome"), createdAt: t("header.time_ago"), isRead: true }
   ]);
@@ -64,11 +65,10 @@ export default function Header({
         isPremium: userData.isPremium || false
       });
     }
-  }, [userData]);
+  }, [userData, t]);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
-    window.innerWidth < 768 && setUnreadCount(prev => prev); 
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
@@ -90,9 +90,9 @@ export default function Header({
 
     window.addEventListener("ws-notification", handleWSNotification);
     return () => window.removeEventListener("ws-notification", handleWSNotification);
-  }, []);
+  }, [t]);
 
- useEffect(() => {
+  useEffect(() => {
     const handleProfileUpdate = (event) => {
       const updatedData = event.detail;
       setLocalUserData(prev => ({
@@ -133,109 +133,130 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-100 flex items-center gap-2 px-3 py-4 pr-14">
-      {/* Hamburger Menu (Mobile) */}
-      {isMobile && (
-        <button
-          onClick={onMenuOpen}
-          aria-label={t("header.aria.open_menu")}
-          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-indigo-600 hover:bg-indigo-50 border border-gray-200 transition"
-        >
-          <IconMenu />
-        </button>
-      )}
+    <header className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-zinc-200/50 flex items-center justify-between gap-4 px-6 py-3.5 transition-all">
+      {/* Left side: Hamburger (Mobile) & Search */}
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Hamburger Menu (Mobile) */}
+        {isMobile && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onMenuOpen}
+            aria-label={t("header.aria.open_menu")}
+            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-indigo-600 hover:bg-indigo-50 border border-zinc-200/80 bg-white shadow-sm transition-colors"
+          >
+            <IconMenu />
+          </motion.button>
+        )}
 
-      {/* Search Input */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center bg-slate-100 px-3 py-2 rounded-xl border border-transparent focus-within:border-indigo-200 focus-within:bg-white transition-all">
-          <span className="text-gray-400 mr-2 shrink-0">
-            <IconSearch />
-          </span>
-          <input
-            type="text"
-            placeholder={t("header.search_placeholder")}
-            className="bg-transparent outline-none w-full min-w-0 text-sm text-gray-700 placeholder-gray-400"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {/* Search Input */}
+        <div className="flex-1 max-w-md min-w-0">
+          <div className="flex items-center bg-zinc-50 hover:bg-zinc-100/50 px-3.5 py-2 rounded-xl border border-zinc-200/80 focus-within:border-indigo-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200 shadow-sm">
+            <span className="text-zinc-400 mr-2.5 shrink-0 transition-colors">
+              <IconSearch />
+            </span>
+            <input
+              type="text"
+              placeholder={t("header.search_placeholder")}
+              className="bg-transparent outline-none w-full min-w-0 text-sm text-zinc-800 placeholder-zinc-400 font-medium"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Actions Khu vực bên phải Header */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        <LanguageSwitcher />
+      {/* Right side: Actions (Language, Bell, Avatar) */}
+      <div className="flex items-center gap-3 shrink-0">
+        <div className="hover:scale-105 transition-transform duration-200">
+          <LanguageSwitcher />
+        </div>
         
-        {/* KHU VỰC CHUÔNG THÔNG BÁO */}
+        {/* Notification Bell */}
         <div className="relative" ref={dropdownRef}>
-          <button
-            className={`p-2 shrink-0 rounded-xl transition ${showDropdown ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:bg-slate-100'}`}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`p-2 shrink-0 rounded-xl border transition-all duration-200 shadow-sm relative ${
+              showDropdown 
+                ? 'text-indigo-600 bg-indigo-50 border-indigo-200' 
+                : 'text-zinc-500 bg-white border-zinc-200/80 hover:bg-zinc-50'
+            }`}
             onClick={handleBellClick}
           >
             <IconBell />
             
-            {/* BADGE SỐ: Chỉ hiện khi số lượng tin chưa đọc > 0 */}
+            {/* BADGE SỐ */}
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center border border-white animate-pulse">
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center border border-white animate-pulse">
                 {unreadCount}
               </span>
             )}
-          </button>
+          </motion.button>
 
           {/* DROPDOWN MENU THẢ XUỐNG */}
-          {/* DROPDOWN MENU THẢ XUỐNG */}
-          {showDropdown && (
-            <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-1 overflow-hidden transition-all duration-200">
-              <div className="px-4 py-2.5 border-b border-gray-50 flex justify-between items-center bg-slate-50/50">
-                <span className="text-sm font-semibold text-gray-800">{t("header.notifications.title")}</span>
-                <span 
-                  className="text-[11px] text-indigo-600 font-medium cursor-pointer hover:underline" 
-                  onClick={() => setNotifications(p => p.map(n => ({ ...n, isRead: true })))}
-                >
-                  {t("header.notifications.mark_read")}
-                </span>
-              </div>
-              
-              <div className="max-h-[300px] overflow-y-auto divide-y divide-gray-50">
-                {notifications.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-xs text-gray-400">
-                    {t("header.notifications.empty")}
-                  </div>
-                ) : (
-                  notifications.map((noti) => (
-                    <div 
-                      key={noti.id} 
-                      className={`px-4 py-3 hover:bg-slate-50 cursor-pointer transition flex gap-2 items-start ${!noti.isRead ? 'bg-indigo-50/20' : ''}`}
-                    >
-                      <div className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${!noti.isRead ? 'bg-indigo-500' : 'bg-transparent'}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-xs text-gray-700 leading-normal break-words ${!noti.isRead ? 'font-medium' : ''}`}>
-                          {noti.message}
-                        </p>
-                        <span className="text-[10px] text-gray-400 mt-1 block">
-                          {noti.createdAt}
-                        </span>
-                      </div>
+          <AnimatePresence>
+            {showDropdown && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="absolute right-0 mt-2.5 w-80 bg-white/95 backdrop-blur-xl border border-zinc-200/80 rounded-2xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.08)] z-50 py-1 overflow-hidden origin-top-right"
+              >
+                <div className="px-4 py-3 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
+                  <span className="text-xs font-bold text-zinc-800 uppercase tracking-wider">{t("header.notifications.title")}</span>
+                  <span 
+                    className="text-[11px] text-indigo-600 font-semibold cursor-pointer hover:underline" 
+                    onClick={() => setNotifications(p => p.map(n => ({ ...n, isRead: true })))}
+                  >
+                    {t("header.notifications.mark_read")}
+                  </span>
+                </div>
+                
+                <div className="max-h-[300px] overflow-y-auto divide-y divide-zinc-100">
+                  {notifications.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-xs text-zinc-400 font-medium">
+                      {t("header.notifications.empty")}
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
+                  ) : (
+                    notifications.map((noti) => (
+                      <div 
+                        key={noti.id} 
+                        className={`px-4 py-3 hover:bg-zinc-50/80 cursor-pointer transition flex gap-3 items-start ${!noti.isRead ? 'bg-indigo-550/5' : ''}`}
+                      >
+                        <div className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${!noti.isRead ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'bg-transparent'}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-xs text-zinc-700 leading-relaxed break-words ${!noti.isRead ? 'font-semibold text-zinc-900' : ''}`}>
+                            {noti.message}
+                          </p>
+                          <span className="text-[10px] text-zinc-400 mt-1 block font-medium">
+                            {noti.createdAt}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* User Profile Avatar */}
         <div className="relative" ref={userMenuRef}>
-          {/* Phóng to nút bọc ngoài lên w-10 h-10 để nhìn thoáng đãng và có không gian gài Badge VIP */}
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleAvatarClick}
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all duration-150 relative active:scale-95 ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shadow-sm transition-all relative ${
               localUserData.isPremium 
-                ? 'bg-gradient-to-tr from-amber-500 via-orange-400 to-yellow-300 p-[2px] ring-2 ring-amber-400 ring-offset-1' 
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                ? 'bg-gradient-to-tr from-amber-500 via-orange-400 to-yellow-300 p-[2px] ring-2 ring-amber-400 ring-offset-1 shadow-md' 
+                : 'bg-blue-500 text-white hover:bg-blue-600 border border-zinc-200/50'
             } ${showUserDropdown ? 'ring-2 ring-indigo-500 ring-offset-2' : ''}`}
           >
-            {/* Ruột Avatar: Bọc thêm thẻ div tròn nhỏ bên trong để xử lý viền gradient cho tài khoản Premium */}
-            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-blue-500 text-white">
+            {/* Inner Avatar wrapper */}
+            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-blue-500 text-white font-bold select-none">
               {localUserData.isImage ? (
                 <img 
                   src={localUserData.avatar} 
@@ -247,63 +268,72 @@ export default function Header({
               )}
             </div>
 
-            {/* CÀI BADGE PREMIUM: Nếu là tài khoản VIP, búng thêm cái icon vương miện nhỏ xíu lấp lánh góc chân avatar */}
+            {/* CÀI BADGE PREMIUM */}
             {localUserData.isPremium && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full flex items-center justify-center text-[8px] text-white shadow-md border border-white">
+              <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full flex items-center justify-center text-[9px] text-white shadow-md border border-white animate-pulse">
                 <FaCrown />
               </span>
             )}
-          </button>
+          </motion.button>
 
-          {showUserDropdown && (
-            <div className="absolute right-0 md:-right-4 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-3 duration-150">
-              <div className="px-4 py-2.5 border-b border-gray-50 bg-slate-50/40 flex justify-between items-center">
-                <div className="min-w-0 flex-1 pr-2">
-                  <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{t("header.account_label")}</p>
-                  <p className="text-sm font-bold text-gray-800 truncate mt-0.5">{localUserData.fullName}</p>
+          <AnimatePresence>
+            {showUserDropdown && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="absolute right-0 md:-right-2 mt-2.5 w-64 bg-white/95 backdrop-blur-xl border border-zinc-200/80 rounded-2xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.08)] py-1.5 z-50 overflow-hidden origin-top-right"
+              >
+                <div className="px-4 py-3 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
+                  <div className="min-w-0 flex-1 pr-2">
+                    <p className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-wider">{t("header.account_label")}</p>
+                    <p className="text-sm font-bold text-zinc-800 truncate mt-0.5">{localUserData.fullName}</p>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                    localUserData.isPremium 
+                      ? 'bg-gradient-to-r from-amber-500/10 to-yellow-500/10 text-amber-600 border border-amber-200/50 shadow-sm' 
+                      : 'bg-zinc-100 text-zinc-500 border border-zinc-200'
+                  }`}>
+                    {localUserData.isPremium ? "PRO" : "FREE"}
+                  </span>
                 </div>
-                {/* Badge trạng thái hiển thị bằng chữ bên trong khối Popup */}
-                <span className={`px-2 py-0.5 rounded-lg text-[9px] font-extrabold uppercase shrink-0 ${
-                  localUserData.isPremium 
-                    ? 'bg-amber-50 text-amber-600 border border-amber-100 shadow-sm' 
-                    : 'bg-slate-100 text-gray-500'
-                }`}>
-                  {localUserData.isPremium ? "PRO" : "FREE"}
-                </span>
-              </div>
 
-              <button 
-                onClick={() => {
-                  setModalTab("profile");
-                  setIsModalOpen(true);
-                  setShowUserDropdown(false);
-                }}
-                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-slate-50 flex items-center gap-2.5 transition-colors"
-              >
-                <FaUser className="text-gray-400" size={12} /> {t("header.user_menu.profile")}
-              </button>
+                <div className="p-1">
+                  <button 
+                    onClick={() => {
+                      setModalTab("profile");
+                      setIsModalOpen(true);
+                      setShowUserDropdown(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-zinc-650 hover:bg-zinc-50 rounded-xl flex items-center gap-2.5 transition-colors"
+                  >
+                    <FaUser className="text-zinc-400" size={12} /> {t("header.user_menu.profile")}
+                  </button>
 
-              <button 
-                onClick={() => {
-                  setModalTab("billing");
-                  setIsModalOpen(true);
-                  setShowUserDropdown(false);
-                }}
-                className="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2.5 transition-colors"
-              >
-                <FaReceipt className="text-blue-500/80" size={12} /> {t("header.user_menu.billing")}
-              </button>
+                  <button 
+                    onClick={() => {
+                      setModalTab("billing");
+                      setIsModalOpen(true);
+                      setShowUserDropdown(false);
+                    }}
+                    className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-zinc-650 hover:bg-indigo-50/80 hover:text-indigo-650 rounded-xl flex items-center gap-2.5 transition-colors"
+                  >
+                    <FaReceipt className="text-indigo-500/80" size={12} /> {t("header.user_menu.billing")}
+                  </button>
 
-              <hr className="my-1 border-gray-100" />
-              
-              <button 
-                onClick={onLogout} 
-                className="w-full text-left px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2.5 transition-colors"
-              >
-                <FaSignOutAlt size={12} /> {t("header.user_menu.logout")}
-              </button>
-            </div>
-          )}
+                  <hr className="my-1 border-zinc-100" />
+                  
+                  <button 
+                    onClick={onLogout} 
+                    className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 rounded-xl flex items-center gap-2.5 transition-colors"
+                  >
+                    <FaSignOutAlt className="text-red-400" size={12} /> {t("header.user_menu.logout")}
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

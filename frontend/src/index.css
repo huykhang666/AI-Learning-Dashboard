@@ -119,51 +119,51 @@ body {
 
 @keyframes hero-bubble-rise {
   0% {
-    transform: translate3d(0, 0, 0) scale(0.82);
+    transform: translate3d(0, 0, 0) scale(0.85);
     opacity: 0;
   }
   10% {
-    opacity: var(--bubble-peak, 0.55);
+    opacity: var(--bubble-peak, 0.72);
   }
-  88% {
-    opacity: 0.22;
+  85% {
+    opacity: 0.38;
   }
   100% {
-    transform: translate3d(var(--bubble-drift, 0), -108vh, 0) scale(1.08);
+    transform: translate3d(var(--bubble-drift, 0), -108vh, 0) scale(1.12);
     opacity: 0;
   }
 }
 
 @keyframes hero-bubble-sweep {
   0% {
-    transform: translate3d(105vw, var(--bubble-y-shift, 0), 0) scale(0.88);
+    transform: translate3d(105vw, var(--bubble-y-shift, 0), 0) scale(0.9);
     opacity: 0;
   }
   12% {
-    opacity: var(--bubble-peak, 0.5);
+    opacity: var(--bubble-peak, 0.68);
   }
-  88% {
-    opacity: 0.18;
+  85% {
+    opacity: 0.35;
   }
   100% {
-    transform: translate3d(-25vw, calc(var(--bubble-y-shift, 0) - 48px), 0) scale(1.02);
+    transform: translate3d(-25vw, calc(var(--bubble-y-shift, 0) - 48px), 0) scale(1.05);
     opacity: 0;
   }
 }
 
 @keyframes hero-bubble-sweep-ltr {
   0% {
-    transform: translate3d(-28vw, var(--bubble-y-shift, 0), 0) scale(0.86);
+    transform: translate3d(-28vw, var(--bubble-y-shift, 0), 0) scale(0.88);
     opacity: 0;
   }
   12% {
-    opacity: var(--bubble-peak, 0.52);
+    opacity: var(--bubble-peak, 0.7);
   }
-  88% {
-    opacity: 0.2;
+  85% {
+    opacity: 0.36;
   }
   100% {
-    transform: translate3d(108vw, calc(var(--bubble-y-shift, 0) + 36px), 0) scale(1.04);
+    transform: translate3d(108vw, calc(var(--bubble-y-shift, 0) + 36px), 0) scale(1.08);
     opacity: 0;
   }
 }
@@ -171,10 +171,12 @@ body {
 .hero-bubble {
   position: absolute;
   border-radius: 9999px;
-  border: 1px solid rgb(255 255 255 / 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.85),
-    0 6px 22px -8px var(--bubble-glow, rgb(59 130 246 / 0.22));
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    0 8px 24px -6px var(--bubble-glow, rgba(59, 130, 246, 0.25));
   animation-delay: var(--bubble-delay, 0s);
   animation-duration: var(--bubble-duration, 16s);
   animation-timing-function: linear;
@@ -185,8 +187,8 @@ body {
   bottom: -14%;
   background: linear-gradient(
     145deg,
-    var(--bubble-from, rgb(255 255 255 / 0.6)),
-    var(--bubble-to, rgb(255 255 255 / 0.12))
+    var(--bubble-from, rgba(255, 255, 255, 0.72)),
+    var(--bubble-to, rgba(255, 255, 255, 0.15))
   );
   animation-name: hero-bubble-rise;
 }
@@ -196,8 +198,8 @@ body {
   top: var(--bubble-top, 40%);
   background: linear-gradient(
     135deg,
-    var(--bubble-from, rgb(255 255 255 / 0.55)),
-    var(--bubble-to, rgb(255 255 255 / 0.1))
+    var(--bubble-from, rgba(255, 255, 255, 0.68)),
+    var(--bubble-to, rgba(255, 255, 255, 0.12))
   );
   animation-name: hero-bubble-sweep;
 }
@@ -207,59 +209,59 @@ body {
   top: var(--bubble-top, 40%);
   background: linear-gradient(
     225deg,
-    var(--bubble-from, rgb(255 255 255 / 0.55)),
-    var(--bubble-to, rgb(255 255 255 / 0.1))
+    var(--bubble-from, rgba(255, 255, 255, 0.68)),
+    var(--bubble-to, rgba(255, 255, 255, 0.12))
   );
   animation-name: hero-bubble-sweep-ltr;
 }
 
 .hero-bubble-tone-0 {
-  --bubble-from: rgb(254 202 202 / 0.65);
-  --bubble-to: rgb(254 226 226 / 0.15);
-  --bubble-glow: rgb(248 113 113 / 0.28);
-  border-color: rgb(252 165 165 / 0.55);
+  --bubble-from: rgba(254, 202, 202, 0.72);
+  --bubble-to: rgba(254, 202, 202, 0.15);
+  --bubble-glow: rgba(248, 113, 113, 0.3);
+  border-color: rgba(252, 165, 165, 0.75);
 }
 
 .hero-bubble-tone-1 {
-  --bubble-from: rgb(254 215 170 / 0.65);
-  --bubble-to: rgb(255 237 213 / 0.15);
-  --bubble-glow: rgb(251 146 60 / 0.28);
-  border-color: rgb(253 186 116 / 0.55);
+  --bubble-from: rgba(254, 215, 170, 0.72);
+  --bubble-to: rgba(254, 215, 170, 0.15);
+  --bubble-glow: rgba(251, 146, 60, 0.3);
+  border-color: rgba(253, 186, 116, 0.75);
 }
 
 .hero-bubble-tone-2 {
-  --bubble-from: rgb(253 230 138 / 0.62);
-  --bubble-to: rgb(254 243 199 / 0.14);
-  --bubble-glow: rgb(250 204 21 / 0.26);
-  border-color: rgb(252 211 77 / 0.52);
+  --bubble-from: rgba(253, 230, 138, 0.72);
+  --bubble-to: rgba(253, 230, 138, 0.15);
+  --bubble-glow: rgba(250, 204, 21, 0.28);
+  border-color: rgba(252, 211, 77, 0.75);
 }
 
 .hero-bubble-tone-3 {
-  --bubble-from: rgb(187 247 208 / 0.62);
-  --bubble-to: rgb(220 252 231 / 0.14);
-  --bubble-glow: rgb(74 222 128 / 0.26);
-  border-color: rgb(134 239 172 / 0.52);
+  --bubble-from: rgba(187, 247, 208, 0.72);
+  --bubble-to: rgba(187, 247, 208, 0.15);
+  --bubble-glow: rgba(74, 222, 128, 0.28);
+  border-color: rgba(134, 239, 172, 0.75);
 }
 
 .hero-bubble-tone-4 {
-  --bubble-from: rgb(191 219 254 / 0.65);
-  --bubble-to: rgb(219 234 254 / 0.15);
-  --bubble-glow: rgb(96 165 250 / 0.3);
-  border-color: rgb(147 197 253 / 0.55);
+  --bubble-from: rgba(191, 219, 254, 0.75);
+  --bubble-to: rgba(191, 219, 254, 0.15);
+  --bubble-glow: rgba(96, 165, 250, 0.32);
+  border-color: rgba(147, 197, 253, 0.8);
 }
 
 .hero-bubble-tone-5 {
-  --bubble-from: rgb(199 210 254 / 0.65);
-  --bubble-to: rgb(224 231 255 / 0.15);
-  --bubble-glow: rgb(129 140 248 / 0.3);
-  border-color: rgb(165 180 252 / 0.55);
+  --bubble-from: rgba(199, 210, 254, 0.75);
+  --bubble-to: rgba(199, 210, 254, 0.15);
+  --bubble-glow: rgba(129, 140, 248, 0.32);
+  border-color: rgba(165, 180, 252, 0.8);
 }
 
 .hero-bubble-tone-6 {
-  --bubble-from: rgb(221 214 254 / 0.65);
-  --bubble-to: rgb(237 233 254 / 0.15);
-  --bubble-glow: rgb(167 139 250 / 0.3);
-  border-color: rgb(196 181 253 / 0.55);
+  --bubble-from: rgba(221, 214, 254, 0.75);
+  --bubble-to: rgba(221, 214, 254, 0.15);
+  --bubble-glow: rgba(167, 139, 250, 0.32);
+  border-color: rgba(196, 181, 253, 0.8);
 }
 
 .btn-hero-primary {

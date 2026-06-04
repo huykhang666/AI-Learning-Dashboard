@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import {
   FaHeart, FaCheck, FaBolt, FaCrown,
@@ -5,15 +7,40 @@ import {
   FaUniversity, FaShieldAlt, FaTimes, FaInfoCircle
 } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
+import { motion, useReducedMotion } from 'motion/react';
 import { paymentApi } from '../../api/PaymentApi';
 import momoLogo from '../../img/MoMo.png';
 import vnpayLogo from '../../img/VNPay.png';
+
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.98 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 90,
+      damping: 16,
+    },
+  },
+};
 
 const Pricing = ({ onRegister, userData = null }) => {
   const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedGateway, setSelectedGateway] = useState('VNPAY');
   const [isProcessing, setIsProcessing] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const plansConfig = [
     {
@@ -152,6 +179,10 @@ const Pricing = ({ onRegister, userData = null }) => {
 
   return (
     <section id="Pricing" className="bg-gray-50 py-24 relative overflow-hidden">
+      {/* Hiệu ứng mạng lưới chấm nền */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+        <div className="hero-dot-grid-light absolute inset-0 opacity-45" />
+      </div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 relative">
@@ -165,11 +196,21 @@ const Pricing = ({ onRegister, userData = null }) => {
           <p className="text-gray-500 max-w-md mx-auto">{t("pricing.header.description")}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        {/* Lưới chứa các thẻ: hỗ trợ Stagger Scroll lặp lại (once: false) */}
+        <motion.div
+          variants={containerVariants}
+          initial={reduceMotion ? "show" : "hidden"}
+          whileInView="show"
+          viewport={{ once: false, amount: 0.08 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch"
+        >
           {plansConfig.map((plan) => (
-            <div
+            <motion.div
               key={plan.id}
-              className={`relative rounded-2xl flex flex-col p-8 transition-all duration-300 hover:-translate-y-1 ${plan.highlight
+              variants={cardVariants}
+              whileHover={reduceMotion ? undefined : { y: -8 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+              className={`relative rounded-2xl flex flex-col p-8 transition-all duration-300 ${plan.highlight
                 ? "bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 text-white shadow-2xl scale-105 z-10"
                 : "bg-white text-gray-900 shadow-sm border border-gray-100"
                 }`}
@@ -217,9 +258,9 @@ const Pricing = ({ onRegister, userData = null }) => {
               >
                 {plan.buttonText}
               </button>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <div className="text-center mt-16">
           <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-6">{t("pricing.header.trusted_partners")}</p>
@@ -307,7 +348,7 @@ const Pricing = ({ onRegister, userData = null }) => {
 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-bold text-slate-800 leading-none mb-0.5">{gw.name}</p>
-                        <p className="text-[11px] text-slate-500">{gw.description}</p>
+                        <p className="text-[11px] text-slate-555">{gw.description}</p>
                         <p className="text-[10px] text-slate-400 mt-0.5">{gw.note}</p>
                       </div>
 
