@@ -42,7 +42,7 @@ function AppLayout({ onLogout }) {
 
   // Khai báo state tập trung để phân phối dữ liệu cho cả Sidebar và Header
   const [usageData, setUsageData] = useState({ used: 0, total: 4 });
-  const [userData, setUserData] = useState({ fullName: "Đang tải...", plan: "Free Plan", avatar: "..", isPremium: false });
+  const [userData, setUserData] = useState({ fullName: "Đang tải...", email: "huukhang@email.com", plan: "Free Plan", avatar: "..", isPremium: false });
 
   // Gọi API để lấy thông tin thực tế ngay tại Layout cha
   useEffect(() => {
@@ -55,6 +55,7 @@ function AppLayout({ onLogout }) {
 
         setUserData({
           fullName: fullName || "Nguyễn Khang",
+          email: res.email || "huukhang@email.com",
           // Đón đầu cả 2 kiểu đặt tên của Backend (is_premium hoặc isPremium)
           isPremium: res.is_premium === true || res.isPremium === true || res.premium === true,
           plan: (res.is_premium || res.isPremium || res.premium) ? "Premium Plan" : "Free Plan",

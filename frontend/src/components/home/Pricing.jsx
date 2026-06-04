@@ -178,12 +178,14 @@ const Pricing = ({ onRegister, userData = null }) => {
   };
 
   return (
-    <section id="Pricing" className="bg-gray-50 py-24 relative overflow-hidden">
-      {/* Hiệu ứng mạng lưới chấm nền */}
+    <section id="Pricing" className="relative overflow-hidden bg-slate-50/40 py-24 border-t border-zinc-200/50">
+      {/* Mạng lưới chấm nền và ánh sáng mờ đồng bộ với HeroSection */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-        <div className="hero-dot-grid-light absolute inset-0 opacity-45" />
+        <div className="hero-dot-grid-light absolute inset-0 opacity-80" />
+        <div className="hero-spotlight absolute inset-0 opacity-90" />
+        <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-400/10 blur-[120px] hero-ambient-drift" />
+        <div className="absolute bottom-[10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-400/8 blur-[120px] hero-ambient-drift-reverse" />
       </div>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 relative">
         <div className="text-center mb-14">

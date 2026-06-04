@@ -52,6 +52,7 @@ export default function Header({
   const [localUserData, setLocalUserData] = useState({
     fullName: userData?.fullName || t("header.default_user_name"),
     avatar: userData?.avatar || "NK",
+    email: userData?.email || "huukhang@email.com",
     isImage: false,
     isPremium: userData?.isPremium || false 
   });
@@ -61,6 +62,7 @@ export default function Header({
       setLocalUserData({
         fullName: userData.fullName || t("header.default_user_name"),
         avatar: userData.avatar || "NK",
+        email: userData.email || "huukhang@email.com",
         isImage: false,
         isPremium: userData.isPremium || false
       });
@@ -99,6 +101,7 @@ export default function Header({
         ...prev,
         fullName: updatedData.fullName,
         avatar: updatedData.avatar,
+        email: updatedData.email || prev.email,
         isImage: updatedData.isImage,
         isPremium: updatedData.isPremium ?? prev.isPremium 
       }));
@@ -279,36 +282,55 @@ export default function Header({
           <AnimatePresence>
             {showUserDropdown && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                initial={{ opacity: 0, scale: 0.96, y: -4 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="absolute right-0 md:-right-2 mt-2.5 w-64 bg-white/95 backdrop-blur-xl border border-zinc-200/80 rounded-2xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.08)] py-1.5 z-50 overflow-hidden origin-top-right"
+                exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                transition={{ type: "spring", stiffness: 350, damping: 26 }}
+                className="absolute right-0 md:-right-2 mt-3.5 w-[290px] bg-white/98 backdrop-blur-md border border-slate-200/70 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] p-2.5 z-50 overflow-visible origin-top-right animate-in fade-in-50 duration-200"
               >
-                <div className="px-4 py-3 border-b border-zinc-100 bg-zinc-50/50 flex justify-between items-center">
-                  <div className="min-w-0 flex-1 pr-2">
-                    <p className="text-[9px] text-zinc-400 font-extrabold uppercase tracking-wider">{t("header.account_label")}</p>
-                    <p className="text-sm font-bold text-zinc-800 truncate mt-0.5">{localUserData.fullName}</p>
+                {/* Micro-arrow indicator */}
+                <div className="absolute -top-1.5 right-4 md:right-5 w-3 h-3 rotate-45 bg-white border-t border-l border-slate-200/70" />
+
+                {/* Dropdown Header */}
+                <div className="relative bg-white z-10 px-3.5 py-4 border-b border-zinc-100 flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white font-black shrink-0 shadow-inner border border-slate-200/80 select-none">
+                    {localUserData.isImage ? (
+                      <img 
+                        src={localUserData.avatar} 
+                        alt="Avatar" 
+                        className="w-full h-full object-cover animate-fade-in"
+                      />
+                    ) : (
+                      localUserData.avatar
+                    )}
                   </div>
-                  <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[14px] font-black text-slate-800 truncate tracking-tight leading-snug">{localUserData.fullName}</p>
+                    <p className="text-xs text-slate-500 font-medium truncate mt-0.5 leading-none">{localUserData.email}</p>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase tracking-wider shrink-0 select-none ${
                     localUserData.isPremium 
-                      ? 'bg-gradient-to-r from-amber-500/10 to-yellow-500/10 text-amber-600 border border-amber-200/50 shadow-sm' 
-                      : 'bg-zinc-100 text-zinc-500 border border-zinc-200'
+                      ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-white shadow-sm border border-amber-300/35' 
+                      : 'bg-zinc-100 text-zinc-400 border border-zinc-200/60'
                   }`}>
                     {localUserData.isPremium ? "PRO" : "FREE"}
                   </span>
                 </div>
 
-                <div className="p-1">
+                {/* Dropdown Options */}
+                <div className="relative bg-white z-10 pt-2.5 space-y-1">
                   <button 
                     onClick={() => {
                       setModalTab("profile");
                       setIsModalOpen(true);
                       setShowUserDropdown(false);
                     }}
-                    className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-zinc-650 hover:bg-zinc-50 rounded-xl flex items-center gap-2.5 transition-colors"
+                    className="w-full text-left px-3 py-2 text-[13.5px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50/50 rounded-xl flex items-center gap-3 transition-all duration-200 active:scale-[0.98] group"
                   >
-                    <FaUser className="text-zinc-400" size={12} /> {t("header.user_menu.profile")}
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100/40 flex items-center justify-center text-blue-500 group-hover:scale-105 transition-transform duration-200 shrink-0">
+                      <FaUser size={12} />
+                    </div>
+                    <span>{t("header.user_menu.profile")}</span>
                   </button>
 
                   <button 
@@ -317,18 +339,24 @@ export default function Header({
                       setIsModalOpen(true);
                       setShowUserDropdown(false);
                     }}
-                    className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-zinc-650 hover:bg-indigo-50/80 hover:text-indigo-650 rounded-xl flex items-center gap-2.5 transition-colors"
+                    className="w-full text-left px-3 py-2 text-[13.5px] font-bold text-slate-600 hover:text-emerald-600 hover:bg-emerald-50/50 rounded-xl flex items-center gap-3 transition-all duration-200 active:scale-[0.98] group"
                   >
-                    <FaReceipt className="text-indigo-500/80" size={12} /> {t("header.user_menu.billing")}
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100/40 flex items-center justify-center text-emerald-500 group-hover:scale-105 transition-transform duration-200 shrink-0">
+                      <FaReceipt size={12} />
+                    </div>
+                    <span>{t("header.user_menu.billing")}</span>
                   </button>
 
-                  <hr className="my-1 border-zinc-100" />
+                  <div className="my-1.5 border-t border-zinc-100/80 mx-1" />
                   
                   <button 
                     onClick={onLogout} 
-                    className="w-full text-left px-3.5 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 rounded-xl flex items-center gap-2.5 transition-colors"
+                    className="w-full text-left px-3 py-2 text-[13.5px] font-bold text-red-500 hover:text-red-600 hover:bg-red-50/50 rounded-xl flex items-center gap-3 transition-all duration-200 active:scale-[0.98] group"
                   >
-                    <FaSignOutAlt className="text-red-400" size={12} /> {t("header.user_menu.logout")}
+                    <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-100/40 flex items-center justify-center text-red-400 group-hover:scale-105 transition-transform duration-200 shrink-0">
+                      <FaSignOutAlt size={12} />
+                    </div>
+                    <span>{t("header.user_menu.logout")}</span>
                   </button>
                 </div>
               </motion.div>
