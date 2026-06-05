@@ -33,7 +33,7 @@ import PaymentManagement from "./pages/admin/PaymentManagement.jsx";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import webSocketService from "./api/WebSocketService.js";
-import { userService } from "./api/UserService.js"; 
+import { userService } from "./api/UserService.js";
 
 
 function AppLayout({ onLogout }) {

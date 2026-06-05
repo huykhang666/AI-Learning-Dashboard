@@ -140,6 +140,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse togglePremium(Long userId, boolean premium) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setPremium(premium);
+        if (!premium) {
+            user.setPremiumExpiredAt(null);
+        }
+
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getUsers() {
         log.info("In method get users");
         return userRepository.findAll().stream()

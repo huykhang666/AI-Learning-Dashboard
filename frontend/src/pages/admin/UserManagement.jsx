@@ -11,11 +11,11 @@ const fallbackUsers = [
 
 export default function UserManagement() {
   const { t } = useTranslation();
-  const [users, setUsers] = useState(fallbackUsers);
+  const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", role: "USER" });
+  const [editForm, setEditForm] = useState({ name: "" });
   const [deletingUserId, setDeletingUserId] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -49,53 +49,60 @@ export default function UserManagement() {
       ? t("admin.user_management.premium.pro")
       : t("admin.user_management.premium.free");
 
+  const buildFullName = (item) => {
+    const first = item.firstname ?? item.firstName ?? "";
+    const last = item.lastname ?? item.lastName ?? "";
+    const combined = `${first} ${last}`.trim();
+    return combined || item.fullName || item.name || item.username || "Unknown User";
+  };
+
+  const getUserRole = (item) => {
+    if (item.role) return item.role;
+
+    const roles = Array.isArray(item.roles) ? item.roles : [];
+    return roles.includes("ADMIN") ? "ADMIN" : "USER";
+  };
+
   // Load users on mount
   useEffect(() => {
     loadUsers();
   }, []);
 
   const loadUsers = async () => {
-    let active = true;
     setLoading(true);
 
     try {
       const response = await adminApi.getAllUsers();
 
-      if (!active || !response) return;
-
       const normalized = Array.isArray(response)
         ? response
         : Array.isArray(response?.content)
           ? response.content
-          : fallbackUsers;
+          : [];
 
       setUsers(
         normalized.map((item, index) => ({
-          id: item.id ?? item.userId ?? index + 1,
-          name: item.fullName ?? item.name ?? item.username ?? "Unknown User",
+          id: item.userId ?? item.id ?? index + 1,
+          name: buildFullName(item),
           email: item.email ?? item.username ?? "unknown@example.com",
-          role: item.role ?? item.userRole ?? "USER",
+          role: getUserRole(item),
           status: item.status ?? "Active",
-          isPremium: item.isPremium ?? item.is_premium ?? false,
-          joinedAt: item.createdAt ?? item.createdDate ?? "2026-01-01",
+          isPremium: item.premium ?? item.isPremium ?? item.is_premium ?? false,
+          joinedAt: item.dateOfBirth ?? item.createdAt ?? item.createdDate ?? "-",
         }))
       );
     } catch (error) {
       console.error("Lỗi tải danh sách user:", error);
       setUsers(fallbackUsers);
     } finally {
-      if (active) setLoading(false);
-    }
-
-    return () => {
-      active = false;
+      setLoading(false);
     };
   };
 
   // Handle edit
   const handleEdit = (user) => {
     setEditingUser(user);
-    setEditForm({ name: user.name, role: user.role });
+    setEditForm({ name: user.name });
   };
 
   const handleSaveEdit = async () => {
@@ -106,16 +113,20 @@ export default function UserManagement() {
 
     setActionLoading("edit");
     try {
+      const parts = editForm.name.trim().split(/\s+/);
+      const firstname = parts.shift() || editForm.name.trim();
+      const lastname = parts.join(" ");
+
       await adminApi.updateUser(editingUser.id, {
-        fullName: editForm.name,
-        role: editForm.role,
+        firstname,
+        lastname,
       });
 
       // Update local state
       setUsers((prev) =>
         prev.map((u) =>
           u.id === editingUser.id
-            ? { ...u, name: editForm.name, role: editForm.role }
+            ? { ...u, name: editForm.name }
             : u
         )
       );
@@ -341,7 +352,7 @@ export default function UserManagement() {
 
       {/* EDIT MODAL */}
       {editingUser && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           {/* Overlay */}
           <div
             className="absolute inset-0 bg-slate-900/35 backdrop-blur-sm"
@@ -372,20 +383,6 @@ export default function UserManagement() {
                   placeholder={t("admin.user_management.modals.name_placeholder")}
                 />
               </div>
-
-              {/* Role Select */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">{t("admin.user_management.modals.role_label")}</label>
-                <select
-                  value={editForm.role}
-                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                  className="mt-2 w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:border-blue-300 focus:outline-none"
-                >
-                  <option value="USER">{t("admin.user_management.roles.user")}</option>
-                  <option value="ADMIN">{t("admin.user_management.roles.admin")}</option>
-                  <option value="MODERATOR">{t("admin.user_management.roles.moderator")}</option>
-                </select>
-              </div>
             </div>
 
             <div className="mt-8 flex gap-3">
@@ -398,7 +395,7 @@ export default function UserManagement() {
               <button
                 onClick={handleSaveEdit}
                 disabled={actionLoading === "edit"}
-                className="flex-1 rounded-lg bg-gradient-to-r from-blue-700 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow-md disabled:opacity-50"
+                className="flex-1 rounded-lg bg-linear-to-r from-blue-700 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:shadow-md disabled:opacity-50"
               >
                 {actionLoading === "edit"
                   ? t("admin.user_management.buttons.saving")
@@ -411,7 +408,7 @@ export default function UserManagement() {
 
       {/* DELETE CONFIRM MODAL */}
       {deletingUserId && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           {/* Overlay */}
           <div
             className="absolute inset-0 bg-slate-900/35 backdrop-blur-sm"

@@ -72,6 +72,20 @@ public class UserController {
                 .build();
     }
 
+    @PatchMapping("/{id}/premium")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResponse<UserResponse> togglePremium(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Boolean> request
+    ) {
+        boolean premium = Boolean.TRUE.equals(request.get("isPremium"));
+
+        return ApiResponse.<UserResponse>builder()
+                .code(1000)
+                .result(userService.togglePremium(id, premium))
+                .build();
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<List<UserResponse>> getUsers() {

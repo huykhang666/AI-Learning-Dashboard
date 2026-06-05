@@ -26,6 +26,9 @@ public interface UserService {
         //Delete User
         void deleteUser(Long userId);
 
+        //Toggle premium status for a user
+        UserResponse togglePremium(Long userId, boolean premium);
+
         //Get list user
         public List<UserResponse> getUsers();
 }
