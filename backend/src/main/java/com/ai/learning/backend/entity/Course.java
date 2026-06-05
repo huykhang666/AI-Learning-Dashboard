@@ -27,6 +27,7 @@ public class Course {
 
     private Double price;
 
+    @Builder.Default
     private boolean isPremiumRequired = false;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)

@@ -4,7 +4,7 @@ import com.ai.learning.backend.entity.UserProgress;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface UserProgressMapper {
 
     @Mapping(source = "session.learningSessionId", target = "sessionId")

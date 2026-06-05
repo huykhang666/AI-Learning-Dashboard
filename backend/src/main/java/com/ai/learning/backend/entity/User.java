@@ -15,24 +15,24 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "username", unique = true,nullable = false,length = 50)
+    @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
 
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
-    @Column(name = "password",nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "firstname",length = 20)
+    @Column(name = "firstname", length = 20)
     private String firstName;
 
     @Column(name = "lastname", length = 20)
@@ -50,12 +50,15 @@ public class User {
     @Column(name = "role_name")
     private Set<String> roles;
 
+    @Builder.Default
     private boolean isPremium = false;
 
     private LocalDateTime premiumExpiredAt;
 
+    @Builder.Default
     private int dailyUploadCount = 0;
 
+    @Builder.Default
     private LocalDate lastUploadDate = LocalDate.now();
 
     private String paymentCustomerId;
@@ -73,8 +76,9 @@ public class User {
     @Column(nullable = false, length = 20)
     private UserRole role;
 
+    @Builder.Default
     @Column(name = "weekly_goal")
-    Integer weeklyGoal = 10;
+    private Integer weeklyGoal = 10; // Đã thêm chữ private cho chuẩn OOP
 
     //Get time the automatically
     @PrePersist

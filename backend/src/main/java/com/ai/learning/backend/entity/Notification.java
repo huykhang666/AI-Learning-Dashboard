@@ -35,6 +35,7 @@ public class Notification {
     String targetId;
 
     @Column(name = "is_read")
+    @Builder.Default
     boolean isRead = false;
 
     @CreationTimestamp

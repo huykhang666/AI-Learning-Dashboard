@@ -25,9 +25,12 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @Builder.Default
     private LocalDateTime enrolledAt = LocalDateTime.now();
 
+    @Builder.Default
     private Integer progress = 0;
-
+    
+    @Builder.Default
     private boolean inActive = true;
 }
