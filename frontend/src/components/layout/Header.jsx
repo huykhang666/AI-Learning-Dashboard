@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../common/LanguageSwitcher";
-import { FaUser, FaReceipt, FaSignOutAlt, FaCrown } from "react-icons/fa"; 
+import { FaUser, FaReceipt, FaSignOutAlt, FaCrown, FaShieldAlt } from "react-icons/fa"; 
+import { useNavigate } from "react-router-dom";
 import UserProfileModal from "../../pages/Premium/UserProfileModal";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -32,6 +33,18 @@ export default function Header({
   onMenuOpen,
   onLogout,
 }) {
+  const navigate = useNavigate();
+  
+  let currentUser = {};
+    try {
+      const localData = localStorage.getItem("user");
+      if (localData && localData !== "undefined") {
+        currentUser = JSON.parse(localData);
+      }
+    } catch (e) {
+      console.error("Lỗi parse user data", e);
+    }
+    const userRole = currentUser?.role || "USER";
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -332,6 +345,22 @@ export default function Header({
                     </div>
                     <span>{t("header.user_menu.profile")}</span>
                   </button>
+
+                  {/* --- NÚT ADMIN (CHỈ HIỆN KHI ROLE LÀ ADMIN) --- */}
+                  {userRole === "ADMIN" && (
+                    <button
+                      onClick={() => {
+                        navigate("/admin");
+                        setShowUserDropdown(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-[13.5px] font-bold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50/50 rounded-xl flex items-center gap-3 transition-all duration-200 active:scale-[0.98] group"
+                    >
+                      <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100/40 flex items-center justify-center text-indigo-500 group-hover:scale-105 transition-transform duration-200 shrink-0">
+                        <FaShieldAlt size={12} />
+                      </div>
+                      <span>{t("header.user_menu.admin") || "Quản trị Admin"}</span>
+                    </button>
+                  )}
 
                   <button 
                     onClick={() => {

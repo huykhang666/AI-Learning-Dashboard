@@ -491,7 +491,8 @@
     "user_menu": {
       "profile": "Profile information",
       "billing": "Payment history",
-      "logout": "Log out"
+      "logout": "Log out",
+      "admin": "Admin dashboard"
     }
   },
   "sidebar": {

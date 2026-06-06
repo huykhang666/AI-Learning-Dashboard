@@ -32,9 +32,9 @@ adminClient.interceptors.request.use(attachAuthToken);
 userClient.interceptors.request.use(attachAuthToken);
 
 function unwrapResponse(response) {
-  console.log("📦 Response data:", response?.data);
+  console.log("Response data:", response?.data);
   const result = response?.data?.result ?? response?.data ?? null;
-  console.log("✅ Unwrapped result:", result);
+  console.log("Unwrapped result:", result);
   return result;
 }
 
