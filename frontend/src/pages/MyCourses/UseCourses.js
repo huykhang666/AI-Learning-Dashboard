@@ -1,6 +1,5 @@
-// src/pages/dashboard/MyCourses/UseCourses.js
 import { useState, useMemo, useEffect } from "react";
-import { userService } from "../../api/UserService";
+import axios from "axios"; // Đừng quên import axios nhé
 
 export function useCourses() {
   const [courses, setCourses] = useState([]);
@@ -12,25 +11,34 @@ export function useCourses() {
     const loadDashboardData = async () => {
       try {
         setLoading(true);
-        const userInfo = await userService.getMyInfo();
-        const currentUserId = userInfo.userId; 
+        // Lấy thẻ Token trong ví ra
+        const token = localStorage.getItem("accessToken"); 
 
-        if (currentUserId) {
-          const data = await userService.getCourses(currentUserId); 
-          setCourses(data);
-        }
+        // Gọi thẳng vào API Tất cả khóa học (thay localhost:8080 nếu cổng của nhóm bạn khác)
+        const response = await axios.get("http://localhost:8080/api/v1/courses", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        // Tùy theo chuẩn API của nhóm, dữ liệu thường nằm trong response.data.result
+        const allCourses = response.data.result || response.data || [];
+        setCourses(allCourses);
+
       } catch (error) {
-        console.error("Lỗi tải dữ liệu:", error);
+        console.error("Lỗi tải dữ liệu khóa học:", error);
       } finally {
         setLoading(false);
       }
     };
+    
     loadDashboardData();
   }, []);
 
   const filteredCourses = useMemo(() => {
     let result = courses;
 
+    // Nếu chuyển tab "Khóa học của tôi", mới lọc các khóa đã mở khóa
     if (activeTab === "mine") {
       result = result.filter((c) => c.unlocked === true);
     }
