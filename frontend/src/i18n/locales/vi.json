@@ -32,7 +32,8 @@
     "user_menu": {
       "profile": "Thông tin cá nhân",
       "billing": "Lịch sử thanh toán",
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "admin": "Quản trị Admin"
     }
   },
   "hero": {

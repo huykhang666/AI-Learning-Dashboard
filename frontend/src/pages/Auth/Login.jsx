@@ -185,8 +185,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
         try {
           const decoded = jwtDecode(data.result.token);
           const autoId = decoded.userId || decoded.id || decoded.sub;
+          const userRole = decoded.scope === "ADMIN" ? "ADMIN" : "USER";
           if (autoId) {
-            localStorage.setItem("user", JSON.stringify({ id: autoId }));
+            localStorage.setItem("user", JSON.stringify({ id: autoId, role: userRole }));
           }
         } catch (decodeErr) {
           console.warn(t("auth.login.errors.decode_token"), decodeErr);
