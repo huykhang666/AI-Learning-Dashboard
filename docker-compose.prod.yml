@@ -79,8 +79,8 @@ services:
       - MOMO_ENDPOINT=${MOMO_ENDPOINT}
       - MOMO_RETURN_URL=${MOMO_RETURN_URL}
       - MOMO_NOTIFY_URL=${MOMO_NOTIFY_URL}
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     networks:
       - ai-learning-network
     volumes:
@@ -96,8 +96,8 @@ services:
     restart: always
     environment:
       - PORT=8080
-    expose:
-      - "8080"
+    ports:
+      - "8000:8080"
     volumes:
       - ai_model_cache:/root/.cache
       - ./ai-service/storage:/app/storage
