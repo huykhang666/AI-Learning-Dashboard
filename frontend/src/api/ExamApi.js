@@ -14,7 +14,7 @@ examClient.interceptors.request.use((config) => {
 
 export const examApi = {
   getExams: async () => {
-    const res = await examClient.get("/exams");
+    const res = await examClient.get("/exams?size=1000");
     return res.data;
   },
   getExamDetail: async (id) => {

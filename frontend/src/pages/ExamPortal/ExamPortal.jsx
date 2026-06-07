@@ -12,7 +12,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   TbMath, TbAtom, TbFlask, TbSchool, 
-  TbVideo, TbClock, TbListNumbers, TbConfetti, TbChevronRight,
+  TbVideo, TbClock, TbListNumbers, TbConfetti, TbChevronRight, TbChevronLeft,
   TbInfoCircle, TbLock, TbAlertCircle, TbCheck, TbX, TbActivity,
   TbHelp, TbDeviceLaptop, TbAward
 } from "react-icons/tb";
@@ -214,7 +214,14 @@ const normalizeExamDetail = (detail) => {
           .map(([key, val]) => `${key}. ${val}`)
           .sort();
       } else if (Array.isArray(opts)) {
-        newQ.options = opts;
+        newQ.options = opts.map((opt, index) => {
+          const prefix = String.fromCharCode(65 + index); // A, B, C, D
+          const optStr = opt !== null && opt !== undefined ? String(opt) : "";
+          if (optStr.match(/^[A-D]\.\s/)) {
+            return optStr;
+          }
+          return `${prefix}. ${optStr}`;
+        });
       } else {
         newQ.options = newQ.options || [];
       }
@@ -266,18 +273,19 @@ export default function ExamPortal() {
   const [subjectSearch, setSubjectSearch] = useState("");
   const [currentUserName, setCurrentUserName] = useState("Học viên ẩn danh");
   const [leaderboard, setLeaderboard] = useState(() => {
-    return {
-      1: [
-        { name: "Nguyễn Hoàng Nam", score: 10.0, timeSeconds: 520, date: "Hôm nay" },
-        { name: "Trần Thị Minh Anh", score: 10.0, timeSeconds: 615, date: "Hôm qua" },
-        { name: "Phạm Thảo Vy", score: 9.33, timeSeconds: 480, date: "3 ngày trước" },
-      ],
-      2: [
-        { name: "Lê Minh Triết", score: 9.67, timeSeconds: 430, date: "2 ngày trước" },
-        { name: "Vũ Hải Đăng", score: 9.0, timeSeconds: 320, date: "Hôm nay" },
-      ]
-    };
+    try {
+      const stored = localStorage.getItem("examLeaderboards");
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return {};
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("examLeaderboards", JSON.stringify(leaderboard));
+    } catch (e) {}
+  }, [leaderboard]);
+
   const [answers, setAnswers] = useState({}); // { [qId]: answerValue }
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -332,6 +340,44 @@ export default function ExamPortal() {
     
     return "Khác";
   };
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const EXAMS_PER_PAGE = 12;
+
+  const filteredExams = React.useMemo(() => {
+    return exams.filter((exam) => {
+      // 1. Grade/Level Filter
+      if (selectedGrade !== "Tất cả") {
+        const grade = getNormalizedGrade(exam);
+        if (grade !== selectedGrade) return false;
+      }
+      
+      // 2. Subject Filter
+      if (selectedSubject !== "Tất cả") {
+        const sub = getNormalizedSubjectGroup(exam.subject);
+        if (sub !== selectedSubject) return false;
+      }
+      
+      return true;
+    });
+  }, [exams, selectedGrade, selectedSubject]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSubject, selectedGrade]);
+
+  const indexOfLastExam = currentPage * EXAMS_PER_PAGE;
+  const indexOfFirstExam = indexOfLastExam - EXAMS_PER_PAGE;
+  const paginatedExams = filteredExams.slice(indexOfFirstExam, indexOfLastExam);
+  const totalPages = Math.ceil(filteredExams.length / EXAMS_PER_PAGE);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const mainContent = document.querySelector("main") || document.querySelector(".overflow-y-auto");
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentPage]);
 
   useEffect(() => {
     try {
@@ -668,25 +714,60 @@ export default function ExamPortal() {
     try {
       const result = await examApi.submitExam(selectedExam.id, payload);
       console.log("Raw submitExam API response:", result);
-      // Hỗ trợ tự động mở bọc dữ liệu trả về sau khi nộp bài
-      const unwrappedResult = result?.results 
-        ? result 
-        : (result?.data?.results 
-            ? result.data 
-            : (result?.result?.results ? result.result : null));
-            
-      // Chuẩn hóa cấu trúc kết quả nộp bài
-      let normalizedResult = unwrappedResult || fallbackSubmitResult;
-      if (normalizedResult && !normalizedResult.results && normalizedResult.resultsMap) {
+      
+      const apiData = result?.data || result?.result || result;
+      let normalizedResult = null;
+      
+      if (apiData && (apiData.details || apiData.score !== undefined)) {
+        const detailsArray = apiData.details || [];
+        const resultsMap = {};
+        
+        detailsArray.forEach((d) => {
+          let uAns = d.userAnswer;
+          if (typeof uAns === "string" && (uAns.startsWith("{") || uAns.startsWith("["))) {
+            try { uAns = JSON.parse(uAns); } catch(e) {}
+          }
+          let cAns = d.correctAnswer;
+          if (typeof cAns === "string" && (cAns.startsWith("{") || cAns.startsWith("["))) {
+            try { cAns = JSON.parse(cAns); } catch(e) {}
+          }
+          resultsMap[d.questionId] = {
+            isCorrect: d.isCorrect,
+            userAnswer: uAns,
+            correctAnswer: cAns,
+            explanation: d.explanation
+          };
+        });
+        
         normalizedResult = {
-          ...normalizedResult,
-          results: normalizedResult.resultsMap
+          score: apiData.score,
+          correctCount: apiData.correctCount,
+          totalPoints: apiData.score,
+          honestyScore: apiData.honestyScore,
+          status: apiData.status,
+          results: resultsMap
         };
+      } else {
+        const unwrappedResult = result?.results 
+          ? result 
+          : (result?.data?.results 
+              ? result.data 
+              : (result?.result?.results ? result.result : null));
+              
+        normalizedResult = unwrappedResult || fallbackSubmitResult;
+        if (normalizedResult && !normalizedResult.results && normalizedResult.resultsMap) {
+          normalizedResult = {
+            ...normalizedResult,
+            results: normalizedResult.resultsMap
+          };
+        }
       }
+      
       setSubmitResult(normalizedResult);
       
       // Calculate time spent
-      const timeSpentSeconds = selectedExam ? (selectedExam.durationMinutes * 60 - timeLeft) : 0;
+      const durationMinutes = selectedExam ? (selectedExam.durationMinutes || selectedExam.duration || 15) : 15;
+      const timeSpentSeconds = durationMinutes * 60 - timeLeft;
       const finalScore = normalizedResult?.score !== undefined ? normalizedResult.score : fallbackSubmitResult.score;
       
       // Add result to exam-specific leaderboard
@@ -702,10 +783,10 @@ export default function ExamPortal() {
         const currentList = prev[examId] || [];
         const updated = [...currentList, newLeaderboardEntry];
         const sorted = updated.sort((a, b) => {
-          if (b.score !== a.score) {
-            return b.score - a.score;
+          if (Number(b.score) !== Number(a.score)) {
+            return Number(b.score) - Number(a.score);
           }
-          return a.timeSeconds - b.timeSeconds;
+          return Number(a.timeSeconds) - Number(b.timeSeconds);
         });
         return {
           ...prev,
@@ -821,51 +902,75 @@ export default function ExamPortal() {
             {/* Glassmorphism Bento Grid Layout */}
             <div className="grid grid-cols-12 gap-6 items-stretch">
               
-              {/* Left Asymmetric Statistic/Info Bento Tile (col-span-4) */}
-              <div className="col-span-12 lg:col-span-4 flex flex-col justify-between bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group min-h-[460px]">
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-indigo-500/10 blur-2xl group-hover:scale-125 transition-transform duration-500" />
+              {/* Top Horizontal AI Monitoring Bento Tile (col-span-12) */}
+              <div className="col-span-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-indigo-500/10 blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
                 
-                <div className="space-y-6">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
-                    <TbAlertCircle size={22} />
+                <div className="flex flex-col lg:flex-row gap-6 justify-between items-stretch">
+                  {/* Left part: Title & Intro */}
+                  <div className="flex-1 min-w-[280px] flex flex-col justify-between space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                          <TbAlertCircle size={22} />
+                        </div>
+                        <h3 className="text-[19px] font-black text-slate-800">Cơ Chế Giám Sát AI</h3>
+                      </div>
+                      <p className="text-[14px] text-slate-600 leading-relaxed">
+                        Chế độ giám sát AI mô phỏng kỳ thi chính thức nghiêm ngặt. Khi kích hoạt chế độ này:
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2.5 pt-2 lg:pt-0">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-xs font-bold text-slate-500">Môi trường thi trực tuyến an toàn</span>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-black text-slate-800">Cơ Chế Giám Sát AI</h3>
-                    <p className="text-sm text-slate-655 leading-relaxed mt-2">
-                      Chế độ giám sát AI mô phỏng kỳ thi chính thức nghiêm ngặt. Khi kích hoạt chế độ này:
-                    </p>
-                    <ul className="text-[13.5px] text-slate-700 space-y-3 mt-4">
-                      <li className="flex items-start gap-2">
-                        <TbCheck size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                        <span>Giám sát camera ghi hình liên tục trong suốt phòng thi.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <TbCheck size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                        <span>Cảnh báo nếu đổi tab, rời màn hình, nhấp chuột phải.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <TbCheck size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                        <span>Chấm điểm trung thực và tự động nộp bài khi vi phạm nhiều lần.</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
 
-                <div className="pt-6 border-t border-slate-100 flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
-                  <span className="text-xs font-bold text-slate-500">Môi trường thi trực tuyến an toàn</span>
+                  {/* Right part: Features Grid */}
+                  <div className="flex-[2] grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-2xl bg-indigo-50/20 border border-indigo-100/30 flex gap-3 items-start">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-55 flex items-center justify-center text-emerald-600 shrink-0">
+                        <TbCheck size={16} />
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[12.5px] font-black text-indigo-600 block">GIÁM SÁT CAMERA</span>
+                        <p className="text-[12px] text-slate-655 leading-normal">Giám sát camera ghi hình liên tục trong suốt phòng thi.</p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-indigo-50/20 border border-indigo-100/30 flex gap-3 items-start">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-55 flex items-center justify-center text-emerald-600 shrink-0">
+                        <TbCheck size={16} />
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[12.5px] font-black text-indigo-600 block">CHỐNG GIAN LẬN</span>
+                        <p className="text-[12px] text-slate-655 leading-normal">Cảnh báo nếu đổi tab, rời màn hình, nhấp chuột phải.</p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-indigo-50/20 border border-indigo-100/30 flex gap-3 items-start">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-55 flex items-center justify-center text-emerald-600 shrink-0">
+                        <TbCheck size={16} />
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[12.5px] font-black text-indigo-600 block">ĐIỂM TRUNG THỰC</span>
+                        <p className="text-[12px] text-slate-655 leading-normal">Chấm điểm trung thực và tự động nộp bài khi vi phạm nhiều lần.</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Right Exam Cards Bento Grid (col-span-8) */}
-              <div className="col-span-12 lg:col-span-8 space-y-6">
+              {/* Bottom Exam Cards Bento Grid (col-span-12) */}
+              <div className="col-span-12 space-y-6">
                 
                 {/* Dropdown Selection Filter Panel */}
-                <div className="flex flex-col sm:flex-row gap-4 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm relative z-30">
+                <div className="flex flex-col sm:flex-row gap-4 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-2xl p-4.5 shadow-sm relative z-30">
                   
                   {/* Grade Dropdown Select */}
                   <div className="flex-1 relative">
-                    <label className="block text-[11.5px] font-black uppercase text-indigo-600 tracking-wider mb-2">
+                    <label className="block text-[11px] font-black uppercase text-indigo-600 tracking-wider mb-1.5">
                       Phân loại lớp
                     </label>
                     <button
@@ -873,7 +978,7 @@ export default function ExamPortal() {
                         setIsGradeDropdownOpen(!isGradeDropdownOpen);
                         setIsSubjectDropdownOpen(false);
                       }}
-                      className={`w-full bg-white border rounded-2xl px-5 py-4 text-[17px] md:text-[18px] font-black flex items-center justify-between transition-all cursor-pointer ${
+                      className={`w-full bg-white border rounded-xl px-4.5 py-2.5 text-[15px] md:text-[16px] font-black flex items-center justify-between transition-all cursor-pointer ${
                         isGradeDropdownOpen
                           ? "border-indigo-500 text-indigo-600 ring-4 ring-indigo-500/10 bg-indigo-50/20"
                           : selectedGrade !== "Tất cả"
@@ -892,14 +997,14 @@ export default function ExamPortal() {
                     </button>
 
                     {isGradeDropdownOpen && (
-                      <div className="absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 max-h-[280px] overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-1 mb-2">
+                      <div className="absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-[280px] overflow-y-auto p-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-1 mb-1.5">
                           <input
                             type="text"
                             placeholder="Tìm kiếm lớp..."
                             value={gradeSearch}
                             onChange={(e) => setGradeSearch(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold text-slate-700"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 font-bold text-slate-700"
                           />
                         </div>
                         {["Tất cả", "Đại học / THPT QG", "Lớp 12", "Lớp 11", "Lớp 10"]
@@ -910,11 +1015,11 @@ export default function ExamPortal() {
                               <button
                                 key={grade}
                                 onClick={() => {
-                                  setSelectedGrade(grade);
-                                  setIsGradeDropdownOpen(false);
-                                  setGradeSearch("");
+                                    setSelectedGrade(grade);
+                                    setIsGradeDropdownOpen(false);
+                                    setGradeSearch("");
                                 }}
-                                className={`w-full text-left px-4 py-3 text-[16px] md:text-[17px] font-extrabold rounded-xl transition-all cursor-pointer ${
+                                className={`w-full text-left px-3.5 py-2 text-[14.5px] md:text-[15px] font-extrabold rounded-lg transition-all cursor-pointer ${
                                   isSelected
                                     ? "bg-indigo-50 text-indigo-600 font-black"
                                     : "text-slate-700 hover:bg-indigo-50/50 hover:text-indigo-600"
@@ -930,7 +1035,7 @@ export default function ExamPortal() {
 
                   {/* Subject Dropdown Select */}
                   <div className="flex-1 relative">
-                    <label className="block text-[11.5px] font-black uppercase text-indigo-600 tracking-wider mb-2">
+                    <label className="block text-[11px] font-black uppercase text-indigo-600 tracking-wider mb-1.5">
                       Môn học
                     </label>
                     <button
@@ -938,7 +1043,7 @@ export default function ExamPortal() {
                         setIsSubjectDropdownOpen(!isSubjectDropdownOpen);
                         setIsGradeDropdownOpen(false);
                       }}
-                      className={`w-full bg-white border rounded-2xl px-5 py-4 text-[17px] md:text-[18px] font-black flex items-center justify-between transition-all cursor-pointer ${
+                      className={`w-full bg-white border rounded-xl px-4.5 py-2.5 text-[15px] md:text-[16px] font-black flex items-center justify-between transition-all cursor-pointer ${
                         isSubjectDropdownOpen
                           ? "border-indigo-500 text-indigo-600 ring-4 ring-indigo-500/10 bg-indigo-50/20"
                           : selectedSubject !== "Tất cả"
@@ -957,14 +1062,14 @@ export default function ExamPortal() {
                     </button>
 
                     {isSubjectDropdownOpen && (
-                      <div className="absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 max-h-[280px] overflow-y-auto p-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-1 mb-2">
+                      <div className="absolute left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-[280px] overflow-y-auto p-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-1 mb-1.5">
                           <input
                             type="text"
                             placeholder="Tìm kiếm môn học..."
                             value={subjectSearch}
                             onChange={(e) => setSubjectSearch(e.target.value)}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500 font-bold text-slate-700"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 font-bold text-slate-700"
                           />
                         </div>
                         {["Tất cả", "Toán học", "Vật lý", "Hóa học", "Ngữ văn", "Tiếng Anh"]
@@ -979,7 +1084,7 @@ export default function ExamPortal() {
                                   setIsSubjectDropdownOpen(false);
                                   setSubjectSearch("");
                                 }}
-                                className={`w-full text-left px-4 py-3 text-[16px] md:text-[17px] font-extrabold rounded-xl transition-all cursor-pointer ${
+                                className={`w-full text-left px-3.5 py-2 text-[14.5px] md:text-[15px] font-extrabold rounded-lg transition-all cursor-pointer ${
                                   isSelected
                                     ? "bg-indigo-50 text-indigo-600 font-black"
                                     : "text-slate-700 hover:bg-indigo-50/50 hover:text-indigo-600"
@@ -994,119 +1099,150 @@ export default function ExamPortal() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
                   {isLoadingExams ? (
-                    <div className="col-span-2 flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[300px]">
+                    <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[300px]">
                       <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
                       <span className="text-xs font-semibold text-slate-500">Đang tải danh sách đề thi...</span>
                     </div>
-                  ) : (() => {
-                    const filteredExams = exams.filter((exam) => {
-                      // 1. Grade/Level Filter
-                      if (selectedGrade !== "Tất cả") {
-                        const grade = getNormalizedGrade(exam);
-                        if (grade !== selectedGrade) return false;
-                      }
-                      
-                      // 2. Subject Filter
-                      if (selectedSubject !== "Tất cả") {
-                        const sub = getNormalizedSubjectGroup(exam.subject);
-                        if (sub !== selectedSubject) return false;
-                      }
-                      
-                      return true;
-                    });
-
-                    if (filteredExams.length === 0) {
-                      return (
-                        <div className="col-span-2 flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[300px]">
+                  ) : (
+                    <>
+                      {filteredExams.length === 0 ? (
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[300px]">
                           <span className="text-xs font-semibold text-slate-500">Không tìm thấy đề thi phù hợp với bộ lọc.</span>
                         </div>
-                      );
-                    }
+                      ) : (
+                        paginatedExams.map((exam, index) => {
+                          const theme = getSubjectColor(exam.subject);
+                          const isAiEnabled = !!aiMonitoredExams[exam.id];
+                          
+                          return (
+                            <motion.div
+                              key={exam.id}
+                              initial={{ opacity: 0, y: 15 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.08 }}
+                              className="bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-slate-300/60 transition-all duration-300 flex flex-col justify-between"
+                            >
+                              <div className="space-y-4">
+                                {/* Subject Badge */}
+                                <div className="flex justify-between items-center">
+                                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${theme.bg}`}>
+                                    {theme.icon}
+                                    {exam.subject}
+                                  </span>
+                                  <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
+                                    <TbClock size={13} /> {exam.durationMinutes || exam.duration} phút
+                                  </span>
+                                </div>
 
-                    return filteredExams.map((exam, index) => {
-                      const theme = getSubjectColor(exam.subject);
-                      const isAiEnabled = !!aiMonitoredExams[exam.id];
-                      
-                      return (
-                        <motion.div
-                          key={exam.id}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.08 }}
-                          className="bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm hover:shadow-md hover:border-slate-300/60 transition-all duration-300 flex flex-col justify-between"
-                        >
-                          <div className="space-y-4">
-                            {/* Subject Badge */}
-                            <div className="flex justify-between items-center">
-                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${theme.bg}`}>
-                                {theme.icon}
-                                {exam.subject}
-                              </span>
-                              <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
-                                <TbClock size={13} /> {exam.durationMinutes || exam.duration} phút
-                              </span>
-                            </div>
+                                {/* Title */}
+                                <h3 className="text-[19px] md:text-[20px] font-black text-slate-800 leading-snug group-hover:text-indigo-600 transition-colors">
+                                  {exam.title}
+                                </h3>
 
-                            {/* Title */}
-                            <h3 className="text-[19px] md:text-[20px] font-black text-slate-800 leading-snug group-hover:text-indigo-600 transition-colors">
-                              {exam.title}
-                            </h3>
+                                {/* Description */}
+                                <p className="text-[14.5px] text-slate-600 leading-relaxed line-clamp-2">
+                                  {exam.description}
+                                </p>
 
-                            {/* Description */}
-                            <p className="text-[14.5px] text-slate-600 leading-relaxed line-clamp-2">
-                              {exam.description}
-                            </p>
+                                {/* Meta items */}
+                                <div className="flex items-center gap-3 text-[13px] text-slate-500 font-bold pt-1">
+                                  <span className="flex items-center gap-1"><TbListNumbers size={13} /> {exam.questionCount || exam.questions?.length || 0} Câu hỏi</span>
+                                  <span>•</span>
+                                  <span>Thang điểm 10.0</span>
+                                </div>
+                              </div>
 
-                            {/* Meta items */}
-                            <div className="flex items-center gap-3 text-[13px] text-slate-500 font-bold pt-1">
-                              <span className="flex items-center gap-1"><TbListNumbers size={13} /> {exam.questionCount || exam.questions?.length || 0} Câu hỏi</span>
-                              <span>•</span>
-                              <span>Thang điểm 10.0</span>
-                            </div>
-                          </div>
+                              {/* Switch Toggle and Action */}
+                              <div className="mt-6 pt-5 border-t border-slate-100 space-y-4">
+                                {/* Toggle AI Monitor Switch */}
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-bold text-slate-655 flex items-center gap-1.5 select-none">
+                                    <TbVideo size={14} className={isAiEnabled ? "text-emerald-500 animate-pulse" : "text-slate-400"} />
+                                    Chế độ giám sát AI
+                                  </span>
+                                  
+                                  {/* Custom Toggle Switch */}
+                                  <button
+                                    onClick={() => toggleAiMode(exam.id)}
+                                    className={`w-10 h-5.5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none relative flex items-center ${
+                                      isAiEnabled ? "bg-emerald-500" : "bg-slate-200"
+                                    }`}
+                                  >
+                                    <motion.div 
+                                      layout
+                                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                      className="w-4.5 h-4.5 bg-white rounded-full shadow-sm"
+                                      style={{
+                                        position: 'absolute',
+                                        left: isAiEnabled ? '21px' : '3px'
+                                      }}
+                                    />
+                                  </button>
+                                </div>
 
-                          {/* Switch Toggle and Action */}
-                          <div className="mt-6 pt-5 border-t border-slate-100 space-y-4">
-                            {/* Toggle AI Monitor Switch */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-bold text-slate-655 flex items-center gap-1.5 select-none">
-                                <TbVideo size={14} className={isAiEnabled ? "text-emerald-500 animate-pulse" : "text-slate-400"} />
-                                Chế độ giám sát AI
-                              </span>
-                              
-                              {/* Custom Toggle Switch */}
+                                {/* Play Exam Button */}
+                                <button
+                                  onClick={() => handleSelectExamForPreview(exam)}
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm py-3.5 rounded-2xl shadow-sm hover:shadow-md hover:shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                >
+                                  Xem Chi Tiết & Bắt Đầu <TbChevronRight size={14} />
+                                </button>
+                              </div>
+                            </motion.div>
+                          );
+                        })
+                      )}
+
+                      {/* Pagination Controls */}
+                      {totalPages > 1 && (
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3 flex items-center justify-center gap-2 mt-8 z-10">
+                          <button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                              currentPage === 1
+                                ? "bg-slate-50 text-slate-350 border-slate-200 cursor-not-allowed"
+                                : "bg-white hover:bg-slate-50 text-slate-700 border-slate-250 active:scale-95 shadow-sm"
+                            }`}
+                          >
+                            <TbChevronLeft size={16} />
+                          </button>
+
+                          {Array.from({ length: totalPages }).map((_, i) => {
+                            const pageNum = i + 1;
+                            const isCurrent = currentPage === pageNum;
+                            return (
                               <button
-                                onClick={() => toggleAiMode(exam.id)}
-                                className={`w-10 h-5.5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none relative flex items-center ${
-                                  isAiEnabled ? "bg-emerald-500" : "bg-slate-200"
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={`w-10 h-10 rounded-xl font-black text-sm flex items-center justify-center transition-all cursor-pointer ${
+                                  isCurrent
+                                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20 border-none"
+                                    : "bg-white hover:bg-slate-50 text-slate-700 border border-slate-250 active:scale-95 shadow-sm"
                                 }`}
                               >
-                                <motion.div 
-                                  layout
-                                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                  className="w-4.5 h-4.5 bg-white rounded-full shadow-sm"
-                                  style={{
-                                    position: 'absolute',
-                                    left: isAiEnabled ? '21px' : '3px'
-                                  }}
-                                />
+                                {pageNum}
                               </button>
-                            </div>
+                            );
+                          })}
 
-                            {/* Play Exam Button */}
-                            <button
-                              onClick={() => handleSelectExamForPreview(exam)}
-                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm py-3.5 rounded-2xl shadow-sm hover:shadow-md hover:shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                            >
-                              Xem Chi Tiết & Bắt Đầu <TbChevronRight size={14} />
-                            </button>
-                          </div>
-                        </motion.div>
-                      );
-                    });
-                  })()}
+                          <button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                              currentPage === totalPages
+                                ? "bg-slate-50 text-slate-350 border-slate-200 cursor-not-allowed"
+                                : "bg-white hover:bg-slate-50 text-slate-700 border-slate-250 active:scale-95 shadow-sm"
+                            }`}
+                          >
+                            <TbChevronRight size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -1148,27 +1284,23 @@ export default function ExamPortal() {
             ) : (
               <div className="grid grid-cols-12 gap-6 items-stretch">
                 {/* Left Column: Leaderboard for this specific exam */}
-                <div className="col-span-12 lg:col-span-4 flex flex-col justify-between bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group min-h-[460px]">
-                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-indigo-500/10 blur-2xl group-hover:scale-125 transition-transform duration-500" />
-                  
-                  <div className="space-y-6">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase text-indigo-600 tracking-wider flex items-center gap-1">
-                        <TbAward size={12} /> BẢNG XẾP HẠNG CHI TIẾT
-                      </span>
-                      <h3 className="text-xl font-black text-slate-800 mt-1">Bảng Vàng Thủ Khoa</h3>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Vinh danh những thành tích xuất sắc nhất của bài thi này.
-                      </p>
-                    </div>
+                {getExamLeaderboard(selectedExam.id).length > 0 && (
+                  <div className="col-span-12 lg:col-span-4 flex flex-col justify-between bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group min-h-[460px]">
+                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-indigo-500/10 blur-2xl group-hover:scale-125 transition-transform duration-500" />
+                    
+                    <div className="space-y-6">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black uppercase text-indigo-600 tracking-wider flex items-center gap-1">
+                          <TbAward size={12} /> BẢNG XẾP HẠNG CHI TIẾT
+                        </span>
+                        <h3 className="text-xl font-black text-slate-800 mt-1">Bảng Vàng Thủ Khoa</h3>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Vinh danh những thành tích xuất sắc nhất của bài thi này.
+                        </p>
+                      </div>
 
-                    <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1">
-                      {getExamLeaderboard(selectedExam.id).length === 0 ? (
-                        <div className="text-center py-16 text-slate-400 text-xs font-medium">
-                          Chưa có lượt thi nào. Hãy là người đầu tiên chinh phục!
-                        </div>
-                      ) : (
-                        getExamLeaderboard(selectedExam.id).map((user, idx) => {
+                      <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1">
+                        {getExamLeaderboard(selectedExam.id).map((user, idx) => {
                           const isTop3 = idx < 3;
                           const rankIcons = ["🥇", "🥈", "🥉"];
                           const isCurrentUser = user.name === currentUserName || user.name.includes("Bạn");
@@ -1208,19 +1340,21 @@ export default function ExamPortal() {
                               </div>
                             </div>
                           );
-                        })
-                      )}
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center text-xs text-slate-500 font-semibold">
+                      <span>Tiêu chí xếp thứ hạng:</span>
+                      <span className="text-indigo-600 font-black">Điểm cao → Thời gian ít</span>
                     </div>
                   </div>
-
-                  <div className="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center text-xs text-slate-500 font-semibold">
-                    <span>Tiêu chí xếp thứ hạng:</span>
-                    <span className="text-indigo-600 font-black">Điểm cao → Thời gian ít</span>
-                  </div>
-                </div>
+                )}
 
                 {/* Right Column: Detailed Exam Info & Rules & Camera Config */}
-                <div className="col-span-12 lg:col-span-8 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col justify-between">
+                <div className={`col-span-12 ${
+                  getExamLeaderboard(selectedExam.id).length > 0 ? "lg:col-span-8" : ""
+                } bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col justify-between`}>
                   <div className="space-y-6">
                     {/* Subject and Time badges */}
                     <div className="flex justify-between items-start gap-4">
@@ -1406,7 +1540,7 @@ export default function ExamPortal() {
                               <button
                                 key={option}
                                 onClick={() => handleSelectSingleChoice(examDetail.questions[activeQuestionIndex].id, optionKey)}
-                                className={`w-full text-left px-6 py-4.5 rounded-2xl border text-[17px] md:text-[18px] font-bold transition-all duration-200 flex items-center justify-between active:scale-[0.99] cursor-pointer ${
+                                className={`w-full text-left px-6 py-4.5 rounded-2xl border text-[17px] md:text-[18px] font-medium transition-all duration-200 flex items-center justify-between active:scale-[0.99] cursor-pointer ${
                                   isSelected 
                                     ? "bg-indigo-50/70 text-indigo-700 border-indigo-300 shadow-sm"
                                     : "bg-white/60 hover:bg-slate-50 text-slate-700 border-slate-200/70"
@@ -1435,7 +1569,7 @@ export default function ExamPortal() {
                                 <th className="py-3.5 px-4 text-center w-28">Sai (F)</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 text-[16px] md:text-[17px] text-slate-800 font-bold">
+                            <tbody className="divide-y divide-slate-100 text-[16px] md:text-[17px] text-slate-800 font-medium">
                               {examDetail.questions[activeQuestionIndex].subQuestions.map((subQ) => {
                                 const qId = examDetail.questions[activeQuestionIndex].id;
                                 const userSubAnswers = answers[qId] || {};
@@ -1444,7 +1578,7 @@ export default function ExamPortal() {
 
                                 return (
                                   <tr key={subQ.key} className="hover:bg-slate-50/20">
-                                    <td className="py-4 px-4 font-bold">{subQ.key}. {subQ.text}</td>
+                                    <td className="py-4 px-4 font-medium">{subQ.key}. {subQ.text}</td>
                                     <td className="py-3 px-4 text-center">
                                       <button
                                         onClick={() => handleSelectTrueFalse(qId, subQ.key, "T")}
@@ -1488,7 +1622,7 @@ export default function ExamPortal() {
                             placeholder="Nhập giá trị số (ví dụ: 10, -2.5, 1.25, ...)"
                             value={answers[examDetail.questions[activeQuestionIndex].id] || ""}
                             onChange={(e) => handleSelectShortAnswer(examDetail.questions[activeQuestionIndex].id, e.target.value)}
-                            className="w-full border border-slate-200 rounded-2xl px-6 py-4.5 text-[17px] md:text-[18px] text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 bg-slate-50/20 hover:bg-slate-50/50 transition-all font-bold"
+                            className="w-full border border-slate-200 rounded-2xl px-6 py-4.5 text-[17px] md:text-[18px] text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 bg-slate-50/20 hover:bg-slate-50/50 transition-all font-medium"
                           />
                           <p className="text-xs text-slate-500 font-semibold flex items-center gap-1">
                             <TbInfoCircle size={13} /> Nhập kết số nguyên hoặc số thực thập phân, không chứa ký tự chữ.
@@ -1658,7 +1792,7 @@ export default function ExamPortal() {
                   </div>
                   <div className="flex justify-between items-center text-[15px]">
                     <span className="text-slate-500 font-medium">Thời gian hoàn thành</span>
-                    <span className="text-slate-800 font-bold">{selectedExam ? selectedExam.durationMinutes : 15} phút</span>
+                    <span className="text-slate-800 font-bold">{selectedExam ? (selectedExam.durationMinutes || selectedExam.duration) : 15} phút</span>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-slate-100 text-xs text-slate-400 font-semibold text-center">
@@ -1743,9 +1877,11 @@ export default function ExamPortal() {
                         <div className="space-y-1">
                           <span className="text-slate-400 block uppercase tracking-wider text-[11px]">Lựa chọn của bạn</span>
                           <span className={isCorrect ? "text-emerald-600 font-extrabold" : "text-rose-500 font-extrabold"}>
-                            {typeof itemResult.userAnswer === "object" 
-                              ? JSON.stringify(itemResult.userAnswer)
-                              : itemResult.userAnswer || "(Không trả lời)"}
+                            {itemResult.userAnswer === null || itemResult.userAnswer === undefined || itemResult.userAnswer === "null" || itemResult.userAnswer === ""
+                              ? "Không chọn"
+                              : typeof itemResult.userAnswer === "object"
+                                ? JSON.stringify(itemResult.userAnswer)
+                                : itemResult.userAnswer}
                           </span>
                         </div>
                         <div className="space-y-1">
