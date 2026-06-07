@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../common/LanguageSwitcher";
 import {
   LayoutDashboard,
   Menu,
@@ -11,30 +13,22 @@ import {
 } from "lucide-react";
 
 const navigation = [
-  { label: "Dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Users", to: "/admin/users", icon: Users },
-  { label: "Payments", to: "/admin/payments", icon: CreditCard },
+  { key: "dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
+  { key: "users", to: "/admin/users", icon: Users },
+  { key: "payments", to: "/admin/payments", icon: CreditCard },
 ];
 
-const titleMap = {
-  "/admin/dashboard": "Dashboard",
-  "/admin/users": "User Management",
-  "/admin/payments": "Payment Management",
-};
-
 export default function AdminLayout({ onLogout }) {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
   const pageTitle = useMemo(() => {
-    if (titleMap[location.pathname]) {
-      return titleMap[location.pathname];
-    }
-
-    if (location.pathname.startsWith("/admin/users")) return "User Management";
-    if (location.pathname.startsWith("/admin/payments")) return "Payment Management";
-    return "Admin Dashboard";
-  }, [location.pathname]);
+    if (location.pathname.startsWith("/admin/dashboard")) return t("admin.layout.titles.dashboard");
+    if (location.pathname.startsWith("/admin/users")) return t("admin.layout.titles.users");
+    if (location.pathname.startsWith("/admin/payments")) return t("admin.layout.titles.payments");
+    return t("admin.layout.titles.dashboard");
+  }, [location.pathname, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/40 text-gray-900">
@@ -43,7 +37,7 @@ export default function AdminLayout({ onLogout }) {
           type="button"
           onClick={() => setMobileOpen(false)}
           className="fixed inset-0 z-30 bg-slate-900/35 backdrop-blur-[1px] lg:hidden"
-          aria-label="Close sidebar overlay"
+          aria-label={t("admin.layout.aria.close_overlay")}
         />
       )}
 
@@ -59,9 +53,9 @@ export default function AdminLayout({ onLogout }) {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.24em] text-gray-400">
-                Control Center
+                {t("admin.layout.brand_tag")}
               </p>
-              <h2 className="text-base font-bold text-gray-900">AI Learning Admin</h2>
+              <h2 className="text-base font-bold text-gray-900">{t("admin.layout.brand_name")}</h2>
             </div>
           </div>
 
@@ -69,14 +63,14 @@ export default function AdminLayout({ onLogout }) {
             type="button"
             onClick={() => setMobileOpen(false)}
             className="rounded-full border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition hover:border-blue-200 hover:text-blue-700 lg:hidden"
-            aria-label="Close sidebar"
+            aria-label={t("admin.layout.aria.close_sidebar")}
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <nav className="flex-1 space-y-1 px-3 py-4">
-          {navigation.map(({ label, to, icon: Icon }) => (
+          {navigation.map(({ key, to, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -91,7 +85,7 @@ export default function AdminLayout({ onLogout }) {
               }
             >
               <Icon className="h-4 w-4 shrink-0" />
-              <span>{label}</span>
+              <span>{t(`admin.layout.navigation.${key}`)}</span>
             </NavLink>
           ))}
         </nav>
@@ -99,10 +93,10 @@ export default function AdminLayout({ onLogout }) {
         <div className="border-t border-gray-100 p-5">
           <div className="rounded-3xl border border-gray-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-4 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">
-              Admin workspace
+              {t("admin.layout.workspace_tag")}
             </p>
             <p className="mt-2 text-sm leading-6 text-gray-600">
-              Quản lý dashboard, user và giao dịch thanh toán trong một giao diện tập trung.
+              {t("admin.layout.workspace_description")}
             </p>
           </div>
         </div>
@@ -116,27 +110,30 @@ export default function AdminLayout({ onLogout }) {
                 type="button"
                 onClick={() => setMobileOpen(true)}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50 lg:hidden"
-                aria-label="Open sidebar"
+                aria-label={t("admin.layout.aria.open_sidebar")}
               >
                 <Menu className="h-5 w-5" />
               </button>
 
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.24em] text-gray-400">
-                  Admin area
+                  {t("admin.layout.area_tag")}
                 </p>
                 <h1 className="text-lg font-bold text-gray-900 sm:text-xl">{pageTitle}</h1>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={onLogout}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-700 to-cyan-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:shadow-md"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Đăng xuất</span>
-            </button>
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+              <button
+                type="button"
+                onClick={onLogout}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-700 to-cyan-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:shadow-md"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{t("admin.layout.logout")}</span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -147,3 +144,4 @@ export default function AdminLayout({ onLogout }) {
     </div>
   );
 }
+

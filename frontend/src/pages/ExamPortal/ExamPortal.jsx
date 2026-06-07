@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   TbMath, TbAtom, TbFlask, TbSchool, 
@@ -254,6 +255,70 @@ const normalizeExamDetail = (detail) => {
 };
 
 export default function ExamPortal() {
+  const { t } = useTranslation();
+
+  const getNormalizedSubjectGroup = (subjectName) => {
+    if (!subjectName) return "Khác";
+    const name = subjectName.toLowerCase().trim();
+    if (name === "tất cả" || name === "all") return "Tất cả";
+    if (name.includes("toán")) return "Toán học";
+    if (name.includes("lý") || name.includes("vật lý")) return "Vật lý";
+    if (name.includes("hóa")) return "Hóa học";
+    if (name.includes("văn") || name.includes("ngữ văn")) return "Ngữ văn";
+    if (name.includes("anh") || name.includes("tiếng anh")) return "Tiếng Anh";
+    return "Khác";
+  };
+
+  const getSubjectLabel = (subject) => {
+    const normalized = getNormalizedSubjectGroup(subject);
+    switch (normalized) {
+      case "Tất cả":
+        return t("exam_portal.filter_all");
+      case "Toán học":
+        return t("exam_portal.filter_math");
+      case "Vật lý":
+        return t("exam_portal.filter_physics");
+      case "Hóa học":
+        return t("exam_portal.filter_chemistry");
+      case "Ngữ văn":
+        return t("exam_portal.filter_literature", { defaultValue: "Ngữ văn" });
+      case "Tiếng Anh":
+        return t("exam_portal.filter_english", { defaultValue: "Tiếng Anh" });
+      default:
+        return subject;
+    }
+  };
+
+  const getGradeLabel = (grade) => {
+    switch (grade) {
+      case "Tất cả":
+        return t("exam_portal.filter_all");
+      case "Đại học / THPT QG":
+        return t("exam_portal.filter_university_prep", { defaultValue: "Đại học / THPT QG" });
+      case "Lớp 12":
+        return t("exam_portal.filter_grade_12", { defaultValue: "Lớp 12" });
+      case "Lớp 11":
+        return t("exam_portal.filter_grade_11", { defaultValue: "Lớp 11" });
+      case "Lớp 10":
+        return t("exam_portal.filter_grade_10", { defaultValue: "Lớp 10" });
+      default:
+        return grade;
+    }
+  };
+
+  const getReasonLabel = (reason) => {
+    switch (reason) {
+      case "Thoát chế độ toàn màn hình":
+        return t("exam_portal.reason_exit_fullscreen", { defaultValue: "Thoát chế độ toàn màn hình" });
+      case "Chuyển sang tab khác":
+        return t("exam_portal.reason_switch_tab", { defaultValue: "Chuyển sang tab khác" });
+      case "Rời con trỏ ngoài cửa sổ thi":
+        return t("exam_portal.reason_cursor_leave", { defaultValue: "Rời con trỏ ngoài cửa sổ thi" });
+      default:
+        return reason;
+    }
+  };
+
   // --- STATE MANAGEMENT ---
   const [exams, setExams] = useState([]);
   const [isLoadingExams, setIsLoadingExams] = useState(true);
@@ -310,16 +375,7 @@ export default function ExamPortal() {
     return leaderboard[examId] || [];
   };
 
-  const getNormalizedSubjectGroup = (subjectName) => {
-    if (!subjectName) return "Khác";
-    const name = subjectName.toLowerCase().trim();
-    if (name.includes("toán")) return "Toán học";
-    if (name.includes("lý") || name.includes("vật lý")) return "Vật lý";
-    if (name.includes("hóa")) return "Hóa học";
-    if (name.includes("văn") || name.includes("ngữ văn")) return "Ngữ văn";
-    if (name.includes("anh") || name.includes("tiếng anh")) return "Tiếng Anh";
-    return "Khác";
-  };
+
 
   const getNormalizedGrade = (exam) => {
     if (!exam) return "Khác";
@@ -474,7 +530,7 @@ export default function ExamPortal() {
         })
         .catch((err) => {
           console.warn("[Webcam] Không thể mở webcam:", err);
-          toast.error("Vui lòng cấp quyền truy cập Camera để kích hoạt chế độ Giám sát AI!");
+          toast.error(t("exam_portal.proctoring_toast_camera_required", { defaultValue: "Vui lòng cấp quyền truy cập Camera để kích hoạt chế độ Giám sát AI!" }));
         });
     } else {
       if (streamRef.current) {
@@ -529,7 +585,7 @@ export default function ExamPortal() {
 
     const handleContextMenu = (e) => {
       e.preventDefault();
-      toast.error("Hành vi kích chuột phải đã bị chặn trong kỳ thi!");
+      toast.error(t("exam_portal.proctoring_toast_right_click_blocked", { defaultValue: "Hành vi kích chuột phải đã bị chặn trong kỳ thi!" }));
     };
 
     const handleKeyDown = (e) => {
@@ -539,7 +595,7 @@ export default function ExamPortal() {
       
       if (isCtrlC || isCtrlV || isCtrlA) {
         e.preventDefault();
-        toast.error("Không được phép sao chép/dán trong lúc làm bài!");
+        toast.error(t("exam_portal.proctoring_toast_copy_paste_blocked", { defaultValue: "Không được phép sao chép/dán trong lúc làm bài!" }));
       }
     };
 
@@ -563,7 +619,7 @@ export default function ExamPortal() {
     setFlashActive(true);
     setTimeout(() => setFlashActive(false), 600);
     
-    toast.error(`CẢNH BÁO: Phát hiện hành vi [${reason}]! Điểm trung thực giảm 15%.`);
+    toast.error(t("exam_portal.proctoring_violation_alert", { reason: getReasonLabel(reason), defaultValue: "CẢNH BÁO: Phát hiện hành vi [{{reason}}]! Điểm trung thực giảm 15%." }));
     
     setHonestyScore((prev) => {
       const nextScore = Math.max(0, prev - 15);
@@ -659,7 +715,7 @@ export default function ExamPortal() {
             }
           }
         } catch (err) {
-          console.warn("Không thể tự động kích hoạt Fullscreen:", err);
+          console.warn(t("exam_portal.proctoring_warn_fullscreen_failed", { defaultValue: "Không thể tự động kích hoạt Fullscreen:" }), err);
         }
       }, 500);
     }
@@ -668,7 +724,7 @@ export default function ExamPortal() {
   // --- AUTO SUBMISSION PROCESS ---
   const handleAutoSubmit = async (finalHonesty) => {
     if (isSubmitting || activeTab !== "testing") return;
-    toast.error("KỲ THI ĐÃ KHÓA: Điểm trung thực quá thấp hoặc hết thời gian. Đang nộp bài tự động...");
+    toast.error(t("exam_portal.proctoring_toast_exam_locked", { defaultValue: "KỲ THI ĐÃ KHÓA: Điểm trung thực quá thấp hoặc hết thời gian. Đang nộp bài tự động..." }));
     
     // Exit Fullscreen if active
     if (document.fullscreenElement) {
@@ -837,12 +893,13 @@ export default function ExamPortal() {
 
   // Helpers for Icons & Backgrounds
   const getSubjectColor = (subject) => {
-    switch (subject?.toLowerCase()) {
-      case "toán học":
+    const normalized = getNormalizedSubjectGroup(subject);
+    switch (normalized) {
+      case "Toán học":
         return { bg: "bg-blue-50 text-blue-600 border-blue-100", icon: <TbMath size={18} /> };
-      case "vật lý":
+      case "Vật lý":
         return { bg: "bg-indigo-50 text-indigo-600 border-indigo-100", icon: <TbAtom size={18} /> };
-      case "hóa học":
+      case "Hóa học":
         return { bg: "bg-emerald-50 text-emerald-600 border-emerald-100", icon: <TbFlask size={18} /> };
       default:
         return { bg: "bg-zinc-50 text-zinc-600 border-zinc-150", icon: <TbSchool size={18} /> };
@@ -889,13 +946,13 @@ export default function ExamPortal() {
             <div className="flex flex-col gap-2">
               <span className="text-sm font-black tracking-[0.2em] text-indigo-600 uppercase flex items-center gap-1.5">
                 <TbActivity size={14} className="animate-pulse" />
-                Hệ Thống Khảo Thí Quốc Gia
+                {t("exam_portal.national_system", { defaultValue: "Hệ Thống Khảo Thí Quốc Gia" })}
               </span>
               <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight">
-                Cổng Thi Trực Tuyến Tích Hợp AI
+                {t("exam_portal.title")}
               </h1>
               <p className="text-[15px] text-slate-605 max-w-[65ch] leading-relaxed">
-                Tham gia các đợt thi thử chuẩn cấu trúc đề thi chính thức với công cụ giám sát AI cực kỳ minh bạch và trực tuyến.
+                {t("exam_portal.subtitle")}
               </p>
             </div>
 
@@ -914,16 +971,16 @@ export default function ExamPortal() {
                         <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
                           <TbAlertCircle size={22} />
                         </div>
-                        <h3 className="text-[19px] font-black text-slate-800">Cơ Chế Giám Sát AI</h3>
+                        <h3 className="text-[19px] font-black text-slate-800">{t("exam_portal.ai_monitor_title")}</h3>
                       </div>
                       <p className="text-[14px] text-slate-600 leading-relaxed">
-                        Chế độ giám sát AI mô phỏng kỳ thi chính thức nghiêm ngặt. Khi kích hoạt chế độ này:
+                        {t("exam_portal.ai_monitor_desc")}
                       </p>
                     </div>
                     
                     <div className="flex items-center gap-2.5 pt-2 lg:pt-0">
                       <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-xs font-bold text-slate-500">Môi trường thi trực tuyến an toàn</span>
+                      <span className="text-xs font-bold text-slate-500">{t("exam_portal.proctoring_environment_status", { defaultValue: "Môi trường thi trực tuyến an toàn" })}</span>
                     </div>
                   </div>
 
@@ -934,8 +991,8 @@ export default function ExamPortal() {
                         <TbCheck size={16} />
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-[12.5px] font-black text-indigo-600 block">GIÁM SÁT CAMERA</span>
-                        <p className="text-[12px] text-slate-655 leading-normal">Giám sát camera ghi hình liên tục trong suốt phòng thi.</p>
+                        <span className="text-[12.5px] font-black text-indigo-600 block">{t("exam_portal.camera_monitoring_label", { defaultValue: "GIÁM SÁT CAMERA" })}</span>
+                        <p className="text-[12px] text-slate-655 leading-normal">{t("exam_portal.camera_monitoring_desc", { defaultValue: "Giám sát camera ghi hình liên tục trong suốt phòng thi." })}</p>
                       </div>
                     </div>
 
@@ -944,8 +1001,8 @@ export default function ExamPortal() {
                         <TbCheck size={16} />
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-[12.5px] font-black text-indigo-600 block">CHỐNG GIAN LẬN</span>
-                        <p className="text-[12px] text-slate-655 leading-normal">Cảnh báo nếu đổi tab, rời màn hình, nhấp chuột phải.</p>
+                        <span className="text-[12.5px] font-black text-indigo-600 block">{t("exam_portal.anti_cheat_label", { defaultValue: "CHỐNG GIAN LẬN" })}</span>
+                        <p className="text-[12px] text-slate-655 leading-normal">{t("exam_portal.anti_cheat_desc", { defaultValue: "Cảnh báo nếu đổi tab, rời màn hình, nhấp chuột phải." })}</p>
                       </div>
                     </div>
 
@@ -954,8 +1011,8 @@ export default function ExamPortal() {
                         <TbCheck size={16} />
                       </div>
                       <div className="space-y-0.5">
-                        <span className="text-[12.5px] font-black text-indigo-600 block">ĐIỂM TRUNG THỰC</span>
-                        <p className="text-[12px] text-slate-655 leading-normal">Chấm điểm trung thực và tự động nộp bài khi vi phạm nhiều lần.</p>
+                        <span className="text-[12.5px] font-black text-indigo-600 block">{t("exam_portal.honesty_score_label", { defaultValue: "ĐIỂM TRUNG THỰC" })}</span>
+                        <p className="text-[12px] text-slate-655 leading-normal">{t("exam_portal.honesty_score_desc", { defaultValue: "Chấm điểm trung thực và tự động nộp bài khi vi phạm nhiều lần." })}</p>
                       </div>
                     </div>
                   </div>
@@ -971,7 +1028,7 @@ export default function ExamPortal() {
                   {/* Grade Dropdown Select */}
                   <div className="flex-1 relative">
                     <label className="block text-[11px] font-black uppercase text-indigo-600 tracking-wider mb-1.5">
-                      Phân loại lớp
+                      {t("exam_portal.grade_filter_label", { defaultValue: "Phân loại lớp" })}
                     </label>
                     <button
                       onClick={() => {
@@ -986,7 +1043,7 @@ export default function ExamPortal() {
                             : "border-slate-200 hover:border-indigo-400 text-slate-700"
                       }`}
                     >
-                      <span>{selectedGrade}</span>
+                      <span>{getGradeLabel(selectedGrade)}</span>
                       <span className={`transition-transform duration-200 ${
                         isGradeDropdownOpen 
                           ? "transform rotate-180 text-indigo-600" 
@@ -1001,19 +1058,19 @@ export default function ExamPortal() {
                         <div className="p-1 mb-1.5">
                           <input
                             type="text"
-                            placeholder="Tìm kiếm lớp..."
+                            placeholder={t("exam_portal.grade_search_placeholder", { defaultValue: "Tìm kiếm lớp..." })}
                             value={gradeSearch}
                             onChange={(e) => setGradeSearch(e.target.value)}
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 font-bold text-slate-700"
                           />
                         </div>
                         {["Tất cả", "Đại học / THPT QG", "Lớp 12", "Lớp 11", "Lớp 10"]
-                          .filter(g => g.toLowerCase().includes(gradeSearch.toLowerCase()))
+                          .filter(g => getGradeLabel(g).toLowerCase().includes(gradeSearch.toLowerCase()))
                           .map((grade) => {
                             const isSelected = selectedGrade === grade;
                             return (
                               <button
-                                key={grade}
+                                key={getGradeLabel(grade)}
                                 onClick={() => {
                                     setSelectedGrade(grade);
                                     setIsGradeDropdownOpen(false);
@@ -1025,7 +1082,7 @@ export default function ExamPortal() {
                                     : "text-slate-700 hover:bg-indigo-50/50 hover:text-indigo-600"
                                 }`}
                               >
-                                {grade}
+                                {getGradeLabel(grade)}
                               </button>
                             );
                           })}
@@ -1036,7 +1093,7 @@ export default function ExamPortal() {
                   {/* Subject Dropdown Select */}
                   <div className="flex-1 relative">
                     <label className="block text-[11px] font-black uppercase text-indigo-600 tracking-wider mb-1.5">
-                      Môn học
+                      {t("exam_portal.details_subject")}
                     </label>
                     <button
                       onClick={() => {
@@ -1051,7 +1108,7 @@ export default function ExamPortal() {
                             : "border-slate-200 hover:border-indigo-400 text-slate-700"
                       }`}
                     >
-                      <span>{selectedSubject}</span>
+                      <span>{getSubjectLabel(selectedSubject)}</span>
                       <span className={`transition-transform duration-200 ${
                         isSubjectDropdownOpen 
                           ? "transform rotate-180 text-indigo-600" 
@@ -1066,19 +1123,19 @@ export default function ExamPortal() {
                         <div className="p-1 mb-1.5">
                           <input
                             type="text"
-                            placeholder="Tìm kiếm môn học..."
+                            placeholder={t("exam_portal.subject_search_placeholder", { defaultValue: "Tìm kiếm môn học..." })}
                             value={subjectSearch}
                             onChange={(e) => setSubjectSearch(e.target.value)}
                             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 font-bold text-slate-700"
                           />
                         </div>
                         {["Tất cả", "Toán học", "Vật lý", "Hóa học", "Ngữ văn", "Tiếng Anh"]
-                          .filter(s => s.toLowerCase().includes(subjectSearch.toLowerCase()))
+                          .filter(s => getSubjectLabel(s).toLowerCase().includes(subjectSearch.toLowerCase()))
                           .map((subject) => {
                             const isSelected = selectedSubject === subject;
                             return (
                               <button
-                                key={subject}
+                                key={getSubjectLabel(subject)}
                                 onClick={() => {
                                   setSelectedSubject(subject);
                                   setIsSubjectDropdownOpen(false);
@@ -1090,7 +1147,7 @@ export default function ExamPortal() {
                                     : "text-slate-700 hover:bg-indigo-50/50 hover:text-indigo-600"
                                 }`}
                               >
-                                {subject}
+                                {getSubjectLabel(subject)}
                               </button>
                             );
                           })}
@@ -1103,13 +1160,13 @@ export default function ExamPortal() {
                   {isLoadingExams ? (
                     <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[300px]">
                       <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
-                      <span className="text-xs font-semibold text-slate-500">Đang tải danh sách đề thi...</span>
+                      <span className="text-xs font-semibold text-slate-500">{t("exam_portal.loading_exams")}</span>
                     </div>
                   ) : (
                     <>
                       {filteredExams.length === 0 ? (
                         <div className="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[300px]">
-                          <span className="text-xs font-semibold text-slate-500">Không tìm thấy đề thi phù hợp với bộ lọc.</span>
+                          <span className="text-xs font-semibold text-slate-500">{t("exam_portal.no_exams")}</span>
                         </div>
                       ) : (
                         paginatedExams.map((exam, index) => {
@@ -1129,10 +1186,10 @@ export default function ExamPortal() {
                                 <div className="flex justify-between items-center">
                                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${theme.bg}`}>
                                     {theme.icon}
-                                    {exam.subject}
+                                    {getSubjectLabel(exam.subject)}
                                   </span>
                                   <span className="text-xs text-slate-500 font-bold flex items-center gap-1">
-                                    <TbClock size={13} /> {exam.durationMinutes || exam.duration} phút
+                                    <TbClock size={13} /> {exam.durationMinutes || exam.duration} {t("exam_portal.exam_card.duration_unit", { defaultValue: "phút" })}
                                   </span>
                                 </div>
 
@@ -1148,9 +1205,9 @@ export default function ExamPortal() {
 
                                 {/* Meta items */}
                                 <div className="flex items-center gap-3 text-[13px] text-slate-500 font-bold pt-1">
-                                  <span className="flex items-center gap-1"><TbListNumbers size={13} /> {exam.questionCount || exam.questions?.length || 0} Câu hỏi</span>
+                                  <span className="flex items-center gap-1"><TbListNumbers size={13} /> {exam.questionCount || exam.questions?.length || 0} {t("exam_portal.exam_card.questions_unit", { defaultValue: "Câu hỏi" })}</span>
                                   <span>•</span>
-                                  <span>Thang điểm 10.0</span>
+                                  <span>{t("exam_portal.exam_card.max_score", { defaultValue: "Thang điểm 10.0" })}</span>
                                 </div>
                               </div>
 
@@ -1160,7 +1217,7 @@ export default function ExamPortal() {
                                 <div className="flex items-center justify-between">
                                   <span className="text-sm font-bold text-slate-655 flex items-center gap-1.5 select-none">
                                     <TbVideo size={14} className={isAiEnabled ? "text-emerald-500 animate-pulse" : "text-slate-400"} />
-                                    Chế độ giám sát AI
+                                    {t("exam_portal.details_proctoring")}
                                   </span>
                                   
                                   {/* Custom Toggle Switch */}
@@ -1187,7 +1244,7 @@ export default function ExamPortal() {
                                   onClick={() => handleSelectExamForPreview(exam)}
                                   className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm py-3.5 rounded-2xl shadow-sm hover:shadow-md hover:shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                                 >
-                                  Xem Chi Tiết & Bắt Đầu <TbChevronRight size={14} />
+                                  {t("exam_portal.exam_card.start_btn")} <TbChevronRight size={14} />
                                 </button>
                               </div>
                             </motion.div>
@@ -1269,17 +1326,17 @@ export default function ExamPortal() {
                 }}
                 className="flex items-center gap-2 text-sm font-black text-slate-650 hover:text-slate-900 transition-all cursor-pointer bg-white px-4 py-2.5 rounded-xl border border-slate-200 hover:shadow-sm"
               >
-                ← Quay lại Trang Chủ Đề Thi
+                ← {t("exam_portal.results.exit_btn")}
               </button>
               <span className="text-xs font-black uppercase tracking-wider text-indigo-600">
-                Chi tiết phòng thi
+                {t("exam_portal.details_card")}
               </span>
             </div>
 
             {isLoadingDetail ? (
               <div className="flex flex-col items-center justify-center p-12 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl min-h-[400px]">
                 <div className="w-10 h-10 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
-                <span className="text-xs font-semibold text-slate-500">Đang chuẩn bị phòng thi và nạp đề...</span>
+                <span className="text-xs font-semibold text-slate-500">{t("exam_portal.loading_detail", { defaultValue: "Đang chuẩn bị phòng thi và nạp đề..." })}</span>
               </div>
             ) : (
               <div className="grid grid-cols-12 gap-6 items-stretch">
@@ -1291,11 +1348,11 @@ export default function ExamPortal() {
                     <div className="space-y-6">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black uppercase text-indigo-600 tracking-wider flex items-center gap-1">
-                          <TbAward size={12} /> BẢNG XẾP HẠNG CHI TIẾT
+                          <TbAward size={12} /> {t("exam_portal.leaderboard")}
                         </span>
-                        <h3 className="text-xl font-black text-slate-800 mt-1">Bảng Vàng Thủ Khoa</h3>
+                        <h3 className="text-xl font-black text-slate-800 mt-1">{t("exam_portal.leaderboard_title", { defaultValue: "Bảng Vàng Thủ Khoa" })}</h3>
                         <p className="text-xs text-slate-500 mt-1">
-                          Vinh danh những thành tích xuất sắc nhất của bài thi này.
+                          {t("exam_portal.leaderboard_desc", { defaultValue: "Vinh danh những thành tích xuất sắc nhất của bài thi này." })}
                         </p>
                       </div>
 
@@ -1332,7 +1389,7 @@ export default function ExamPortal() {
 
                               <div className="text-right space-y-0.5">
                                 <span className="text-sm font-black text-indigo-600 block leading-none">
-                                  {user.score.toFixed(1)} đ
+                                  {user.score.toFixed(1)} {t("exam_portal.score_unit", { defaultValue: "đ" })}
                                 </span>
                                 <span className="text-[10px] text-slate-550 block font-bold">
                                   {Math.floor(user.timeSeconds / 60)}m {user.timeSeconds % 60}s
@@ -1345,8 +1402,8 @@ export default function ExamPortal() {
                     </div>
 
                     <div className="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center text-xs text-slate-500 font-semibold">
-                      <span>Tiêu chí xếp thứ hạng:</span>
-                      <span className="text-indigo-600 font-black">Điểm cao → Thời gian ít</span>
+                      <span>{t("exam_portal.leaderboard_criteria_label", { defaultValue: "Tiêu chí xếp thứ hạng:" })}</span>
+                      <span className="text-indigo-600 font-black">{t("exam_portal.leaderboard_criteria_value", { defaultValue: "Điểm cao → Thời gian ít" })}</span>
                     </div>
                   </div>
                 )}
@@ -1361,7 +1418,7 @@ export default function ExamPortal() {
                       <div className="space-y-2">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${getSubjectColor(selectedExam.subject).bg}`}>
                           {getSubjectColor(selectedExam.subject).icon}
-                          {selectedExam.subject}
+                          {getSubjectLabel(selectedExam.subject)}
                         </span>
                         <h2 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight">
                           {selectedExam.title}
@@ -1370,7 +1427,7 @@ export default function ExamPortal() {
                       
                       <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-indigo-100 bg-indigo-50 text-indigo-600 text-sm font-extrabold shrink-0">
                         <TbClock size={16} />
-                        <span>{selectedExam.durationMinutes || selectedExam.duration || 15} phút</span>
+                        <span>{selectedExam.durationMinutes || selectedExam.duration || 15} {t("exam_portal.exam_card.duration_unit", { defaultValue: "phút" })}</span>
                       </div>
                     </div>
 
@@ -1380,29 +1437,29 @@ export default function ExamPortal() {
 
                     <div className="border-t border-slate-100 pt-6 space-y-4">
                       <h4 className="text-sm font-black uppercase text-slate-400 tracking-wider">
-                        Thông tin & Quy chế phòng thi
+                        {t("exam_portal.rules_title", { defaultValue: "Thông tin & Quy chế phòng thi" })}
                       </h4>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* AI monitoring rules card */}
                         <div className="p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50 space-y-2">
                           <span className="text-xs font-black text-indigo-600 uppercase tracking-wider block">
-                            Chế độ Giám Sát AI
+                            {t("exam_portal.details_proctoring")}
                           </span>
                           <p className="text-[13px] text-slate-600 leading-relaxed">
-                            Yêu cầu bật Camera để hệ thống theo dõi hành vi làm bài của bạn. Hệ thống sẽ phát cảnh báo nếu phát hiện vi phạm.
+                            {t("exam_portal.proctoring_warn_desc", { defaultValue: "Yêu cầu bật Camera để hệ thống theo dõi hành vi làm bài của bạn. Hệ thống sẽ phát cảnh báo nếu phát hiện vi phạm." })}
                           </p>
                         </div>
 
                         {/* Anti-cheat guidelines card */}
                         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/50 space-y-2">
                           <span className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                            Nội quy phòng thi
+                            {t("exam_portal.rules_subtitle", { defaultValue: "Nội quy phòng thi" })}
                           </span>
                           <ul className="text-[12.5px] text-slate-600 space-y-1.5 font-bold">
-                            <li className="text-slate-600">• Không chuyển tab hoặc rời trình duyệt</li>
-                            <li className="text-slate-600">• Không kích chuột phải, sao chép hoặc dán</li>
-                            <li className="text-slate-600">• Giữ khuôn mặt luôn trong khung hình camera</li>
+                            <li className="text-slate-600">• {t("exam_portal.rule_no_switch", { defaultValue: "Không chuyển tab hoặc rời trình duyệt" })}</li>
+                            <li className="text-slate-600">• {t("exam_portal.rule_no_right_click", { defaultValue: "Không kích chuột phải, sao chép hoặc dán" })}</li>
+                            <li className="text-slate-600">• {t("exam_portal.rule_keep_face", { defaultValue: "Giữ khuôn mặt luôn trong khung hình camera" })}</li>
                           </ul>
                         </div>
                       </div>
@@ -1413,10 +1470,10 @@ export default function ExamPortal() {
                       <div className="space-y-0.5">
                         <span className="text-sm font-black text-slate-800 flex items-center gap-1.5">
                           <TbVideo size={16} className={aiMonitoredExams[selectedExam.id] ? "text-emerald-500 animate-pulse" : "text-slate-400"} />
-                          Kích hoạt Giám Sát Camera AI
+                          {t("exam_portal.activate_proctoring_label", { defaultValue: "Kích hoạt Giám Sát Camera AI" })}
                         </span>
                         <span className="text-xs text-slate-500 block">
-                          Yêu cầu cấp quyền và hiển thị radar giám sát trong phòng thi.
+                          {t("exam_portal.activate_proctoring_desc", { defaultValue: "Yêu cầu cấp quyền và hiển thị radar giám sát trong phòng thi." })}
                         </span>
                       </div>
 
@@ -1440,23 +1497,23 @@ export default function ExamPortal() {
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-8 pt-6 border-t border-slate-100 flex gap-4">
+                  <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={() => {
                         setActiveTab("portal");
                         setSelectedExam(null);
                         setExamDetail(null);
                       }}
-                      className="flex-1 bg-white hover:bg-slate-50 border border-slate-250 text-slate-700 font-black text-sm py-4 rounded-2xl transition-all cursor-pointer text-center"
+                      className="w-full sm:flex-1 bg-white hover:bg-slate-50 border border-slate-250 text-slate-700 font-black text-sm py-4 rounded-2xl transition-all cursor-pointer text-center"
                     >
-                      Quay lại
+                      {t("register_page.back")}
                     </button>
                     
                     <button
                       onClick={() => handleStartExam(selectedExam)}
-                      className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm py-4 rounded-2xl shadow-sm hover:shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full sm:flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm py-4 rounded-2xl shadow-sm hover:shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      Bắt đầu làm bài <TbChevronRight size={14} />
+                      {t("exam_portal.details_start")} <TbChevronRight size={14} />
                     </button>
                   </div>
                 </div>
@@ -1473,7 +1530,7 @@ export default function ExamPortal() {
             {/* Top status bar inside room */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white border border-slate-200/50 rounded-2xl p-4 shadow-sm backdrop-blur-md mb-6">
               <div>
-                <span className="text-xs font-black uppercase text-indigo-600 tracking-wider">Đang làm bài thi</span>
+                <span className="text-xs font-black uppercase text-indigo-600 tracking-wider">{t("exam_portal.testing_room")}</span>
                 <h2 className="text-lg md:text-xl font-black text-slate-800 leading-snug mt-0.5">{examDetail.title}</h2>
               </div>
               
@@ -1482,7 +1539,7 @@ export default function ExamPortal() {
                 {mockExamMode && (
                   <div className="flex items-center gap-2 border border-emerald-100 bg-emerald-50/50 rounded-xl px-3 py-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                    <span className="text-sm font-bold text-slate-600">Độ trung thực:</span>
+                    <span className="text-sm font-bold text-slate-600">{t("exam_portal.results.honesty")}:</span>
                     <span className={`text-sm font-black ${honestyScore < 70 ? "text-red-500 animate-pulse" : "text-emerald-600"}`}>
                       {honestyScore}%
                     </span>
@@ -1511,12 +1568,12 @@ export default function ExamPortal() {
                 <div>
                   <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
                     <span className="text-sm font-black text-indigo-600 uppercase">
-                      CÂU HỎI {activeQuestionIndex + 1} / {examDetail.questions.length}
+                      {t("exam_portal.testing_question", { defaultValue: "CÂU HỎI" })} {activeQuestionIndex + 1} / {examDetail.questions.length}
                     </span>
                     <span className="text-xs text-slate-450 font-bold bg-slate-100 px-3 py-1 rounded-md">
-                      {examDetail.questions[activeQuestionIndex].questionType === "SINGLE_CHOICE" && "Trắc nghiệm chọn một"}
-                      {examDetail.questions[activeQuestionIndex].questionType === "TRUE_FALSE" && "Chọn Đúng/Sai ma trận"}
-                      {examDetail.questions[activeQuestionIndex].questionType === "SHORT_ANSWER" && "Điền đáp số ngắn"}
+                      {examDetail.questions[activeQuestionIndex].questionType === "SINGLE_CHOICE" && t("exam_portal.type_single", { defaultValue: "Trắc nghiệm chọn một" })}
+                      {examDetail.questions[activeQuestionIndex].questionType === "TRUE_FALSE" && t("exam_portal.type_true_false", { defaultValue: "Chọn Đúng/Sai ma trận" })}
+                      {examDetail.questions[activeQuestionIndex].questionType === "SHORT_ANSWER" && t("exam_portal.type_short", { defaultValue: "Điền đáp số ngắn" })}
                     </span>
                   </div>
 
@@ -1564,9 +1621,9 @@ export default function ExamPortal() {
                           <table className="w-full border-collapse text-left">
                             <thead>
                               <tr className="bg-slate-50 text-xs font-black text-slate-400 uppercase tracking-wider border-b border-slate-200/70">
-                                <th className="py-3.5 px-4">Ý hỏi</th>
-                                <th className="py-3.5 px-4 text-center w-28">Đúng (T)</th>
-                                <th className="py-3.5 px-4 text-center w-28">Sai (F)</th>
+                                <th className="py-3.5 px-4">{t("exam_portal.subquestion_label", { defaultValue: "Ý hỏi" })}</th>
+                                <th className="py-3.5 px-4 text-center w-28">{t("exam_portal.true_label", { defaultValue: "Đúng (T)" })}</th>
+                                <th className="py-3.5 px-4 text-center w-28">{t("exam_portal.false_label", { defaultValue: "Sai (F)" })}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 text-[16px] md:text-[17px] text-slate-800 font-medium">
@@ -1588,7 +1645,7 @@ export default function ExamPortal() {
                                             : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
                                         }`}
                                       >
-                                        Đúng
+                                        {t("exam_portal.testing_true")}
                                       </button>
                                     </td>
                                     <td className="py-3 px-4 text-center">
@@ -1600,7 +1657,7 @@ export default function ExamPortal() {
                                             : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
                                         }`}
                                       >
-                                        Sai
+                                        {t("exam_portal.testing_false")}
                                       </button>
                                     </td>
                                   </tr>
@@ -1615,11 +1672,11 @@ export default function ExamPortal() {
                       {examDetail.questions[activeQuestionIndex].questionType === "SHORT_ANSWER" && (
                         <div className="space-y-3">
                           <label className="block text-sm font-black uppercase text-slate-400 tracking-wider">
-                            Đáp án / Kết số:
+                            {t("exam_portal.short_answer_label", { defaultValue: "Đáp án / Kết số:" })}
                           </label>
                           <input
                             type="text"
-                            placeholder="Nhập giá trị số (ví dụ: 10, -2.5, 1.25, ...)"
+                            placeholder={t("exam_portal.testing_short_placeholder", { defaultValue: "Nhập câu trả lời ngắn của bạn ở đây..." })}
                             value={answers[examDetail.questions[activeQuestionIndex].id] || ""}
                             onChange={(e) => handleSelectShortAnswer(examDetail.questions[activeQuestionIndex].id, e.target.value)}
                             className="w-full border border-slate-200 rounded-2xl px-6 py-4.5 text-[17px] md:text-[18px] text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 bg-slate-50/20 hover:bg-slate-50/50 transition-all font-medium"
@@ -1641,7 +1698,7 @@ export default function ExamPortal() {
                     onClick={() => setActiveQuestionIndex(prev => prev - 1)}
                     className="px-5 py-3 border border-slate-250 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none rounded-xl text-sm font-black text-slate-655 transition-all cursor-pointer"
                   >
-                    Câu Trước
+                    {t("exam_portal.prev_btn", { defaultValue: "Câu Trước" })}
                   </button>
 
                   <button
@@ -1667,7 +1724,7 @@ export default function ExamPortal() {
                   <div className="bg-white border border-slate-200/50 rounded-3xl p-5 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <span className="text-xs font-black uppercase tracking-wider text-emerald-600 mb-4 flex items-center gap-1">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
-                      Camera AI Giám Sát Realtime
+                      {t("exam_portal.camera_realtime_label", { defaultValue: "Camera AI Giám Sát Realtime" })}
                     </span>
                     
                     {/* Circle Video container with radar border */}
@@ -1686,14 +1743,14 @@ export default function ExamPortal() {
                     </div>
                     
                     <p className="text-xs text-slate-500 font-semibold mt-4">
-                      Vui lòng giữ khuôn mặt thẳng chính diện với camera, không rời khung hình thi.
+                      {t("exam_portal.camera_realtime_desc", { defaultValue: "Vui lòng giữ khuôn mặt thẳng chính diện với camera, không rời khung hình thi." })}
                     </p>
                   </div>
                 )}
 
                 {/* QUESTION MAP DIRECT JUMP */}
                 <div className="bg-white border border-slate-200/50 rounded-3xl p-5 shadow-sm">
-                  <h3 className="text-sm font-black uppercase text-slate-400 tracking-wider mb-4">Sơ đồ câu hỏi</h3>
+                  <h3 className="text-sm font-black uppercase text-slate-400 tracking-wider mb-4">{t("exam_portal.testing_card_title")}</h3>
                   <div className="flex flex-wrap gap-2.5">
                     {examDetail.questions.map((q, idx) => {
                       const isAnswered = answers[q.id] !== undefined && answers[q.id] !== "";
@@ -1718,20 +1775,20 @@ export default function ExamPortal() {
                   </div>
                   
                   <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-indigo-600 inline-block" /> Đang chọn</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-indigo-50 border border-indigo-200 inline-block" /> Đã trả lời</span>
-                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-slate-50 border border-slate-200 inline-block" /> Chưa làm</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-indigo-600 inline-block" /> {t("exam_portal.legend_active", { defaultValue: "Đang chọn" })}</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-indigo-50 border border-indigo-200 inline-block" /> {t("exam_portal.legend_answered", { defaultValue: "Đã trả lời" })}</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-slate-50 border border-slate-200 inline-block" /> {t("exam_portal.legend_unanswered", { defaultValue: "Chưa làm" })}</span>
                   </div>
                 </div>
 
                 {/* SUBMIT WIDGET DIRECT */}
                 <div className="bg-white border border-slate-200/50 rounded-3xl p-5 shadow-sm text-center">
-                  <p className="text-sm text-slate-655 font-bold mb-4">Hoàn thành bài thi sớm?</p>
+                  <p className="text-sm text-slate-655 font-bold mb-4">{t("exam_portal.submit_widget_title", { defaultValue: "Hoàn thành bài thi sớm?" })}</p>
                   <button
                     onClick={handleManualSubmit}
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm py-3.5 rounded-2xl shadow-sm active:scale-95 transition-all cursor-pointer"
                   >
-                    Nộp Bài Khảo Thí
+                    {t("exam_portal.testing_submit_btn")}
                   </button>
                 </div>
 
@@ -1756,8 +1813,8 @@ export default function ExamPortal() {
               <div className="w-16 h-16 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-2 shadow-inner">
                 <TbConfetti size={32} className="animate-bounce" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">Hoàn Thành Bài Thi!</h2>
-              <p className="text-xs text-slate-500">Kết quả điểm số đã được đồng bộ về học bạ cá nhân của bạn.</p>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">{t("exam_portal.results.completed_title", { defaultValue: "Hoàn Thành Bài Thi!" })}</h2>
+              <p className="text-xs text-slate-500">{t("exam_portal.results.sync_desc", { defaultValue: "Kết quả điểm số đã được đồng bộ về học bạ cá nhân của bạn." })}</p>
             </div>
 
             {/* Results Grid Dashboard (Bento Grid) */}
@@ -1765,44 +1822,46 @@ export default function ExamPortal() {
               
               {/* Score card (col-span-4) */}
               <div className="col-span-12 md:col-span-4 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 text-center flex flex-col justify-between shadow-sm">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-400">Điểm Số Quy Đổi</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-400">{t("exam_portal.results.score")}</span>
                 <div className="my-6">
                   <span className="text-6xl font-black text-indigo-600 leading-none">{submitResult.score}</span>
                   <span className="text-lg font-bold text-slate-400"> / 10.0</span>
                 </div>
                 <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-500">
-                  <span>Kết quả:</span>
+                  <span>{t("exam_portal.results.outcome_label", { defaultValue: "Kết quả:" })}</span>
                   <span className={`font-bold ${submitResult.score >= 5 ? "text-green-600" : "text-rose-500"}`}>
-                    {submitResult.score >= 5 ? "ĐẠT YÊU CẦU" : "KHÔNG ĐẠT"}
+                    {submitResult.score >= 5 
+                      ? t("exam_portal.results.status_passed", { defaultValue: "ĐẠT YÊU CẦU" }) 
+                      : t("exam_portal.results.status_failed", { defaultValue: "KHÔNG ĐẠT" })}
                   </span>
                 </div>
               </div>
 
               {/* Statistics details (col-span-4) */}
               <div className="col-span-12 md:col-span-4 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 flex flex-col justify-between shadow-sm">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-400 text-center block">Chi Tiết Trả Lời</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-400 text-center block">{t("exam_portal.results.correct_ratio")}</span>
                 <div className="space-y-4 my-auto">
                   <div className="flex justify-between items-center text-[15px]">
-                    <span className="text-slate-500 font-medium">Số câu trả lời đúng</span>
-                    <span className="text-slate-800 font-bold">{submitResult.correctCount} câu</span>
+                    <span className="text-slate-500 font-medium">{t("exam_portal.results.correct")}</span>
+                    <span className="text-slate-800 font-bold">{submitResult.correctCount} {t("exam_portal.exam_card.questions_unit", { defaultValue: "câu" })}</span>
                   </div>
                   <div className="flex justify-between items-center text-[15px]">
-                    <span className="text-slate-500 font-medium">Tổng điểm trọng số</span>
+                    <span className="text-slate-500 font-medium">{t("exam_portal.results.total_weight", { defaultValue: "Tổng điểm trọng số" })}</span>
                     <span className="text-slate-800 font-bold">{submitResult.totalPoints} / 10.0</span>
                   </div>
                   <div className="flex justify-between items-center text-[15px]">
-                    <span className="text-slate-500 font-medium">Thời gian hoàn thành</span>
-                    <span className="text-slate-800 font-bold">{selectedExam ? (selectedExam.durationMinutes || selectedExam.duration) : 15} phút</span>
+                    <span className="text-slate-500 font-medium">{t("exam_portal.details_duration")}</span>
+                    <span className="text-slate-800 font-bold">{selectedExam ? (selectedExam.durationMinutes || selectedExam.duration) : 15} {t("exam_portal.exam_card.duration_unit", { defaultValue: "phút" })}</span>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-slate-100 text-xs text-slate-400 font-semibold text-center">
-                  Cập nhật lúc: {new Date().toLocaleTimeString()}
+                  {t("exam_portal.results.update_time_label", { defaultValue: "Cập nhật lúc:" })} {new Date().toLocaleTimeString()}
                 </div>
               </div>
 
               {/* Honesty Gauge card (col-span-4) */}
               <div className="col-span-12 md:col-span-4 bg-white/70 backdrop-blur-md border border-slate-200/50 rounded-3xl p-6 text-center flex flex-col justify-between shadow-sm">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-400">Điểm Trung Thực AI</span>
+                <span className="text-xs font-black uppercase tracking-wider text-slate-400">{t("exam_portal.results.honesty")}</span>
                 <div className="my-6 space-y-2">
                   <div className="text-5xl font-black tracking-tight" style={{
                     color: submitResult.honestyScore >= 80 ? "#10B981" : submitResult.honestyScore >= 50 ? "#F59E0B" : "#EF4444"
@@ -1822,11 +1881,11 @@ export default function ExamPortal() {
                   </div>
                 </div>
                 <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-500">
-                  <span>Trạng thái:</span>
+                  <span>{t("admin.user_management.table.status")}:</span>
                   <span className={`font-black ${
                     submitResult.honestyScore >= 80 ? "text-emerald-600" : submitResult.honestyScore >= 50 ? "text-amber-600" : "text-rose-500 animate-pulse"
                   }`}>
-                    {submitResult.honestyScore >= 80 ? "Chấp hành tốt" : submitResult.honestyScore >= 50 ? "Cảnh báo vi phạm" : "Bị hủy kết quả"}
+                    {submitResult.honestyScore >= 80 ? t("exam_portal.results.honesty_good", { defaultValue: "Chấp hành tốt" }) : submitResult.honestyScore >= 50 ? t("exam_portal.results.honesty_warn", { defaultValue: "Cảnh báo vi phạm" }) : t("exam_portal.results.honesty_voided", { defaultValue: "Bị hủy kết quả" })}
                   </span>
                 </div>
               </div>
@@ -1836,12 +1895,12 @@ export default function ExamPortal() {
             {/* Questions detailed corrections review */}
             <div className="space-y-6 pt-6">
               <h3 className="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                <TbListNumbers size={20} /> Đáp Án & Lời Giải Chi Tiết
+                <TbListNumbers size={20} /> {t("exam_portal.results.explanation")}
               </h3>
               
               <div className="space-y-5">
                 {examDetail && examDetail.questions.map((q, idx) => {
-                  const itemResult = submitResult.results[q.id] || { isCorrect: false, correctAnswer: "", userAnswer: "", explanation: "Chưa cập nhật giải thích." };
+                  const itemResult = submitResult.results[q.id] || { isCorrect: false, correctAnswer: "", userAnswer: "", explanation: t("exam_portal.results.no_explanation", { defaultValue: "Chưa cập nhật giải thích." }) };
                   const isCorrect = itemResult.isCorrect;
                   
                   return (
@@ -1853,16 +1912,16 @@ export default function ExamPortal() {
                     >
                       <div className="flex justify-between items-start gap-4 pb-3 border-b border-slate-100 mb-4">
                         <span className="text-sm font-black text-slate-450 uppercase">
-                          CÂU HỎI {idx + 1}
+                          {t("exam_portal.testing_question", { defaultValue: "CÂU HỎI" })} {idx + 1}
                         </span>
                         
                         {isCorrect ? (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
-                            <TbCheck size={14} /> Chính Xác
+                            <TbCheck size={14} /> {t("exam_portal.results.correct")}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-100">
-                            <TbX size={14} /> Chưa Đúng
+                            <TbX size={14} /> {t("exam_portal.results.incorrect")}
                           </span>
                         )}
                       </div>
@@ -1875,17 +1934,17 @@ export default function ExamPortal() {
                       {/* User answer vs correct answer */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[15px] md:text-[16px] font-bold bg-slate-50/50 border border-slate-100 rounded-2xl p-4 mb-4">
                         <div className="space-y-1">
-                          <span className="text-slate-400 block uppercase tracking-wider text-[11px]">Lựa chọn của bạn</span>
+                          <span className="text-slate-400 block uppercase tracking-wider text-[11px]">{t("exam_portal.results.your_ans")}</span>
                           <span className={isCorrect ? "text-emerald-600 font-extrabold" : "text-rose-500 font-extrabold"}>
                             {itemResult.userAnswer === null || itemResult.userAnswer === undefined || itemResult.userAnswer === "null" || itemResult.userAnswer === ""
-                              ? "Không chọn"
+                              ? t("exam_portal.results.unanswered")
                               : typeof itemResult.userAnswer === "object"
                                 ? JSON.stringify(itemResult.userAnswer)
                                 : itemResult.userAnswer}
                           </span>
                         </div>
                         <div className="space-y-1">
-                          <span className="text-slate-400 block uppercase tracking-wider text-[11px]">Đáp án chính xác</span>
+                          <span className="text-slate-400 block uppercase tracking-wider text-[11px]">{t("exam_portal.results.correct_ans")}</span>
                           <span className="text-indigo-600 font-extrabold">
                             {typeof itemResult.correctAnswer === "object" 
                               ? JSON.stringify(itemResult.correctAnswer)
@@ -1898,7 +1957,7 @@ export default function ExamPortal() {
                       {itemResult.explanation && (
                         <div className="bg-indigo-50/30 border border-indigo-100/50 rounded-2xl p-4 text-[16px] text-slate-700 leading-relaxed">
                           <span className="text-xs font-black uppercase text-indigo-600 tracking-wider block mb-1.5 flex items-center gap-1">
-                            <TbInfoCircle size={14} /> Hướng dẫn giải / Lời giải chi tiết:
+                            <TbInfoCircle size={14} /> {t("exam_portal.results.explanation")}
                           </span>
                           {itemResult.explanation}
                         </div>
@@ -1921,7 +1980,7 @@ export default function ExamPortal() {
                 }}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm px-8 py-3.5 rounded-2xl shadow-sm hover:shadow active:scale-95 transition-all cursor-pointer"
               >
-                Quay Lại Trang Chủ Đề Thi
+                {t("exam_portal.results.exit_btn")}
               </button>
             </div>
           </motion.div>

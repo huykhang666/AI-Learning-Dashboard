@@ -98,12 +98,10 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               {isPremium ? (
                 <span className="font-bold flex items-center gap-1.5">
-                  <FaCrown className="text-yellow-300" /> Gói Premium: Không giới hạn lượt dùng
+                  <FaCrown className="text-yellow-300" /> {t("dashboard_extra.premium_unlimited")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5">
-                  <FaBolt className="text-orange-400" /> Hôm nay: <strong className="text-base font-bold">{uploadCount}</strong> / 5 lượt upload bài giảng
-                </span>
+                <span className="flex items-center gap-1.5" dangerouslySetInnerHTML={{ __html: `<svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" class="text-orange-400" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M0 464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V192H0v272zm64-192c0-8.8 7.2-16 16-16h288c8.8 0 16 7.2 16 16v64c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16v-64zM400 64h-48V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H160V16c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v48H48C21.5 64 0 85.5 0 112v48h448v-48c0-26.5-21.5-48-48-48z"></path></svg> ` + t("dashboard_extra.limit_status", { used: uploadCount }) }} />
               )}
             </div>
           </div>
@@ -113,7 +111,7 @@ export default function DashboardPage() {
               onClick={() => navigate("/app/premium")}
               className="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl border border-blue-100 transition-all shadow-sm active:scale-95 flex items-center gap-1.5"
             >
-              <FaCrown /> Nâng cấp Premium để mở khóa thêm
+              <FaCrown /> {t("dashboard_extra.upgrade_more")}
             </button>
           )}
         </div>
@@ -142,15 +140,15 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-3 shadow-md">
                   <FaExclamationTriangle className="text-red-600 text-xl" />
                 </div>
-                <h3 className="text-base font-bold text-slate-950">Đã hết lượt dùng miễn phí!</h3>
+                <h3 className="text-base font-bold text-slate-950">{t("dashboard_extra.limit_reached_title")}</h3>
                 <p className="text-xs text-gray-600 mt-1.5 max-w-[220px] leading-relaxed">
-                  Tài khoản thường chỉ được upload tối đa 5 bài giảng/ngày. Hãy nâng cấp để tiếp tục học tập.
+                  {t("dashboard_extra.limit_reached_desc")}
                 </p>
                 <button 
                   onClick={() => navigate("/app/premium")}
                   className="mt-4 px-5 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 text-white font-bold text-xs rounded-xl shadow-lg hover:opacity-95 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5"
                 >
-                  <FaCrown /> Nâng cấp Premium ngay
+                  <FaCrown /> {t("dashboard_extra.upgrade_now")}
                 </button>
               </div>
             )}

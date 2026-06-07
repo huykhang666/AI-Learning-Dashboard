@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FaBolt } from "react-icons/fa";
 import {
   Eye,
@@ -43,9 +44,6 @@ const GIcon = () => (
     />
   </svg>
 );
-
-const S_LABEL = ["", "Yếu", "Trung bình", "Khá tốt", "Mạnh"];
-const S_COLOR = ["", "#EF4444", "#F59E0B", "#84CC16", "#06C16A"];
 
 function calcStrength(p) {
   if (!p) return 0;
@@ -114,171 +112,173 @@ const Field = ({
   </div>
 );
 
-const featureItems = [
-  { Icon: Mic, text: "AI Whisper bóc băng tự động" },
-  { Icon: Sparkles, text: "Tóm tắt nội dung thông minh" },
-  { Icon: MessageSquare, text: "Chatbot hỏi đáp theo bài giảng" },
-];
+const LeftPanel = ({ t }) => {
+  const featureItems = [
+    { Icon: Mic, text: t("register_page.features.whisper") },
+    { Icon: Sparkles, text: t("register_page.features.summary") },
+    { Icon: MessageSquare, text: t("register_page.features.chat") },
+  ];
 
-const LeftPanel = () => (
-  <div
-    className="register-left"
-    style={{
-      flex: "0 0 50%",
-      background: "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "40px 44px",
-      position: "relative",
-      overflow: "hidden",
-      boxSizing: "border-box",
-      minHeight: "100vh",
-    }}
-  >
-    <button
-      className="register-back-button"
-      onClick={() => (window.location.href = "/")}
-      style={{
-        position: "absolute",
-        top: 20,
-        left: 20,
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        background: "rgba(255,255,255,.15)",
-        border: "1px solid rgba(255,255,255,.25)",
-        borderRadius: 10,
-        padding: "7px 14px",
-        cursor: "pointer",
-        color: "#fff",
-        fontSize: 13,
-        fontWeight: 600,
-        fontFamily: F,
-        backdropFilter: "blur(4px)",
-        zIndex: 10,
-      }}
-    >
-      ← Quay lại
-    </button>
-
+  return (
     <div
+      className="register-left"
       style={{
+        flex: "0 0 50%",
+        background: "linear-gradient(150deg,#1e3a8a 0%,#2563eb 45%,#38bdf8 100%)",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        gap: 10,
-        marginBottom: 36,
-        zIndex: 1,
+        justifyContent: "center",
+        padding: "40px 44px",
+        position: "relative",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        minHeight: "100vh",
       }}
     >
-      <div
+      <button
+        className="register-back-button"
+        onClick={() => (window.location.href = "/")}
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          background: "rgba(255,255,255,.18)",
+          position: "absolute",
+          top: 20,
+          left: 20,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <FaBolt size={20} color="#F59E0B" />
-      </div>
-      <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
-        AI-Learning DashBoard
-      </span>
-    </div>
-
-    <div
-      style={{ zIndex: 1, textAlign: "center", maxWidth: 340, width: "100%" }}
-    >
-      <h2
-        style={{
-          fontSize: 28,
-          fontWeight: 900,
+          gap: 6,
+          background: "rgba(255,255,255,.15)",
+          border: "1px solid rgba(255,255,255,.25)",
+          borderRadius: 10,
+          padding: "7px 14px",
+          cursor: "pointer",
           color: "#fff",
-          lineHeight: 1.2,
-          marginBottom: 10,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          flexWrap: "wrap",
-        }}
-      >
-        Học thông minh hơn với sức mạnh của AI
-        <FaBolt size={22} color="#F59E0B" />
-      </h2>
-      <p
-        style={{
           fontSize: 13,
-          color: "rgba(255,255,255,.8)",
-          lineHeight: 1.7,
-          marginBottom: 22,
+          fontWeight: 600,
+          fontFamily: F,
+          backdropFilter: "blur(4px)",
+          zIndex: 10,
         }}
       >
-        Upload video bài giảng, AI tự động bóc băng, tóm tắt và trả lời mọi câu
-        hỏi.
-      </p>
+        ← {t("register_page.back")}
+      </button>
 
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          marginBottom: 28,
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 36,
+          zIndex: 1,
         }}
       >
-        {featureItems.map(({ Icon, text }) => (
-          <div
-            key={text}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              background: "rgba(255,255,255,.13)",
-              borderRadius: 12,
-              padding: "10px 16px",
-              border: "1px solid rgba(255,255,255,.2)",
-              textAlign: "left",
-            }}
-          >
-            <Icon size={18} color="#fff" style={{ flexShrink: 0 }} />
-            <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>
-              {text}
-            </span>
-          </div>
-        ))}
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 12,
+            background: "rgba(255,255,255,.18)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <FaBolt size={20} color="#F59E0B" />
+        </div>
+        <span style={{ fontWeight: 800, fontSize: 18, color: "#fff" }}>
+          AI-Learning DashBoard
+        </span>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
-        {[
-          ["2K+", "Người dùng"],
-          ["50K+", "Video xử lý"],
-          ["98%", "Hài lòng"],
-        ].map(([v, l]) => (
-          <div key={l}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
-              {v}
-            </div>
+      <div
+        style={{ zIndex: 1, textAlign: "center", maxWidth: 340, width: "100%" }}
+      >
+        <h2
+          style={{
+            fontSize: 28,
+            fontWeight: 900,
+            color: "#fff",
+            lineHeight: 1.2,
+            marginBottom: 10,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            flexWrap: "wrap",
+          }}
+        >
+          {t("register_page.features.hero_title")}
+          <FaBolt size={22} color="#F59E0B" />
+        </h2>
+        <p
+          style={{
+            fontSize: 13,
+            color: "rgba(255,255,255,.8)",
+            lineHeight: 1.7,
+            marginBottom: 22,
+          }}
+        >
+          {t("register_page.features.hero_desc")}
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            marginBottom: 28,
+          }}
+        >
+          {featureItems.map(({ Icon, text }) => (
             <div
+              key={text}
               style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,.6)",
-                marginTop: 2,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                background: "rgba(255,255,255,.13)",
+                borderRadius: 12,
+                padding: "10px 16px",
+                border: "1px solid rgba(255,255,255,.2)",
+                textAlign: "left",
               }}
             >
-              {l}
+              <Icon size={18} color="#fff" style={{ flexShrink: 0 }} />
+              <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>
+                {text}
+              </span>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", gap: 36 }}>
+          {[
+            ["2K+", t("register_page.stats.users")],
+            ["50K+", t("register_page.stats.videos")],
+            ["98%", t("register_page.stats.satisfied")],
+          ].map(([v, l]) => (
+            <div key={l}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: "#fff" }}>
+                {v}
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "rgba(255,255,255,.6)",
+                  marginTop: 2,
+                }}
+              >
+                {l}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function PageRegister({ onGoLogin }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -306,6 +306,8 @@ export default function PageRegister({ onGoLogin }) {
   };
 
   const strength = calcStrength(form.pass);
+  const strengthLabels = ["", t("register_page.strength_weak"), t("register_page.strength_fair"), t("register_page.strength_good"), t("register_page.strength_strong")];
+  const strengthColors = ["", "#EF4444", "#F59E0B", "#84CC16", "#06C16A"];
 
   const handleGoogleRegister = () => {
     setGLoading(true);
@@ -317,15 +319,15 @@ export default function PageRegister({ onGoLogin }) {
 
   const handleRegister = async () => {
     const e = {};
-    if (!form.firstName.trim()) e.firstName = "Vui lòng nhập họ";
-    if (!form.lastName.trim()) e.lastName = "Vui lòng nhập tên";
-    if (!form.username.trim()) e.username = "Vui lòng nhập tên đăng nhập";
-    if (!form.email) e.email = "Vui lòng nhập email";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = "Email không hợp lệ";
-    if (!form.pass) e.pass = "Vui lòng nhập mật khẩu";
-    else if (form.pass.length < 8) e.pass = "Mật khẩu tối thiểu 8 ký tự";
-    if (form.confirm !== form.pass) e.confirm = "Mật khẩu không khớp";
-    if (!agree) e.agree = "Bạn cần đồng ý với điều khoản";
+    if (!form.firstName.trim()) e.firstName = t("register_page.errors.firstName");
+    if (!form.lastName.trim()) e.lastName = t("register_page.errors.lastName");
+    if (!form.username.trim()) e.username = t("register_page.errors.username");
+    if (!form.email) e.email = t("register_page.errors.email_required");
+    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = t("register_page.errors.email_invalid");
+    if (!form.pass) e.pass = t("register_page.errors.pass_required");
+    else if (form.pass.length < 8) e.pass = t("register_page.errors.pass_length");
+    if (form.confirm !== form.pass) e.confirm = t("register_page.errors.confirm_mismatch");
+    if (!agree) e.agree = t("register_page.errors.agree_required");
     if (Object.keys(e).length) {
       setErrors(e);
       return;
@@ -347,16 +349,16 @@ export default function PageRegister({ onGoLogin }) {
       if (data.code === 1000) {
         setShowSuccess(true);
       } else {
-        setErrors({ apiError: data.message || "Tài khoản đã tồn tại" });
+        setErrors({ apiError: data.message || t("register_page.errors.exists", { defaultValue: "Tài khoản đã tồn tại" }) });
       }
     } catch (error) {
       const msg = error.message || "";
       if (msg.includes("email already exists") || msg.includes("already exists")) {
-        setErrors({ apiError: "Email này đã được đăng ký. Vui lòng dùng email khác hoặc đăng nhập!" });
+        setErrors({ apiError: t("register_page.errors.email_exists", { defaultValue: "Email này đã được đăng ký. Vui lòng dùng email khác hoặc đăng nhập!" }) });
       } else if (msg.includes("username")) {
-        setErrors({ apiError: "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác!" });
+        setErrors({ apiError: t("register_page.errors.username_exists", { defaultValue: "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác!" }) });
       } else {
-        setErrors({ apiError: "Không thể kết nối server. Vui lòng thử lại!" });
+        setErrors({ apiError: t("register_page.errors.server_error", { defaultValue: "Không thể kết nối server. Vui lòng thử lại!" }) });
       }
     } finally {
       setLoading(false);
@@ -449,7 +451,7 @@ export default function PageRegister({ onGoLogin }) {
         }
       `}</style>
       <div className="register-page">
-        <LeftPanel />
+        <LeftPanel t={t} />
         <div className="register-right">
           <div className="register-form">
             {/* Lỗi từ API */}
@@ -475,16 +477,17 @@ export default function PageRegister({ onGoLogin }) {
                   style={{ flexShrink: 0 }}
                 />
                 <span>
-                  {errors.apiError}. Bạn đã có tài khoản?{" "}
+                  {errors.apiError}. {t("register_page.has_account")}{" "}
                   <span
                     onClick={onGoLogin}
                     style={{
                       textDecoration: "underline",
                       cursor: "pointer",
                       color: T.primary,
+                      fontWeight: 700,
                     }}
                   >
-                    Đăng nhập ngay
+                    {t("register_page.login_here")}
                   </span>
                 </span>
               </div>
@@ -498,10 +501,10 @@ export default function PageRegister({ onGoLogin }) {
                 marginBottom: 4,
               }}
             >
-              Tạo tài khoản mới
+              {t("register_page.title")}
             </h1>
             <p style={{ fontSize: 13, color: T.textMid, marginBottom: 20 }}>
-              Bắt đầu hành trình cùng AI-Learning
+              {t("register_page.subtitle")}
             </p>
 
             {/* Đăng ký Google */}
@@ -539,19 +542,19 @@ export default function PageRegister({ onGoLogin }) {
               ) : (
                 <GIcon />
               )}
-              {gLoading ? "Đang kết nối..." : "Đăng ký với Google"}
+              {gLoading ? t("register_page.connecting") : t("register_page.google_btn")}
             </button>
 
             <div className="register-input-row">
               <Field
-                label="Họ & tên đệm"
+                label={t("register_page.firstname")}
                 placeholder="Nguyễn Văn"
                 value={form.firstName}
                 onChange={set("firstName")}
                 error={errors.firstName}
               />
               <Field
-                label="Tên"
+                label={t("register_page.lastname")}
                 placeholder="An"
                 value={form.lastName}
                 onChange={set("lastName")}
@@ -560,14 +563,14 @@ export default function PageRegister({ onGoLogin }) {
             </div>
 
             <Field
-              label="Tên đăng nhập"
+              label={t("register_page.username")}
               placeholder="ten_dang_nhap"
               value={form.username}
               onChange={set("username")}
               error={errors.username}
             />
             <Field
-              label="Email"
+              label={t("register_page.email")}
               type="email"
               placeholder="example@email.com"
               value={form.email}
@@ -575,7 +578,7 @@ export default function PageRegister({ onGoLogin }) {
               error={errors.email}
             />
             <Field
-              label="Ngày sinh (không bắt buộc)"
+              label={t("register_page.dob")}
               type="date"
               value={form.dob}
               onChange={set("dob")}
@@ -592,12 +595,12 @@ export default function PageRegister({ onGoLogin }) {
                   marginBottom: 5,
                 }}
               >
-                Mật khẩu
+                {t("register_page.password")}
               </label>
               <div style={{ position: "relative" }}>
                 <input
                   type={showPass ? "text" : "password"}
-                  placeholder="Tối thiểu 8 ký tự"
+                  placeholder={t("register_page.errors.pass_length")}
                   value={form.pass}
                   onChange={set("pass")}
                   style={{
@@ -654,7 +657,7 @@ export default function PageRegister({ onGoLogin }) {
                           height: 3,
                           borderRadius: 2,
                           background:
-                            i <= strength ? S_COLOR[strength] : T.border,
+                            i <= strength ? strengthColors[strength] : T.border,
                         }}
                       />
                     ))}
@@ -662,20 +665,20 @@ export default function PageRegister({ onGoLogin }) {
                   <span
                     style={{
                       fontSize: 10,
-                      color: S_COLOR[strength],
+                      color: strengthColors[strength],
                       fontWeight: 700,
                     }}
                   >
-                    Độ mạnh: {S_LABEL[strength]}
+                    {t("register_page.strength")}: {strengthLabels[strength]}
                   </span>
                 </div>
               )}
             </div>
 
             <Field
-              label="Xác nhận mật khẩu"
+              label={t("register_page.confirm_password")}
               type="password"
-              placeholder="Nhập lại mật khẩu"
+              placeholder={t("register_page.confirm_password")}
               value={form.confirm}
               onChange={set("confirm")}
               error={errors.confirm}
@@ -700,7 +703,7 @@ export default function PageRegister({ onGoLogin }) {
                 }}
               />
               <span style={{ fontSize: 12, color: T.textMid }}>
-                Tôi đồng ý với các điều khoản dịch vụ
+                {t("register_page.agree")}
               </span>
             </label>
             {errors.agree && (
@@ -751,7 +754,7 @@ export default function PageRegister({ onGoLogin }) {
                   }}
                 />
               )}
-              {loading ? "Đang tạo tài khoản..." : "Đăng ký ngay"}
+              {loading ? t("register_page.btn_loading") : t("register_page.btn")}
             </button>
 
             <p
@@ -764,7 +767,7 @@ export default function PageRegister({ onGoLogin }) {
                 fontWeight: 500,
               }}
             >
-              Đã có tài khoản?{" "}
+              {t("register_page.has_account")}{" "}
               <span
                 onClick={onGoLogin}
                 style={{
@@ -774,7 +777,7 @@ export default function PageRegister({ onGoLogin }) {
                   textDecoration: "underline",
                 }}
               >
-                Đăng nhập tại đây
+                {t("register_page.login_here")}
               </span>
             </p>
           </div>
