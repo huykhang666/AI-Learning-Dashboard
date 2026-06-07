@@ -35,6 +35,7 @@ const SidebarInner = ({ showClose, onMobileClose, usageData, userData }) => {
         {[
           { label: t("sidebar.dashboard"), key: "dashboard", path: "/app/dash" },
           { label: t("sidebar.courses"), key: "courses", path: "/app/courses" },
+          { label: "Thi Online", key: "exams", path: "/app/exams" },
           { label: t("sidebar.history"), key: "history", path: "/app/history" },
           { label: t("sidebar.analytics"), key: "analytics", path: "/app/analytics" },
           {

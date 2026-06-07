@@ -25,6 +25,7 @@ import CourseDetail from "./pages/CourseDetail/CourseDetail";
 import PaymentSuccessPage from "./pages/Payment/PaymentSuccess.jsx";
 import PaymentFailedPage from "./pages/Payment/PaymentFailed.jsx";
 import CourseLanding from "./pages/MyCourses/CourseLanding.jsx";
+import ExamPortal from "./pages/ExamPortal/ExamPortal.jsx";
 import AdminRoute from "./routes/AdminRoute.jsx";
 import AdminLayout from "./components/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -159,6 +160,7 @@ function AppLayout({ onLogout }) {
             <Route path="courses" element={<MyCourses />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="help" element={<HelpCenter />} />
+            <Route path="exams" element={<ExamPortal />} />
             <Route path="courses/:courseId" element={<CourseLanding />} />
             <Route path="history/:id" element={<CourseDetail />} />
           </Routes>
