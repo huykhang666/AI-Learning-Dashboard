@@ -80,7 +80,7 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const [usageData, setUsageData] = useState({ used: 0, total: 4 });
+  const [usageData, setUsageData] = useState({ used: 0, total: 10 });
   const { t } = useTranslation();
   const [userData, setUserData] = useState({ name: t("sidebar.loading"), plan: t("sidebar.plan.free"), avatar: ".." });
 
@@ -103,7 +103,7 @@ function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
 
         setUsageData({
           used: Number(res.dailyUploadCount) || 0,
-          total: 4
+          total: 10
         });
       } catch (err) {
         console.error(t("sidebar.error_loading"), err);

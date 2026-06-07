@@ -66,10 +66,10 @@ export default function DashboardPage() {
 
   const maxHours = Math.max(
     ...data.weeklyActivity.map((item) => item.hours),
-    1,
+    8,
   );
 
-  const isLimitReached = !isPremium && uploadCount >= 5;
+  const isLimitReached = !isPremium && uploadCount >= 10;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 bg-slate-50 min-h-full w-full overflow-x-hidden">

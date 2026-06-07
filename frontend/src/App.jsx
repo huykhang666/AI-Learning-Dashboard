@@ -42,7 +42,7 @@ function AppLayout({ onLogout }) {
   const location = useLocation();
 
   // Khai báo state tập trung để phân phối dữ liệu cho cả Sidebar và Header
-  const [usageData, setUsageData] = useState({ used: 0, total: 4 });
+  const [usageData, setUsageData] = useState({ used: 0, total: 10 });
   const [userData, setUserData] = useState({ fullName: "Đang tải...", email: "huukhang@email.com", plan: "Free Plan", avatar: "..", isPremium: false });
 
   // Gọi API để lấy thông tin thực tế ngay tại Layout cha
@@ -65,7 +65,7 @@ function AppLayout({ onLogout }) {
 
         setUsageData({
           used: Number(res.dailyUploadCount) || 0,
-          total: 4
+          total: 10
         });
       } catch (err) {
         console.error("Lỗi lấy thông tin tại AppLayout:", err);

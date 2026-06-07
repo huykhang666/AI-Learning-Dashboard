@@ -777,10 +777,10 @@
   },
   "dashboard_extra": {
     "premium_unlimited": "Premium Plan: Unlimited usage",
-    "limit_status": "Today: <strong class=\"text-base font-bold\">{{used}}</strong> / 5 lecture uploads",
+    "limit_status": "Today: <strong class=\"text-base font-bold\">{{used}}</strong> / 10 lecture uploads",
     "upgrade_more": "Upgrade to Premium to unlock more",
     "limit_reached_title": "Free limits reached!",
-    "limit_reached_desc": "Free tier is limited to 5 uploads/day. Please upgrade to continue learning.",
+    "limit_reached_desc": "Free tier is limited to 10 uploads/day. Please upgrade to continue learning.",
     "upgrade_now": "Upgrade to Premium now"
   },
   "admin_extra": {

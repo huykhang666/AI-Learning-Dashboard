@@ -28,7 +28,7 @@ public interface SessionRepository extends JpaRepository<LearningSession,Long> {
     Double getTotalStudyHours(@Param("userId") Long userId);
 
     @Query(value = "SELECT TO_CHAR(created_at, 'Dy') as day_name, " +
-            "COALESCE(SUM(duration), 0) / 60.0 as hours " +
+            "COALESCE(SUM(duration), 0) / 3600.0 as hours " +
             "FROM learning_session " +
             "WHERE user_id = :userId " +
             "AND created_at >= date_trunc('week', CURRENT_DATE) " +

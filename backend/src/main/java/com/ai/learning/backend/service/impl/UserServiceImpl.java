@@ -74,6 +74,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(name)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        String today = LocalDate.now().toString();
+        String redisKey = "upload:count:" + user.getUserId() + ":" + today;
+        String currentCountStr = redisTemplate.opsForValue().get(redisKey);
+        int currentCount = (currentCountStr != null) ? Integer.parseInt(currentCountStr) : 0;
+        user.setDailyUploadCount(currentCount);
+
         try {
             this.canUpload(user.getUserId());
         } catch (AppException e) {
@@ -110,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
         if (currentCountStr != null) {
             int currentCount = Integer.parseInt(currentCountStr);
-            if (currentCount >= 4) {
+            if (currentCount >= 10) {
                 throw new AppException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
             }
         }

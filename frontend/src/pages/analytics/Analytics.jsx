@@ -34,7 +34,7 @@ export default function AnalyticsPage() {
 
   const maxHours = Math.max(
     ...data.weeklyActivity.map((item) => item.hours),
-    1
+    8
   );
 
   return (

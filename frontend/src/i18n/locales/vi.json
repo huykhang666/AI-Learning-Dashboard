@@ -759,10 +759,10 @@
   },
   "dashboard_extra": {
     "premium_unlimited": "Gói Premium: Không giới hạn lượt dùng",
-    "limit_status": "Hôm nay: <strong class=\"text-base font-bold\">{{used}}</strong> / 5 lượt upload bài giảng",
+    "limit_status": "Hôm nay: <strong class=\"text-base font-bold\">{{used}}</strong> / 10 lượt upload bài giảng",
     "upgrade_more": "Nâng cấp Premium để mở khóa thêm",
     "limit_reached_title": "Đã hết lượt dùng miễn phí!",
-    "limit_reached_desc": "Tài khoản thường chỉ được upload tối đa 5 bài giảng/ngày. Hãy nâng cấp để tiếp tục học tập.",
+    "limit_reached_desc": "Tài khoản thường chỉ được upload tối đa 10 bài giảng/ngày. Hãy nâng cấp để tiếp tục học tập.",
     "upgrade_now": "Nâng cấp Premium ngay"
   },
   "admin_extra": {
