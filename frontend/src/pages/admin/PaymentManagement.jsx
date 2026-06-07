@@ -61,11 +61,9 @@ export default function PaymentManagement() {
       if (statusFilter) params.append("status", statusFilter);
       if (gatewayFilter) params.append("gateway", gatewayFilter);
 
-      const response = await adminApi.getPaymentsPaginated(params);
+      const pageData = await adminApi.getPaymentsPaginated(params);
 
-      if (!response) return;
-
-      const pageData = response.result || {};
+      if (!pageData) return;
 
       setPayments(
         (pageData.content || []).map((item) => ({

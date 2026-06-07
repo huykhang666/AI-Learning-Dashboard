@@ -3,11 +3,6 @@ import { ShieldCheck, Search, Edit2, Trash2, Crown, X, AlertCircle } from "lucid
 import { useTranslation } from "react-i18next";
 import { adminApi } from "../../api/AdminApi.js";
 
-const fallbackUsers = [
-  { id: 1, name: "Nguyễn Minh Anh", email: "anh.nguyen@example.com", role: "USER", status: "Active", isPremium: false, joinedAt: "2026-01-12" },
-  { id: 2, name: "Trần Quốc Huy", email: "huy.tran@example.com", role: "ADMIN", status: "Active", isPremium: true, joinedAt: "2025-11-03" },
-  { id: 3, name: "Lê Thu Hà", email: "ha.le@example.com", role: "USER", status: "Blocked", isPremium: false, joinedAt: "2026-02-18" },
-];
 
 export default function UserManagement() {
   const { t } = useTranslation();
