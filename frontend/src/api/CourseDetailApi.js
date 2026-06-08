@@ -19,10 +19,12 @@ axiosClient.interceptors.request.use((config) => {
 /* ========================
    2. AXIOS CLIENT PYTHON (AI) 
 ======================== */
+// Nginx có location /ai { proxy_pass http://ai-learning-ai:8080 }
+// Nên AI luôn dùng path /ai tuyệt đối, không ghép với VITE_API_URL
+const _apiBase = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const _aiBase = _apiBase.startsWith("http") ? `${_apiBase}/ai` : "/ai";
 const aiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL 
-    ? `${import.meta.env.VITE_API_URL}/ai`
-    : "http://localhost:8000/ai",
+  baseURL: _aiBase,
 });
 
 /* ========================

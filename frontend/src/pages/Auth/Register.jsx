@@ -312,8 +312,8 @@ export default function PageRegister({ onGoLogin }) {
   const handleGoogleRegister = () => {
     setGLoading(true);
     setTimeout(() => {
-      const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
-      window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
+      // OAuth path đi qua nginx /oauth2/authorization/ → backend, KHÔNG dùng /api prefix
+      window.location.href = `/oauth2/authorization/google`;
     }, 1500);
   };
 

@@ -153,7 +153,8 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   const handleGoogleLogin = () => {
     setGLoading(true);
     setTimeout(() => {
-      window.location.href = `${BASE_API_URL}/oauth2/authorization/google`;
+      // OAuth path đi qua nginx /oauth2/authorization/ → backend, KHÔNG dùng /api prefix
+      window.location.href = `/oauth2/authorization/google`;
     }, 1500);
   };
 

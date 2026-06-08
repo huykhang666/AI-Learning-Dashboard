@@ -15,7 +15,11 @@ class WebSocketService {
             return;
         }
 
-        const socket = new SockJS(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/ws`); 
+        // Trong production, VITE_API_URL="/api" (relative) nên phải dùng origin của browser
+        // Trong dev, VITE_API_URL="http://localhost:8080" nên dùng trực tiếp
+        const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8080";
+        const wsBase = apiBase.startsWith("http") ? apiBase : window.location.origin;
+        const socket = new SockJS(`${wsBase}/ws`); 
         
         this.stompClient = new Client({
             webSocketFactory: () => socket,
