@@ -199,8 +199,10 @@ function UploadWidget({ onProcessAction, hideHeader, variant = "embedded" }) {
         formData.append("file", selectedFile);
       }
 
+      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
       const response = await axios.post(
-        "http://localhost:8080/api/v1/sessions",
+        `${apiBaseUrl}/api/v1/sessions`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -213,7 +215,7 @@ function UploadWidget({ onProcessAction, hideHeader, variant = "embedded" }) {
         const checkStatusInterval = setInterval(async () => {
           try {
             const statusRes = await axios.get(
-              `http://localhost:8080/api/v1/jobs/${sessionId}`,
+              `${apiBaseUrl}/api/v1/jobs/${sessionId}`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               }

@@ -89,7 +89,7 @@ const CourseDetail = () => {
       const encodedTitle = encodeURIComponent(videoTitle);
 
       const response = await fetch(
-        `http://localhost:8080/api/v1/courses/${id}/quizzes/export-pdf?videoTitle=${encodedTitle}`,
+        `${apiUrl}/api/v1/courses/${id}/quizzes/export-pdf?videoTitle=${encodedTitle}`,
         {
           method: "GET",
           headers: {

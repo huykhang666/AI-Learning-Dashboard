@@ -16,7 +16,8 @@ export function useCourses() {
       const userStr = localStorage.getItem("user");
       const userId = userStr ? JSON.parse(userStr).userId : null; // ← Fix lỗi 'userId is not defined'
 
-      const response = await axios.get("http://localhost:8080/api/v1/courses", {
+      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const response = await axios.get(`${apiBaseUrl}/api/v1/courses`, {
         headers: {
           Authorization: `Bearer ${token}`
         },
