@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.ai.learning.backend.dto.request.ForgotPasswordRequest;
+import com.ai.learning.backend.dto.request.ResetPasswordRequest;
 import java.text.ParseException;
 
 @RestController
@@ -43,5 +44,21 @@ public class AuthenticationController {
                 .result(result)
                 .build();
     }
+    @PostMapping("/forgot-password")
+    ApiResponse<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authenticationService.forgotPassword(request.getEmail());
+        return ApiResponse.<Void>builder()
+                .code(1000)
+                .message("Email đặt lại mật khẩu đã được gửi!")
+                .build();
+    }
 
+    @PostMapping("/reset-password")
+    ApiResponse<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authenticationService.resetPassword(request.getToken(), request.getNewPassword());
+        return ApiResponse.<Void>builder()
+                .code(1000)
+                .message("Đặt lại mật khẩu thành công!")
+                .build();
+    }
 }
