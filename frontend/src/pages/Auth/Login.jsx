@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useTranslation } from "react-i18next";
-
+import ForgotPasswordModal from "./ForgotPasswordModal";
 const T = {
   primary: "#2563EB",
   primaryHover: "#1D4ED8",
@@ -138,7 +138,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
   const [errors, setErrors] = useState({});
   const [remember, setRemember] = useState(false);
   const [visible, setVisible] = useState(false);
-
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   useEffect(() => {
     setTimeout(() => setVisible(true), 20);
   }, []);
@@ -187,7 +187,10 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
           const autoId = decoded.userId || decoded.id || decoded.sub;
           const userRole = decoded.scope === "ADMIN" ? "ADMIN" : "USER";
           if (autoId) {
-            localStorage.setItem("user", JSON.stringify({ id: autoId, role: userRole }));
+            localStorage.setItem(
+              "user",
+              JSON.stringify({ id: autoId, role: userRole }),
+            );
           }
         } catch (decodeErr) {
           console.warn(t("auth.login.errors.decode_token"), decodeErr);
@@ -274,7 +277,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
             <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">
               {t("auth.login.left.title_line1")}
               <br />
-              {t("auth.login.left.title_line2")} {" "}
+              {t("auth.login.left.title_line2")}{" "}
               <FaBolt
                 size={22}
                 color="#F59E0B"
@@ -336,7 +339,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
               disabled={gLoading}
               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition duration-200 disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center gap-3 mb-5"
             >
-              { }
+              {}
               {gLoading ? (
                 <div
                   style={{
@@ -352,7 +355,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 <GIcon />
               )}
 
-              {gLoading ? t("auth.login.google.connecting") : t("auth.login.google.button")}
+              {gLoading
+                ? t("auth.login.google.connecting")
+                : t("auth.login.google.button")}
             </button>
 
             <div className="flex items-center gap-2.5 mb-5">
@@ -445,6 +450,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                   cursor: "pointer",
                   fontWeight: 700,
                 }}
+                onClick={() => setShowForgotPassword(true)}
               >
                 {t("auth.login.right.forgot_password")}
               </span>
@@ -490,7 +496,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                   }}
                 />
               )}
-              {loading ? t("auth.login.right.signing_in") : t("auth.login.right.button")}
+              {loading
+                ? t("auth.login.right.signing_in")
+                : t("auth.login.right.button")}
             </button>
             <p
               style={{
@@ -502,7 +510,7 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
                 fontWeight: 500,
               }}
             >
-              {t("auth.login.right.no_account")} {" "}
+              {t("auth.login.right.no_account")}{" "}
               <span
                 onClick={handleGoRegister}
                 style={{ color: T.primary, fontWeight: 700, cursor: "pointer" }}
@@ -513,6 +521,9 @@ export default function PageLogin({ onLogin, onGoRegister, onAdminLogin }) {
           </div>
         </div>
       </div>
+      {showForgotPassword && (
+        <ForgotPasswordModal onClose={() => setShowForgotPassword(false)} />
+      )}
     </>
   );
 }

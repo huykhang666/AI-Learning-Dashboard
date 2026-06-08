@@ -1,5 +1,5 @@
 import MyCourses from "./pages/MyCourses/MyCourses.jsx";
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -35,7 +35,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import webSocketService from "./api/WebSocketService.js";
 import { userService } from "./api/UserService.js";
-
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 function AppLayout({ onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -43,7 +43,13 @@ function AppLayout({ onLogout }) {
 
   // Khai báo state tập trung để phân phối dữ liệu cho cả Sidebar và Header
   const [usageData, setUsageData] = useState({ used: 0, total: 10 });
-  const [userData, setUserData] = useState({ fullName: "Đang tải...", email: "huukhang@email.com", plan: "Free Plan", avatar: "..", isPremium: false });
+  const [userData, setUserData] = useState({
+    fullName: "Đang tải...",
+    email: "huukhang@email.com",
+    plan: "Free Plan",
+    avatar: "..",
+    isPremium: false,
+  });
 
   // Gọi API để lấy thông tin thực tế ngay tại Layout cha
   useEffect(() => {
@@ -52,20 +58,26 @@ function AppLayout({ onLogout }) {
         const res = await userService.getMyInfo();
 
         // Gộp tên từ firstname và lastname như log Sidebar.jsx:118 của ní
-        const fullName = `${res.firstname || ''} ${res.lastname || ''}`.trim();
+        const fullName = `${res.firstname || ""} ${res.lastname || ""}`.trim();
 
         setUserData({
           fullName: fullName || "Nguyễn Khang",
           email: res.email || "huukhang@email.com",
           // Đón đầu cả 2 kiểu đặt tên của Backend (is_premium hoặc isPremium)
-          isPremium: res.is_premium === true || res.isPremium === true || res.premium === true,
-          plan: (res.is_premium || res.isPremium || res.premium) ? "Premium Plan" : "Free Plan",
-          avatar: (res.firstname || "U").charAt(0).toUpperCase()
+          isPremium:
+            res.is_premium === true ||
+            res.isPremium === true ||
+            res.premium === true,
+          plan:
+            res.is_premium || res.isPremium || res.premium
+              ? "Premium Plan"
+              : "Free Plan",
+          avatar: (res.firstname || "U").charAt(0).toUpperCase(),
         });
 
         setUsageData({
           used: Number(res.dailyUploadCount) || 0,
-          total: 10
+          total: 10,
         });
       } catch (err) {
         console.error("Lỗi lấy thông tin tại AppLayout:", err);
@@ -76,8 +88,7 @@ function AppLayout({ onLogout }) {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    
-    
+
     let username = localStorage.getItem("username");
     if (!username) {
       const userStr = localStorage.getItem("user");
@@ -93,7 +104,9 @@ function AppLayout({ onLogout }) {
 
     if (token && username) {
       webSocketService.connect(token, () => {
-        console.log(`✉️ WebSocket kết nối thành công! Đang lắng nghe user: ${username}`);
+        console.log(
+          `✉️ WebSocket kết nối thành công! Đang lắng nghe user: ${username}`,
+        );
 
         const notificationTopic = `/user/${username}/queue/notifications`;
 
@@ -107,7 +120,6 @@ function AppLayout({ onLogout }) {
             });
           }
 
-          
           const wsEvent = new CustomEvent("ws-notification", { detail: data });
           window.dispatchEvent(wsEvent);
         });
@@ -149,7 +161,7 @@ function AppLayout({ onLogout }) {
         <Header
           onMenuOpen={() => setMobileOpen(true)}
           onLogout={onLogout}
-          userData={userData} 
+          userData={userData}
         />
 
         <main className="flex-1 overflow-y-auto">
@@ -218,7 +230,7 @@ function AppRoutes() {
       <Route path="/payment/failed" element={<PaymentFailedPage />} />
 
       <Route path="/oauth2/callback" element={<OAuth2RedirectHandler />} />
-
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route
         path="/admin"
         element={
@@ -245,7 +257,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
-      <ToastContainer position="top-right" autoClose={4000} hideProgressBar={false} />
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+      />
     </BrowserRouter>
   );
 }

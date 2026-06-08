@@ -23,6 +23,7 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://localhost:5174",
+                "http://192.168.1.13:5173",
                 corsAllowedOrigins
         ));
 

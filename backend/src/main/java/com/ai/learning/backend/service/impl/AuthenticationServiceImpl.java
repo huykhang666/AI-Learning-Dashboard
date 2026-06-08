@@ -20,6 +20,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
+import com.ai.learning.backend.entity.PasswordResetToken;
+import com.ai.learning.backend.repository.PasswordResetTokenRepository;
+import com.ai.learning.backend.service.EmailService;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 public class AuthenticationServiceImpl implements AuthenticationService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
+    PasswordResetTokenRepository passwordResetTokenRepository;
+    EmailService emailService;
     JwtUtils jwtUtils;
     RedisTemplate<String, Object> redisTemplate;
 
@@ -70,5 +77,48 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .authenticated(true)
                 .build();
     }
+    @Override
+    public void forgotPassword(String email) {
+        log.info("Forgot password request for email: {}", email);
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        log.info("User found: {}", user.getUsername());
 
+        passwordResetTokenRepository.deleteByEmail(email);
+        log.info("Deleted old tokens for email: {}", email);
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .token(token)
+                .email(email)
+                .expiryDate(LocalDateTime.now().plusMinutes(15))
+                .used(false)
+                .build();
+        passwordResetTokenRepository.save(resetToken);
+        log.info("Saved new token: {}", token);
+
+        String resetLink = "http://192.168.1.13:5173/reset-password?token=" + token;
+        log.info("Sending email to: {} with link: {}", email, resetLink);
+        emailService.sendPasswordResetEmail(email, resetLink);
+        log.info("Email sent successfully!");
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_TOKEN));
+
+        if (resetToken.isUsed() || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        var user = userRepository.findByEmail(resetToken.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+    }
 }

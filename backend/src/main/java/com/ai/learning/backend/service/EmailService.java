@@ -1,4 +1,5 @@
 package com.ai.learning.backend.service;
 
-public class EmailService {
+public interface EmailService {
+    void sendPasswordResetEmail(String to, String resetLink);
 }
