@@ -58,6 +58,13 @@ public class HistoryController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
             Lesson lesson = lessonRepository.findById(id).orElseThrow();
+            
+            // Cập nhật duration thực tế cho Lesson nếu là giá trị mặc định (600)
+            if (body.containsKey("duration") && (lesson.getDuration() == null || lesson.getDuration() == 600)) {
+                lesson.setDuration(body.get("duration"));
+                lessonRepository.save(lesson);
+            }
+
             LearningSession session = sessionRepository.findByUserIdAndVideoUrl(user.getUserId(), lesson.getVideoUrl())
                     .orElseGet(() -> {
                         LearningSession newSession = LearningSession.builder()

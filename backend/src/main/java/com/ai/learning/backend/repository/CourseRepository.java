@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByPriceNullOrPrice(Double price);
 
-    @Query("SELECT c FROM Course c LEFT JOIN FETCH c.lessons WHERE c.courseId = :courseId")
+    @Query("SELECT c FROM Course c LEFT JOIN FETCH c.lessons l WHERE c.courseId = :courseId ORDER BY l.orderIndex ASC")
     Optional<Course> findByIdWithLessons(@Param("courseId") Long courseId);
 }

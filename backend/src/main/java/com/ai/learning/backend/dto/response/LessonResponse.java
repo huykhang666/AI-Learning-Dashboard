@@ -13,4 +13,5 @@ public class LessonResponse {
     String videoUrl;
     String thumbnailUrl;
     Integer orderIndex;
+    Integer duration;
 }

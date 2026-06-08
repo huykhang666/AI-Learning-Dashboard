@@ -72,6 +72,16 @@ public class CourseServiceImpl implements CourseService {
         response.setCanAccess(canAccess);
         response.setUnlocked(canAccess);
 
+        if (response.getLessons() != null) {
+            response.getLessons().sort((l1, l2) -> {
+                Integer o1 = l1.getOrderIndex();
+                Integer o2 = l2.getOrderIndex();
+                if (o1 == null) return (o2 == null) ? 0 : 1;
+                if (o2 == null) return -1;
+                return o1.compareTo(o2);
+            });
+        }
+
         return response;
     }
 

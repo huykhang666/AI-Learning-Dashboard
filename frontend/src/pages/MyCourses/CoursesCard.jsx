@@ -87,8 +87,7 @@ export default function CourseCard({ course }) {
       </div>
 
       <p className={styles.cardLessons}>
-        {/* Sửa từ course.lessons thành course.lessons_count cho đúng DB ní gửi */}
-        {t("my_courses.lessons", { count: course.lessons_count || 0 })}
+        {t("my_courses.lessons", { count: course.lessonsCount ?? course.lessons_count ?? 0 })}
       </p>
 
       <div className={styles.cardActions}>

@@ -127,7 +127,7 @@ public class SessionServiceImpl implements SessionService {
                             .videoUrl(lesson.getVideoUrl())
                             .status(SessionStatus.COMPLETED)
                             .user(user)
-                            .duration(600) // Default 10 min
+                            .duration(lesson.getDuration() != null ? lesson.getDuration() : 600)
                             .build();
                     return sessionRepository.save(newSession);
                 });

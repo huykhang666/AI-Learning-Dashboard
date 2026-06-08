@@ -62,7 +62,7 @@ public class MessageController {
                                 .videoUrl(lesson.getVideoUrl())
                                 .status(SessionStatus.COMPLETED)
                                 .user(user)
-                                .duration(600)
+                                .duration(lesson.getDuration() != null ? lesson.getDuration() : 600)
                                 .build();
                         return sessionRepository.save(newSession);
                     });

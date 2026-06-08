@@ -22,6 +22,14 @@ const getFullUrl = (url) => {
   return `${cleanBase}${cleanUrl}`;
 };
 
+const getYoutubeID = (url) => {
+  if (!url) return null;
+  const regExp =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?)\??v?=?([^#&?]*)).*/;
+  const match = url.match(regExp);
+  return match && match[7]?.length === 11 ? match[7] : null;
+};
+
 const LessonDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -117,6 +125,36 @@ const LessonDetail = () => {
     await courseDetailApi.updateProgress(resolvedId, current);
   }, [id, courseData]);
 
+  const handleHtml5LoadedMetadata = async (e) => {
+    const duration = Math.floor(e.target.duration);
+    if (duration > 0) {
+      await courseDetailApi.saveDuration(id, { duration });
+    }
+  };
+
+  const handleHtml5TimeUpdate = async (e) => {
+    const videoElement = e.target;
+    if (videoElement.paused) return;
+
+    const current = videoElement.currentTime;
+    if (!current) return;
+
+    const now = Date.now();
+    if (now - lastSentRef.current < 5000) return;
+    lastSentRef.current = now;
+
+    const resolvedId = courseData?.learningSessionId || id;
+    await courseDetailApi.updateProgress(resolvedId, current);
+  };
+
+  // Inject YouTube IFrame API script (1 lần)
+  useEffect(() => {
+    if (window.YT) return;
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+  }, []);
+
   // Fetch lesson data
   useEffect(() => {
     const fetchDetail = async () => {
@@ -128,6 +166,7 @@ const LessonDetail = () => {
           title: data.title,
           videoUrl: data.videoUrl,
           thumbnailUrl: data.thumbnailUrl,
+          videoId: getYoutubeID(data.videoUrl),
           learningSessionId: data.learningSessionId
         });
       } catch (error) {
@@ -140,8 +179,52 @@ const LessonDetail = () => {
     fetchDetail();
   }, [id]);
 
+  // Khởi tạo YouTube Player
   useEffect(() => {
-    if (isReadyRef.current) updateProgress();
+    if (!courseData?.videoId) return;
+
+    const initPlayer = () => {
+      if (!playerRef.current) return;
+      playerInstance.current = new window.YT.Player(playerRef.current, {
+        videoId: courseData.videoId,
+        width: "100%",
+        height: "100%",
+        events: {
+          onReady: async (event) => {
+            isReadyRef.current = true;
+            const duration = Math.floor(event.target.getDuration());
+            if (duration > 0) {
+              await courseDetailApi.saveDuration(id, { duration });
+            }
+          },
+        },
+      });
+    };
+
+    if (window.YT && window.YT.Player) {
+      initPlayer();
+    } else {
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (prev) prev();
+        initPlayer();
+      };
+    }
+  }, [courseData?.videoId, courseData?.learningSessionId, id]);
+
+  // Gọi updateProgress mỗi 5 giây cho YouTube
+  useEffect(() => {
+    if (!courseData?.videoId) return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(updateProgress, 5000);
+    return () => {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    };
+  }, [courseData?.videoId, updateProgress]);
+
+  // Destroy player và cleanup
+  useEffect(() => {
     return () => {
       playerInstance.current?.destroy?.();
       playerInstance.current = null;
@@ -172,14 +255,17 @@ const LessonDetail = () => {
       </header>
 
       <main className="flex-1 overflow-y-auto p-6 max-w-5xl mx-auto w-full">
-        {/* Video Player */}
         <div className="w-full aspect-video bg-[#0B0A1A] rounded-2xl relative shadow-lg overflow-hidden mb-6">
-          {courseData?.videoUrl ? (
+          {courseData?.videoId ? (
+            <div ref={playerRef} className="w-full h-full" />
+          ) : courseData?.videoUrl ? (
             <video
               src={getFullUrl(courseData.videoUrl)}
               poster={getFullUrl(courseData.thumbnailUrl)}
               controls
               className="w-full h-full"
+              onLoadedMetadata={handleHtml5LoadedMetadata}
+              onTimeUpdate={handleHtml5TimeUpdate}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-slate-500">

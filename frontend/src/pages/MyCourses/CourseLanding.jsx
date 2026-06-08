@@ -29,6 +29,14 @@ const getFullUrl = (url) => {
   return `${cleanBase}${cleanUrl}`;
 };
 
+const formatDuration = (seconds) => {
+  if (!seconds) return "10:00";
+  const total = Math.floor(seconds);
+  const mins = Math.floor(total / 60);
+  const secs = total % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
 export default function CourseLanding() {
         const { courseId } = useParams();
         const navigate = useNavigate();
@@ -42,7 +50,11 @@ export default function CourseLanding() {
                     const userId = userStr ? JSON.parse(userStr).userId : 0;
                     
                     const response = await courseApi.getCourseDetail(courseId, userId);
-                    setCourse(response.data);
+                    const courseData = response.data;
+                    if (courseData && Array.isArray(courseData.lessons)) {
+                        courseData.lessons.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+                    }
+                    setCourse(courseData);
                 } catch (err) {
                     console.error("Lỗi gọi API đổ dữ liệu:", err);
                 }
@@ -83,6 +95,15 @@ export default function CourseLanding() {
             } catch (error) {
                 console.error("Lỗi đăng ký:", error);
                 toast.error(t("course_landing.enroll_fail", { defaultValue: "Đăng ký thất bại, thử lại nhé!" }));
+            }
+        };
+
+        const handleGoStudy = () => {
+            const firstLessonId = course.lessons?.[0]?.lessonId;
+            if (firstLessonId) {
+                navigate(`/app/lessons/${firstLessonId}`);
+            } else {
+                toast.warn("Khóa học chưa có bài học nào!");
             }
         };
         
@@ -159,9 +180,9 @@ export default function CourseLanding() {
                                                         {!course.unlocked && course.price > 0 && index < 2 && (
                                                             <span className={styles.previewBadge}>{t("course_landing.preview_badge")}</span>
                                                         )}
-                                                        <span className={styles.lessonDuration}>
-                                                            <Clock size={11} /> 10:00
-                                                        </span>
+                                                         <span className={styles.lessonDuration}>
+                                                             <Clock size={11} /> {formatDuration(lesson.duration)}
+                                                         </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -220,17 +241,38 @@ export default function CourseLanding() {
                                 </div>
 
                                 {/* Nút bấm thay đổi theo trạng thái FREE hoặc CÓ PHÍ */}
-                                <button
-                                    type="button"
-                                    className={`${styles.btnAction} ${(Number(course.price) === 0 || course.unlocked) ? styles.btnStudy : styles.btnBuy}`}
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // Ngăn chặn sự kiện lan truyền
-                                        console.log("Nút được nhấn!"); 
-                                        handleEnroll();
-                                    }}
-                                >
-                                    {(Number(course.price) === 0 || course.unlocked) ? t("course_landing.study_now") : t("course_landing.enroll_now")}
-                                </button>
+                                {(() => {
+                                    const isFree = Number(course.price) === 0;
+                                    const isUnlocked = course.unlocked;
+                                    
+                                    if (isFree || isUnlocked) {
+                                        return (
+                                            <button
+                                                type="button"
+                                                className={`${styles.btnAction} ${styles.btnStudy}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleGoStudy();
+                                                }}
+                                            >
+                                                {t("course_landing.owned")}
+                                            </button>
+                                        );
+                                    } else {
+                                        return (
+                                            <button
+                                                type="button"
+                                                className={`${styles.btnAction} ${styles.btnBuy}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEnroll();
+                                                }}
+                                            >
+                                                {t("course_landing.pay_now")}
+                                            </button>
+                                        );
+                                    }
+                                })()}
 
                                 <div className={styles.guaranteeBox}>
                                     <ShieldCheck size={14} />

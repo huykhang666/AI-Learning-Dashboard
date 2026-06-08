@@ -198,6 +198,27 @@ const CourseDetail = () => {
     await courseDetailApi.updateProgress(id, current);
   }, [id]);
 
+  const handleHtml5LoadedMetadata = async (e) => {
+    const duration = Math.floor(e.target.duration);
+    if (duration > 0) {
+      await courseDetailApi.saveDuration(id, { duration });
+    }
+  };
+
+  const handleHtml5TimeUpdate = async (e) => {
+    const videoElement = e.target;
+    if (videoElement.paused) return;
+
+    const current = videoElement.currentTime;
+    if (!current) return;
+
+    const now = Date.now();
+    if (now - lastSentRef.current < 5000) return;
+    lastSentRef.current = now;
+
+    await courseDetailApi.updateProgress(id, current);
+  };
+
   // Inject YouTube IFrame API script (1 lần)
   useEffect(() => {
     if (window.YT) return;
@@ -353,6 +374,8 @@ const CourseDetail = () => {
                 poster={getFullUrl(courseData.thumbnailUrl)}
                 controls
                 className="w-full h-full"
+                onLoadedMetadata={handleHtml5LoadedMetadata}
+                onTimeUpdate={handleHtml5TimeUpdate}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-500">

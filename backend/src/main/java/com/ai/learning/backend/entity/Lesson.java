@@ -24,6 +24,10 @@ public class Lesson {
 
     private Integer orderIndex;
 
+    @Column(nullable = false, columnDefinition = "integer default 600")
+    @Builder.Default
+    private Integer duration = 600;
+
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;

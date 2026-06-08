@@ -34,6 +34,7 @@ public class Course {
     private boolean isPremiumRequired = false;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OrderBy("orderIndex ASC")
     private List<Lesson> lessons;
 
     @PrePersist
