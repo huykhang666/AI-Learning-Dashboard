@@ -6,7 +6,7 @@ load_dotenv(os.path.join(base_dir, ".env"))
 
 class Settings:
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY")
-    JAVA_URL: str = "http://localhost:8080/api/v1/jobs"
+    JAVA_URL: str = os.getenv("JAVA_URL", "http://localhost:8080/api/v1/jobs")
     WHISPER_MODEL: str = "base"
  
     STORAGE_PATH: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../storage"))

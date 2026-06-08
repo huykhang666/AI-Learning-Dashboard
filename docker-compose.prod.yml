@@ -98,6 +98,8 @@ services:
     restart: always
     environment:
       - PORT=8080
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - JAVA_URL=http://ai-learning-backend:8080/api/v1/jobs
     ports:
       - "8000:8080"
     volumes:

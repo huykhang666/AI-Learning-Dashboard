@@ -19,7 +19,7 @@ class WebSocketService {
         // Trong dev, VITE_API_URL="http://localhost:8080" nên dùng trực tiếp
         const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8080";
         const wsBase = apiBase.startsWith("http") ? apiBase : window.location.origin;
-        const socket = new SockJS(`${wsBase}/ws`); 
+        const socket = new SockJS(`${wsBase}/ws-flyspeech`); 
         
         this.stompClient = new Client({
             webSocketFactory: () => socket,
