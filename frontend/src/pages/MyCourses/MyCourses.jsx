@@ -44,7 +44,7 @@ export default function MyCourses() {
         ) : (
           filteredCourses.map((course) => (
             <CourseCard
-              key={course.courseId} 
+              key={course.id} 
               course={course}
             />
           ))

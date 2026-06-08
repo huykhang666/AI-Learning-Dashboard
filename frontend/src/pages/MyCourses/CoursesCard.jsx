@@ -19,9 +19,18 @@ export default function CourseCard({ course }) {
   const displayPrice = course.price > 0
     ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(course.price)
     : "FREE";
-
+  const handleLatestLesson = () => {
+    console.log("course data:", JSON.stringify(course));
+    const latestLessonId = course.latestLessonId || course.lessons?.[0]?.lessonId;
+    if (latestLessonId) {
+      navigate(`/app/history/${latestLessonId}`);
+    } else {
+      // Không có lesson thì vào trang khóa học
+      navigate(`/app/courses/${course.courseId}`);
+    }
+  };
   return (
-    <div className={styles.card}>
+    <div className={styles.card}> 
       {(isCompleted || course.badge) && (
         <span className={styles.cardBadge}>
           ✓ {t("my_courses.badge.done")}
@@ -74,13 +83,17 @@ export default function CourseCard({ course }) {
 
       <div className={styles.cardActions}>
         <button className={styles.btnView} onClick={handleViewDetails}>
-          {t("my_courses.button.view_course")}
+          {course.unlocked
+            ? t("my_courses.button.go_study")   
+            : t("my_courses.button.view_course") 
+          }
         </button>
 
         {course.unlocked && (
           <button
             className={styles.btnLatest}
             style={{ background: progressColor }}
+            onClick={handleLatestLesson}
           >
             {t("my_courses.button.latest_lesson")}
           </button>

@@ -121,6 +121,7 @@
     "progress_complete": "{{percent}}% Hoàn thành",
     "button": {
       "view_course": "Xem khóa học",
+      "go_study": "Vào học",
       "latest_lesson": "Bài học mới nhất"
     },
     "badge": {
@@ -159,6 +160,7 @@
         "a": "Có! Dán URL YouTube vào ô tải lên và hệ thống sẽ tự động lấy và xử lý video."
       }
     }
+
   },
   "settings": {
     "title": "Tài khoản",

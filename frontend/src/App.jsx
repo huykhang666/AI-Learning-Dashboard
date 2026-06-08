@@ -121,7 +121,7 @@ function AppLayout({ onLogout }) {
 
   const isCourseDetail =
     location.pathname.includes("/history/") &&
-    location.pathname.split("/").length > 3;
+    location.pathname.split("/").length > 2;
 
   if (isCourseDetail) {
     return (

@@ -1,44 +1,45 @@
 import { useState, useMemo, useEffect } from "react";
-import axios from "axios"; // Đừng quên import axios nhé
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 export function useCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("accessToken");
+      const userStr = localStorage.getItem("user");
+      const userId = userStr ? JSON.parse(userStr).userId : null; // ← Fix lỗi 'userId is not defined'
+
+      const response = await axios.get("http://localhost:8080/api/v1/courses", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: { userId } // ← Giờ userId đã được khai báo ở trên
+      });
+
+      const allCourses = response.data.result || response.data || [];
+      setCourses(allCourses);
+
+    } catch (error) {
+      console.error("Lỗi tải dữ liệu khóa học:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        setLoading(true);
-        // Lấy thẻ Token trong ví ra
-        const token = localStorage.getItem("accessToken"); 
-
-        // Gọi thẳng vào API Tất cả khóa học (thay localhost:8080 nếu cổng của nhóm bạn khác)
-        const response = await axios.get("http://localhost:8080/api/v1/courses", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        // Tùy theo chuẩn API của nhóm, dữ liệu thường nằm trong response.data.result
-        const allCourses = response.data.result || response.data || [];
-        setCourses(allCourses);
-
-      } catch (error) {
-        console.error("Lỗi tải dữ liệu khóa học:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     loadDashboardData();
-  }, []);
+  }, [location.state]); // ← Reload khi vừa enroll xong và navigate về
 
   const filteredCourses = useMemo(() => {
     let result = courses;
 
-    // Nếu chuyển tab "Khóa học của tôi", mới lọc các khóa đã mở khóa
     if (activeTab === "mine") {
       result = result.filter((c) => c.unlocked === true);
     }

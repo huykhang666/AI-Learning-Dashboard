@@ -24,5 +24,10 @@ export const courseApi = {
       console.error("[CourseApi] getCourseDetail error:", error);
       throw error;
     }
+  },
+  enroll: (courseId, userId) => {
+        return axiosClient.post(`/courses/${courseId}/enroll`, null, {
+            params: { userId: userId }
+        });
   }
 };

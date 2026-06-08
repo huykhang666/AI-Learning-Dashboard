@@ -1,12 +1,16 @@
 package com.ai.learning.backend.service.impl;
-
+import com.ai.learning.backend.repository.CourseRepository;
+import com.ai.learning.backend.dto.request.LessonRequest;
 import com.ai.learning.backend.dto.response.CourseDetailResponse;
 import com.ai.learning.backend.dto.response.CourseResponse;
+import com.ai.learning.backend.dto.response.LessonResponse;
 import com.ai.learning.backend.entity.Course;
+import com.ai.learning.backend.entity.Lesson;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.mapper.CourseMapper;
 import com.ai.learning.backend.repository.CourseRepository;
 import com.ai.learning.backend.repository.CourseTransactionRepository;
+import com.ai.learning.backend.repository.EnrollmentRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.CourseService;
 import lombok.AccessLevel;
@@ -15,8 +19,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.ai.learning.backend.entity.Lesson;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,7 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
     CourseRepository courseRepository;
     CourseTransactionRepository transactionRepository;
+    EnrollmentRepository enrollmentRepository;
     UserRepository userRepository;
     CourseMapper courseMapper;
 
@@ -34,6 +41,15 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findAll().stream().map(course -> {
             CourseResponse response = courseMapper.toCourseResponse(course);
             response.setUnlocked(checkAccess(user, course));
+            List<Lesson> lessons = course.getLessons();
+            if (lessons != null && !lessons.isEmpty()) {
+                lessons.sort(Comparator.comparing(Lesson::getOrderIndex,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+                response.setLatestLessonId(lessons.get(0).getLessonId());
+                response.setLessonsCount(lessons.size());
+            } else {
+                response.setLessonsCount(0);
+            }
             return response;
         }).collect(Collectors.toList());
     }
@@ -54,18 +70,20 @@ public class CourseServiceImpl implements CourseService {
 
     private boolean checkAccess(User user, Course course) {
         if (user == null) return false;
-
-        if (!course.isPremiumRequired() && (course.getPrice() == null || course.getPrice() <= 0)) {
-            return true;
-        }
-
+        boolean isEnrolled = enrollmentRepository
+                .existsByUserUserIdAndCourseCourseIdAndInActiveFalse(
+                        user.getUserId(), course.getCourseId()
+                );
+        if (isEnrolled) return true;
         if (course.isPremiumRequired() && user.isPremium()) {
-            if (user.getPremiumExpiredAt() != null && user.getPremiumExpiredAt().isAfter(LocalDateTime.now())) {
+            if (user.getPremiumExpiredAt() != null
+                    && user.getPremiumExpiredAt().isAfter(LocalDateTime.now())) {
                 return true;
             }
         }
-
-        return transactionRepository.existsByUserUserIdAndCourseCourseIdAndStatus(
-                user.getUserId(), course.getCourseId(), "COMPLETED");
+        return transactionRepository
+                .existsByUserUserIdAndCourseCourseIdAndStatus(
+                        user.getUserId(), course.getCourseId(), "COMPLETED"
+                );
     }
 }

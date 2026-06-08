@@ -1,8 +1,9 @@
 package com.ai.learning.backend.controller;
 
-import com.ai.learning.backend.dto.response.CourseDetailResponse;
-import com.ai.learning.backend.dto.response.CourseResponse;
+import com.ai.learning.backend.dto.request.LessonRequest;
+import com.ai.learning.backend.dto.response.*;
 import com.ai.learning.backend.service.CourseService;
+import com.ai.learning.backend.service.EnrollmentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +18,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseController {
     CourseService courseService;
+    EnrollmentService enrollmentService; // Khai báo thêm EnrollmentService
 
     @GetMapping
     public ResponseEntity<List<CourseResponse>> getAllCourses(@RequestParam(required = false) Long userId) {
@@ -29,4 +31,20 @@ public class CourseController {
             @RequestParam(required = false) Long userId) {
         return ResponseEntity.ok(courseService.getCourseDetail(userId, courseId));
     }
+
+    // Sửa lại API enroll
+    @PostMapping("/{courseId}/enroll")
+    public ApiResponse<EnrollmentResponse> enrollCourse(
+            @PathVariable Long courseId,
+            @RequestParam Long userId) { // Hứng userId từ Frontend gửi lên
+
+        // Gọi hàm từ enrollmentService và truyền đủ 2 tham số
+        EnrollmentResponse response = enrollmentService.enrollCourse(userId, courseId);
+
+        return ApiResponse.<EnrollmentResponse>builder()
+                .code(1000)
+                .result(response)
+                .build();
+    }
+
 }

@@ -1,15 +1,13 @@
 package com.ai.learning.backend.controller;
 
+import com.ai.learning.backend.dto.request.LessonRequest;
 import com.ai.learning.backend.dto.response.LessonResponse;
 import com.ai.learning.backend.service.LessonService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +26,16 @@ public class LessonController {
     @GetMapping("/{lessonId}")
     public ResponseEntity<LessonResponse> getLessonDetails(@PathVariable Long lessonId) {
         return ResponseEntity.ok(lessonService.getLessonDetails(lessonId));
+    }
+    @PostMapping("/course/{courseId}")
+    public ResponseEntity<LessonResponse> createLesson(
+            @PathVariable Long courseId,
+            @RequestBody LessonRequest request) {
+        return ResponseEntity.ok(lessonService.createLesson(courseId, request));
+    }
+    @DeleteMapping("/{lessonId}")
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long lessonId) {
+        lessonService.deleteLesson(lessonId);
+        return ResponseEntity.ok().build();
     }
 }

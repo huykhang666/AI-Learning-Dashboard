@@ -13,6 +13,7 @@ public class CourseResponse {
     Double price;
     boolean isPremiumRequired;
     boolean isFree;
-    boolean isUnlocked; 
-
+    boolean isUnlocked;
+    Long latestLessonId;
+    Integer lessonsCount;
 }
