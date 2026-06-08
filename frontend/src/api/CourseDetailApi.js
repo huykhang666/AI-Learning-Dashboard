@@ -41,6 +41,18 @@ export const courseDetailApi = {
     }
   },
 
+  // Lấy chi tiết bài học theo lesson ID (resolves to lesson's learning session)
+  getLessonSession: async (lessonId) => {
+    try {
+      const response = await axiosClient.get(`/lessons/${lessonId}/session`);
+      if (response.data?.result) return response.data.result;
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] getLessonSession error:", error);
+      throw error;
+    }
+  },
+
   // Lấy lịch sử chat theo session
   getChatHistory: async (sessionId, page = 1) => {
     try {

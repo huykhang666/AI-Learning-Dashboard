@@ -71,72 +71,72 @@ public class SessionServiceImpl implements SessionService {
     //Retrieve session details including AI analysis results
     @Override
     public SessionDetailResponse getById(Long id) {
-        // 1. Check if this ID belongs to a Lesson
-        java.util.Optional<Lesson> lessonOpt = lessonRepository.findById(id);
-        if (lessonOpt.isPresent()) {
-            Lesson lesson = lessonOpt.get();
-            Course course = lesson.getCourse();
-
-            // Get current user
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-            // 2. Check if course requires paywall
-            boolean isPremium = course.isPremiumRequired() || (course.getPrice() != null && course.getPrice() > 0);
-            if (isPremium) {
-                // Admin bypass
-                boolean isAdmin = user.getRole() == com.ai.learning.backend.enums.UserRole.ADMIN;
-                if (!isAdmin) {
-                    // Check enrollment
-                    boolean isEnrolled = enrollmentRepository.existsByUserUserIdAndCourseCourseIdAndInActiveFalse(
-                            user.getUserId(), course.getCourseId()
-                    );
-
-                    // Check successful transaction
-                    boolean hasPaid = transactionRepository.existsByUserUserIdAndCourseCourseIdAndStatus(
-                            user.getUserId(), course.getCourseId(), "COMPLETED"
-                    );
-
-                    // Check premium status if isPremiumRequired is true
-                    boolean hasPremiumAccess = false;
-                    if (course.isPremiumRequired() && user.isPremium()) {
-                        if (user.getPremiumExpiredAt() != null && user.getPremiumExpiredAt().isAfter(java.time.LocalDateTime.now())) {
-                            hasPremiumAccess = true;
-                        }
-                    }
-
-                    if (!isEnrolled && !hasPaid && !hasPremiumAccess) {
-                        throw new AppException(ErrorCode.FORBIDDEN);
-                    }
-                }
-            }
-
-            // Find or create LearningSession for this user & lesson
-            LearningSession session = sessionRepository.findByUserIdAndVideoUrl(user.getUserId(), lesson.getVideoUrl())
-                    .orElseGet(() -> {
-                        LearningSession newSession = LearningSession.builder()
-                                .title(lesson.getTitle())
-                                .videoUrl(lesson.getVideoUrl())
-                                .status(SessionStatus.COMPLETED)
-                                .user(user)
-                                .duration(600) // Default 10 min
-                                .build();
-                        return sessionRepository.save(newSession);
-                    });
-
-            AIResult aiResult = session.getAiResult();
-            SessionDetailResponse response = sessionMapper.toDetailResponse(session, aiResult);
-            // Crucial: keep the learningSessionId as the input id (lessonId) so frontend routes/actions map correctly!
-            response.setLearningSessionId(id);
-            return response;
-        }
-
         LearningSession session = sessionRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         AIResult aiResult = session.getAiResult();
         return sessionMapper.toDetailResponse(session, aiResult);
+    }
+
+    @Override
+    public SessionDetailResponse getLessonSession(Long lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài học"));
+        Course course = lesson.getCourse();
+
+        // Get current user
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        // Check if course requires paywall
+        boolean isPremium = course.isPremiumRequired() || (course.getPrice() != null && course.getPrice() > 0);
+        if (isPremium) {
+            // Admin bypass
+            boolean isAdmin = user.getRole() == com.ai.learning.backend.enums.UserRole.ADMIN;
+            if (!isAdmin) {
+                // Check enrollment
+                boolean isEnrolled = enrollmentRepository.existsByUserUserIdAndCourseCourseIdAndInActiveFalse(
+                        user.getUserId(), course.getCourseId()
+                );
+
+                // Check successful transaction
+                boolean hasPaid = transactionRepository.existsByUserUserIdAndCourseCourseIdAndStatus(
+                        user.getUserId(), course.getCourseId(), "COMPLETED"
+                );
+
+                // Check premium status if isPremiumRequired is true
+                boolean hasPremiumAccess = false;
+                if (course.isPremiumRequired() && user.isPremium()) {
+                    if (user.getPremiumExpiredAt() != null && user.getPremiumExpiredAt().isAfter(java.time.LocalDateTime.now())) {
+                        hasPremiumAccess = true;
+                    }
+                }
+
+                if (!isEnrolled && !hasPaid && !hasPremiumAccess) {
+                    throw new AppException(ErrorCode.FORBIDDEN);
+                }
+            }
+        }
+
+        // Find or create LearningSession for this user & lesson
+        LearningSession session = sessionRepository.findByUserIdAndVideoUrl(user.getUserId(), lesson.getVideoUrl())
+                .orElseGet(() -> {
+                    LearningSession newSession = LearningSession.builder()
+                            .title(lesson.getTitle())
+                            .videoUrl(lesson.getVideoUrl())
+                            .status(SessionStatus.COMPLETED)
+                            .user(user)
+                            .duration(600) // Default 10 min
+                            .build();
+                    return sessionRepository.save(newSession);
+                });
+
+        AIResult aiResult = session.getAiResult();
+        SessionDetailResponse response = sessionMapper.toDetailResponse(session, aiResult);
+        // Crucial: keep the learningSessionId as the input id (lessonId) so frontend routes/actions map correctly!
+        response.setLearningSessionId(lessonId);
+        return response;
     }
 
     @Override

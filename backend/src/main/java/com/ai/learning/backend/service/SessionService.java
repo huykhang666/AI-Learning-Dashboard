@@ -9,6 +9,7 @@ import java.util.List;
 public interface SessionService {
     SessionListResponse create(SessionRequest request);
     SessionDetailResponse getById(Long id);
+    SessionDetailResponse getLessonSession(Long lessonId);
     PageResponse<SessionListResponse> listByUser(int page, int size);
     String getStatus(Long id);
     void delete(Long id);

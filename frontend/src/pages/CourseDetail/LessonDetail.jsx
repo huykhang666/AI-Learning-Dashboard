@@ -122,7 +122,7 @@ const LessonDetail = () => {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const res = await courseDetailApi.getById(id);
+        const res = await courseDetailApi.getLessonSession(id);
         const data = res.result || res;
         setCourseData({
           title: data.title,
