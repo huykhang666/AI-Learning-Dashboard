@@ -5,8 +5,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Dùng npm ci để cài thư viện siêu tốc theo file lock
-COPY package*.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 
 COPY . .
 
