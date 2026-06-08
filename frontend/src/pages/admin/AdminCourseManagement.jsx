@@ -503,16 +503,21 @@ export default function AdminCourseManagement() {
 
                       {/* Badges */}
                       <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-                        {course.isPremiumRequired ? (
+                        {course.isPremiumRequired && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-purple-600/90 px-3 py-1 text-xs font-bold text-white shadow-sm backdrop-blur">
                             <Sparkles className="h-3.5 w-3.5 fill-white/20" />
                             Premium
                           </span>
-                        ) : (
+                        )}
+                        {course.price > 0 ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-blue-600/90 px-3 py-1 text-xs font-bold text-white shadow-sm backdrop-blur">
+                            Paid
+                          </span>
+                        ) : (!course.isPremiumRequired && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600/90 px-3 py-1 text-xs font-bold text-white shadow-sm backdrop-blur">
                             Free
                           </span>
-                        )}
+                        ))}
                       </div>
                     </div>
 
@@ -534,7 +539,7 @@ export default function AdminCourseManagement() {
                           <span>{course.lessonsCount || 0} bài học</span>
                         </div>
                         <div className="flex items-center gap-0.5 text-gray-900 font-bold">
-                          {course.isPremiumRequired ? (
+                          {course.price > 0 ? (
                             <>
                               <DollarSign className="h-3.5 w-3.5 text-gray-500" />
                               <span>{course.price ? course.price.toLocaleString("vi-VN") : "0"} VNĐ</span>

@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 public class CourseResponse {
     Long courseId;
     String title;
+    String description;
     String thumbnailUrl;
     Double price;
     boolean isPremiumRequired;
