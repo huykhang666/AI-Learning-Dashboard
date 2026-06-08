@@ -16,6 +16,7 @@ import com.ai.learning.backend.repository.ProcessJobRepository;
 import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import com.ai.learning.backend.service.FileStorageService;
+import com.ai.learning.backend.service.ProcessJobService;
 import com.ai.learning.backend.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -49,10 +50,10 @@ public class FileStorageServiceImpl implements FileStorageService {
     UserService userService;
 
     @NonFinal
-    ProcessJobImpl processJobService;
+    ProcessJobService processJobService;
 
     @Autowired
-    public void setProcessJobService(@Lazy ProcessJobImpl processJobService) {
+    public void setProcessJobService(@Lazy ProcessJobService processJobService) {
         this.processJobService = processJobService;
     }
 
