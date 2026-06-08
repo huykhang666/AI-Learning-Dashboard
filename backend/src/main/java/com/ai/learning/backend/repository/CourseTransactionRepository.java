@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface CourseTransactionRepository extends JpaRepository<CourseTransaction, Long> {
     boolean existsByUserUserIdAndCourseCourseIdAndStatus(Long userId, Long courseId, String status);
     List<CourseTransaction> findByUserUserIdOrderByCreatedAtDesc(Long userId);
+    void deleteByCourseCourseId(Long courseId);
 }

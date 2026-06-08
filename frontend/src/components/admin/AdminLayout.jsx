@@ -10,10 +10,12 @@ import {
   LogOut,
   ShieldCheck,
   X,
+  BookOpen,
 } from "lucide-react";
 
 const navigation = [
   { key: "dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
+  { key: "courses", to: "/admin/courses", icon: BookOpen },
   { key: "users", to: "/admin/users", icon: Users },
   { key: "payments", to: "/admin/payments", icon: CreditCard },
 ];
@@ -25,6 +27,7 @@ export default function AdminLayout({ onLogout }) {
 
   const pageTitle = useMemo(() => {
     if (location.pathname.startsWith("/admin/dashboard")) return t("admin.layout.titles.dashboard");
+    if (location.pathname.startsWith("/admin/courses")) return t("admin.layout.titles.courses", { defaultValue: "Quản lý khóa học" });
     if (location.pathname.startsWith("/admin/users")) return t("admin.layout.titles.users");
     if (location.pathname.startsWith("/admin/payments")) return t("admin.layout.titles.payments");
     return t("admin.layout.titles.dashboard");
@@ -85,7 +88,7 @@ export default function AdminLayout({ onLogout }) {
               }
             >
               <Icon className="h-4 w-4 shrink-0" />
-              <span>{t(`admin.layout.navigation.${key}`)}</span>
+              <span>{t(`admin.layout.navigation.${key}`, { defaultValue: key === "courses" ? "Quản lý khóa học" : "" })}</span>
             </NavLink>
           ))}
         </nav>

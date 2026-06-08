@@ -88,4 +88,72 @@ export const adminApi = {
   getPayments: async () => {
     return adminApi.getAllPayments();
   },
+
+  getCourses: async () => {
+    const response = await userClient.get("/courses");
+    return unwrapResponse(response);
+  },
+
+  getCourseDetail: async (courseId) => {
+    const response = await userClient.get(`/courses/${courseId}`);
+    return unwrapResponse(response);
+  },
+
+  createCourse: async (formData) => {
+    const response = await adminClient.post("/courses", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return unwrapResponse(response);
+  },
+
+  updateCourse: async (courseId, formData) => {
+    const response = await adminClient.put(`/courses/${courseId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return unwrapResponse(response);
+  },
+
+  deleteCourse: async (courseId) => {
+    const response = await adminClient.delete(`/courses/${courseId}`);
+    return unwrapResponse(response);
+  },
+
+  createLesson: async (courseId, formData, onProgress) => {
+    const response = await adminClient.post(`/courses/${courseId}/lessons`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: onProgress,
+    });
+    return unwrapResponse(response);
+  },
+
+  updateLesson: async (lessonId, formData, onProgress) => {
+    const response = await adminClient.put(`/lessons/${lessonId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress: onProgress,
+    });
+    return unwrapResponse(response);
+  },
+
+  deleteLesson: async (lessonId) => {
+    const response = await adminClient.delete(`/lessons/${lessonId}`);
+    return unwrapResponse(response);
+  },
+
+  getLessonComments: async (lessonId) => {
+    const response = await userClient.get(`/comments/lesson/${lessonId}`);
+    return unwrapResponse(response);
+  },
+
+  deleteComment: async (commentId) => {
+    const response = await adminClient.delete(`/comments/${commentId}`);
+    return unwrapResponse(response);
+  },
 };

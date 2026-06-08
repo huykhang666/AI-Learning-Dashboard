@@ -3,6 +3,16 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styles from "./MyCourses.module.css";
 
+const getFullUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const baseUrl = apiUrl.includes("/api/v1") ? apiUrl.replace("/api/v1", "") : apiUrl;
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+  return `${cleanBase}${cleanUrl}`;
+};
+
 export default function CourseCard({ course }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -23,7 +33,7 @@ export default function CourseCard({ course }) {
     console.log("course data:", JSON.stringify(course));
     const latestLessonId = course.latestLessonId || course.lessons?.[0]?.lessonId;
     if (latestLessonId) {
-      navigate(`/app/history/${latestLessonId}`);
+      navigate(`/app/lessons/${latestLessonId}`);
     } else {
       // Không có lesson thì vào trang khóa học
       navigate(`/app/courses/${course.courseId}`);
@@ -40,7 +50,7 @@ export default function CourseCard({ course }) {
       <div className={styles.cardTop}>
         {course.thumbnailUrl ? (
           <img
-            src={course.thumbnailUrl}
+            src={getFullUrl(course.thumbnailUrl)}
             alt={course.title}
             className={styles.thumbnail}
           />

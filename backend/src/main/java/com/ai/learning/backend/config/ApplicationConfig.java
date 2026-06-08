@@ -25,18 +25,18 @@ public class ApplicationConfig {
     @Bean
     public ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
-            if(userRepository.findByUsername("admin").isEmpty()) {
+            if(userRepository.findByUsername("aiDashboard").isEmpty()) {
                 var roles = new HashSet<String>();
                 roles.add(UserRole.ADMIN.name());
 
                 User user = User.builder()
-                        .username("admin")
-                        .password(passwordEncoder.encode("admin123"))
-                        .email("huykhang666@gmail.com")
+                        .username("aiDashboard")
+                        .password(passwordEncoder.encode("aiDashboard"))
+                        .email("admin@local.com")
                         .roles(roles)
                         .build();
                 userRepository.save(user);
-                log.warn("Admin user created! Username: admin | Password: admin123");
+                log.warn("Admin user created! Username: aiDashboard | Password: aiDashboard");
             }
         };
     }

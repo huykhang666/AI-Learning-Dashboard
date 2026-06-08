@@ -20,10 +20,14 @@ WORKDIR /app
 
 # Tạo user bảo mật không chạy bằng quyền root
 RUN addgroup -S spring && adduser -S spring -G spring
+
+# Tạo thư mục logs và uploads với quyền sở hữu của user spring
+RUN mkdir -p /app/logs /app/uploads && chown -R spring:spring /app/logs /app/uploads
+
 USER spring:spring
 
 # Bốc duy nhất sản phẩm .jar sang Stage 2
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder --chown=spring:spring /app/target/*.jar app.jar
 
 EXPOSE 8080
 

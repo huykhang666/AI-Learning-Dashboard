@@ -4,13 +4,21 @@ import com.ai.learning.backend.dto.request.MessageRequest;
 import com.ai.learning.backend.dto.response.ApiResponse;
 import com.ai.learning.backend.dto.response.MessageResponse;
 import com.ai.learning.backend.dto.response.PageResponse;
+import com.ai.learning.backend.entity.LearningSession;
+import com.ai.learning.backend.entity.Lesson;
+import com.ai.learning.backend.entity.User;
+import com.ai.learning.backend.enums.SessionStatus;
 import com.ai.learning.backend.mapper.MessageMapper;
 import com.ai.learning.backend.repository.MessageRepository;
+import com.ai.learning.backend.repository.LessonRepository;
+import com.ai.learning.backend.repository.UserRepository;
+import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.service.MessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
@@ -23,6 +31,9 @@ public class MessageController {
     MessageService messageService;
     MessageRepository messageRepository;
     MessageMapper messageMapper;
+    LessonRepository lessonRepository;
+    UserRepository userRepository;
+    SessionRepository sessionRepository;
 
     @PostMapping
     public ApiResponse<MessageResponse> sendMessage(@RequestBody MessageRequest request) {
@@ -38,9 +49,29 @@ public class MessageController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
+        Long resolvedId = sessionId;
+        if (lessonRepository.existsById(sessionId)) {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Lesson lesson = lessonRepository.findById(sessionId).orElseThrow();
+            LearningSession session = sessionRepository.findByUserIdAndVideoUrl(user.getUserId(), lesson.getVideoUrl())
+                    .orElseGet(() -> {
+                        LearningSession newSession = LearningSession.builder()
+                                .title(lesson.getTitle())
+                                .videoUrl(lesson.getVideoUrl())
+                                .status(SessionStatus.COMPLETED)
+                                .user(user)
+                                .duration(600)
+                                .build();
+                        return sessionRepository.save(newSession);
+                    });
+            resolvedId = session.getLearningSessionId();
+        }
+
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        var messagePage = messageRepository.findByLearningSession_LearningSessionIdOrderByCreatedAtAsc(sessionId,pageable);
+        var messagePage = messageRepository.findByLearningSession_LearningSessionIdOrderByCreatedAtAsc(resolvedId,pageable);
 
         List<MessageResponse> responses = messageMapper.toMessageResponseList(messagePage.getContent());
 

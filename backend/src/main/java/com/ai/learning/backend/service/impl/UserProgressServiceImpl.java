@@ -4,12 +4,16 @@ import com.ai.learning.backend.dto.request.UserProgressRequest;
 import com.ai.learning.backend.dto.response.UserProgressResponse;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.entity.UserProgress;
+import com.ai.learning.backend.entity.Lesson;
+import com.ai.learning.backend.entity.LearningSession;
+import com.ai.learning.backend.enums.SessionStatus;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
 import com.ai.learning.backend.mapper.UserProgressMapper;
 import com.ai.learning.backend.repository.SessionRepository;
 import com.ai.learning.backend.repository.UserProgressRepository;
 import com.ai.learning.backend.repository.UserRepository;
+import com.ai.learning.backend.repository.LessonRepository;
 import com.ai.learning.backend.service.UserProgressService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -25,20 +29,38 @@ public class UserProgressServiceImpl implements UserProgressService {
     UserProgressMapper mapper;
     UserRepository userRepository;
     SessionRepository sessionRepository;
+    LessonRepository lessonRepository;
 
     @Override
     @Transactional
     public UserProgressResponse updateProgress(String username, UserProgressRequest request) {
-
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        Long sessionId = request.getSessionId();
+        if (lessonRepository.existsById(sessionId)) {
+            Lesson lesson = lessonRepository.findById(sessionId).orElseThrow();
+            LearningSession session = sessionRepository.findByUserIdAndVideoUrl(user.getUserId(), lesson.getVideoUrl())
+                    .orElseGet(() -> {
+                        LearningSession newSession = LearningSession.builder()
+                                .title(lesson.getTitle())
+                                .videoUrl(lesson.getVideoUrl())
+                                .status(SessionStatus.COMPLETED)
+                                .user(user)
+                                .duration(600)
+                                .build();
+                        return sessionRepository.save(newSession);
+                    });
+            sessionId = session.getLearningSessionId();
+        }
+
+        final Long resolvedSessionId = sessionId;
         UserProgress progress = repository
-                .findByUser_UserIdAndSession_LearningSessionId(user.getUserId(), request.getSessionId())
+                .findByUser_UserIdAndSession_LearningSessionId(user.getUserId(), resolvedSessionId)
                 .orElseGet(() -> {
                     UserProgress newProgress = new UserProgress();
                     newProgress.setUser(user);
-                    newProgress.setSession(sessionRepository.findById(request.getSessionId())
+                    newProgress.setSession(sessionRepository.findById(resolvedSessionId)
                             .orElseThrow(() -> new AppException(ErrorCode.SESSION_NOT_FOUND)));
                     newProgress.setTimeSpent(0L);
                     newProgress.setLastWatchedSecond(0);

@@ -78,8 +78,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
     @Override
-    public void forgotPassword(String email) {
-        log.info("Forgot password request for email: {}", email);
+    public void forgotPassword(String email, String origin) {
+        log.info("Forgot password request for email: {} with origin: {}", email, origin);
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         log.info("User found: {}", user.getUsername());
@@ -97,7 +97,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         passwordResetTokenRepository.save(resetToken);
         log.info("Saved new token: {}", token);
 
-        String resetLink = "http://192.168.1.13:5173/reset-password?token=" + token;
+        String baseUrl = (origin != null && !origin.isEmpty()) ? origin : "http://localhost:5173";
+        String resetLink = baseUrl + "/reset-password?token=" + token;
         log.info("Sending email to: {} with link: {}", email, resetLink);
         emailService.sendPasswordResetEmail(email, resetLink);
         log.info("Email sent successfully!");

@@ -27,9 +27,18 @@ public class Course {
 
     private Double price;
 
+    @Column(unique = true)
+    private String slug;
+
     @Builder.Default
     private boolean isPremiumRequired = false;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Lesson> lessons;
+
+    @PrePersist
+    @PreUpdate
+    protected void onCreateOrUpdate() {
+        this.slug = com.ai.learning.backend.util.SlugUtils.makeSlug(this.title);
+    }
 }

@@ -22,6 +22,7 @@ import SettingPage from "./pages/Setting/Setting";
 import AnalyticsPage from "./pages/analytics/Analytics";
 import HelpCenter from "./pages/HelpCenter/HelpCenter";
 import CourseDetail from "./pages/CourseDetail/CourseDetail";
+import LessonDetail from "./pages/CourseDetail/LessonDetail";
 import PaymentSuccessPage from "./pages/Payment/PaymentSuccess.jsx";
 import PaymentFailedPage from "./pages/Payment/PaymentFailed.jsx";
 import CourseLanding from "./pages/MyCourses/CourseLanding.jsx";
@@ -31,6 +32,7 @@ import AdminLayout from "./components/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import UserManagement from "./pages/admin/UserManagement.jsx";
 import PaymentManagement from "./pages/admin/PaymentManagement.jsx";
+import AdminCourseManagement from "./pages/admin/AdminCourseManagement.jsx";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import webSocketService from "./api/WebSocketService.js";
@@ -131,16 +133,17 @@ function AppLayout({ onLogout }) {
     };
   }, []);
 
-  const isCourseDetail =
-    location.pathname.includes("/history/") &&
+  const isVideoPage =
+    (location.pathname.includes("/history/") || location.pathname.includes("/lessons/")) &&
     location.pathname.split("/").length > 2;
 
-  if (isCourseDetail) {
+  if (isVideoPage) {
     return (
       <div className="h-screen w-full overflow-hidden bg-white">
         <main className="h-full w-full">
           <Routes>
             <Route path="history/:id" element={<CourseDetail />} />
+            <Route path="lessons/:id" element={<LessonDetail />} />
           </Routes>
         </main>
       </div>
@@ -210,7 +213,22 @@ function AppRoutes() {
         path="/login"
         element={
           <LoginPage
-            onLogin={() => navigate("/app/dash")}
+            onLogin={() => {
+              const userStr = localStorage.getItem("user");
+              if (userStr) {
+                try {
+                  const userObj = JSON.parse(userStr);
+                  const isAdmin = userObj.role === "ADMIN" || (userObj.roles && userObj.roles.includes("ADMIN"));
+                  if (isAdmin) {
+                    navigate("/admin");
+                    return;
+                  }
+                } catch (e) {
+                  console.error("Lỗi parse thông tin user:", e);
+                }
+              }
+              navigate("/app/dash");
+            }}
             onGoRegister={() => navigate("/register")}
           />
         }
@@ -241,6 +259,7 @@ function AppRoutes() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="courses" element={<AdminCourseManagement />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="payments" element={<PaymentManagement />} />
       </Route>

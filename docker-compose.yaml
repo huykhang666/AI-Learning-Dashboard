@@ -48,6 +48,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       AI_SERVICE_URL: http://host.docker.internal:8000
       APP_DIR_UPLOADS: /app/uploads
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
     depends_on:
       db:
         condition: service_healthy

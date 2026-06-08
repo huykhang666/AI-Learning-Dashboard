@@ -35,4 +35,7 @@ public interface SessionRepository extends JpaRepository<LearningSession,Long> {
             "GROUP BY day_name, DATE(created_at) " +
             "ORDER BY DATE(created_at) ASC", nativeQuery = true)
     List<Object[]> getWeeklyProgress(@Param("userId") Long userId);
+
+    @Query("SELECT s FROM LearningSession s WHERE s.user.userId = :userId AND s.videoUrl = :videoUrl")
+    java.util.Optional<LearningSession> findByUserIdAndVideoUrl(@Param("userId") Long userId, @Param("videoUrl") String videoUrl);
 }

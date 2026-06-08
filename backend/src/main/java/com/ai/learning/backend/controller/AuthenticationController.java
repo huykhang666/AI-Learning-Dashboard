@@ -45,8 +45,10 @@ public class AuthenticationController {
                 .build();
     }
     @PostMapping("/forgot-password")
-    ApiResponse<Void> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        authenticationService.forgotPassword(request.getEmail());
+    ApiResponse<Void> forgotPassword(
+            @RequestBody ForgotPasswordRequest request,
+            @org.springframework.web.bind.annotation.RequestHeader(value = "Origin", required = false) String origin) {
+        authenticationService.forgotPassword(request.getEmail(), origin);
         return ApiResponse.<Void>builder()
                 .code(1000)
                 .message("Email đặt lại mật khẩu đã được gửi!")

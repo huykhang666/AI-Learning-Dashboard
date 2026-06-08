@@ -11,6 +11,6 @@ import java.text.ParseException;
 public interface AuthenticationService {
     AuthenticationResponse authenticate(AuthenticationRequest request);
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException;
-    void forgotPassword(String email);
+    void forgotPassword(String email, String origin);
     void resetPassword(String token, String newPassword);
 }

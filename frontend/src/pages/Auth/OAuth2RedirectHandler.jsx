@@ -26,7 +26,12 @@ export default function OAuth2RedirectHandler() {
             localStorage.setItem("user", JSON.stringify(res));
           }
           
-          navigate("/app/dash");
+          const isAdmin = res && (res.role === "ADMIN" || (res.roles && res.roles.includes("ADMIN")));
+          if (isAdmin) {
+            navigate("/admin");
+          } else {
+            navigate("/app/dash");
+          }
         } catch (err) {
           console.error("Lỗi lấy thông tin user sau OAuth2:", err);
           navigate("/app/dash");

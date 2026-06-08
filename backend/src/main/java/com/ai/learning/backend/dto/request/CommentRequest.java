@@ -8,9 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LessonRequest {
-    String title;
-    String videoUrl;
-    String thumbnailUrl;
-    Integer orderIndex;
+public class CommentRequest {
+    String content;
+    Long lessonId;
 }

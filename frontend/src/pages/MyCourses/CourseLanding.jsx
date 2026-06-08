@@ -19,7 +19,17 @@
     import { courseApi } from '../../api/CourseApi';
     import styles from './CourseLanding.module.css';
 
-    export default function CourseLanding() {
+const getFullUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const baseUrl = apiUrl.includes("/api/v1") ? apiUrl.replace("/api/v1", "") : apiUrl;
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+  return `${cleanBase}${cleanUrl}`;
+};
+
+export default function CourseLanding() {
         const { courseId } = useParams();
         const navigate = useNavigate();
         const { t } = useTranslation();
@@ -138,7 +148,7 @@
                                         <div
                                             key={lesson.lessonId}
                                             className={`${styles.lessonRow} ${canWatch ? styles.lessonUnlocked : styles.lessonLocked}`}
-                                            onClick={() => canWatch ? navigate(`/app/history/${lesson.lessonId}`) : alert(t("course_landing.locked_alert"))}
+                                            onClick={() => canWatch ? navigate(`/app/lessons/${lesson.lessonId}`) : alert(t("course_landing.locked_alert"))}
                                         >
                                             <div className={styles.lessonLeft}>
                                                 <div className={styles.lessonIndex}>{String(index + 1).padStart(2, '0')}</div>
@@ -171,24 +181,28 @@
                     {/* 3. CỘT PHẢI (SIDEBAR): Giá và Nút hành động */}
                     <div className={styles.sidebarCol}>
                         <div className={styles.stickyCard}>
-                            {course.thumbnailUrl ? (
-                                <img
-                                    src={course.thumbnailUrl}
-                                    alt={course.title}
-                                    className={styles.previewImg}
-                                    /* Thêm cái này để YouTube cho phép hiển thị ảnh trên localhost */
-                                    referrerPolicy="no-referrer"
-                                    onError={(e) => {
-                                        e.target.src = "https://via.placeholder.com/400x225?text=Link+Anh+Loi";
-                                    }}
-                                />
-                            ) : (
-                                <div className={styles.emptyThumbnail} style={{ height: '225px', background: '#eee' }} />
-                            )}
+                            <div className={styles.previewWrapper}>
+                                {course.thumbnailUrl ? (
+                                    <img
+                                        src={getFullUrl(course.thumbnailUrl)}
+                                        alt={course.title}
+                                        className={styles.previewImg}
+                                        /* Thêm cái này để YouTube cho phép hiển thị ảnh trên localhost */
+                                        referrerPolicy="no-referrer"
+                                        onError={(e) => {
+                                            e.target.src = "https://via.placeholder.com/400x225?text=Link+Anh+Loi";
+                                        }}
+                                    />
+                                ) : (
+                                    <div className={styles.emptyThumbnail} style={{ height: '225px', background: '#eee' }} />
+                                )}
 
-                            <div className={styles.previewOverlay}>
-                                <PlayCircle size={45} className={styles.centerPlayIcon} />
-                                <span>{t("course_landing.view_intro")}</span>
+                                <div className={styles.previewOverlay}>
+                                    <div className={styles.playBtn}>
+                                        <PlayCircle size={30} className={styles.centerPlayIcon} />
+                                    </div>
+                                    <span>{t("course_landing.view_intro")}</span>
+                                </div>
                             </div>
 
                             <div className={styles.cardBody}>

@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 public class LessonResponse {
     Long lessonId;
     String title;
-    String videoId;
+    String videoUrl;
+    String thumbnailUrl;
     Integer orderIndex;
 }

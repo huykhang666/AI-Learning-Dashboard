@@ -10,11 +10,22 @@ import {
   XCircle, 
   CircleDot,
   HelpCircle,
-  Download
+  Download,
+  MessageSquare
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AIChatBox from "../../components/common/AIChatBox";
+
+const getFullUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const baseUrl = apiUrl.includes("/api/v1") ? apiUrl.replace("/api/v1", "") : apiUrl;
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanUrl = url.startsWith("/") ? url : `/${url}`;
+  return `${cleanBase}${cleanUrl}`;
+};
 
 // Tách YouTube Video ID từ URL
 const getYoutubeID = (url) => {
@@ -46,6 +57,8 @@ const CourseDetail = () => {
   const [courseData, setCourseData] = useState(null);
   const [midTab, setMidTab] = useState("TRANSCRIPT");
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+
 
   // --- 📝 BỘ STATE QUẢN LÝ QUIZ TRẮC NGHIỆM TỰ ĐỘNG ---
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
@@ -203,6 +216,7 @@ const CourseDetail = () => {
         setCourseData({
           title: data.title,
           videoUrl: data.videoUrl,
+          thumbnailUrl: data.thumbnailUrl,
           videoId: getYoutubeID(data.videoUrl),
           summary: data.summary,
           keyPoints: data.keyPoints
@@ -335,11 +349,8 @@ const CourseDetail = () => {
               <div ref={playerRef} className="w-full h-full" />
             ) : courseData?.videoUrl ? (
               <video
-                src={
-                  courseData.videoUrl.startsWith("http")
-                    ? courseData.videoUrl
-                    : `http://localhost:8080${courseData.videoUrl}`
-                }
+                src={getFullUrl(courseData.videoUrl)}
+                poster={getFullUrl(courseData.thumbnailUrl)}
                 controls
                 className="w-full h-full"
               />
@@ -364,6 +375,8 @@ const CourseDetail = () => {
               ))}
             </ul>
           </div>
+
+
         </div>
 
         {/* CỘT PHẢI: TRANSCRIPT & SUMMARY */}

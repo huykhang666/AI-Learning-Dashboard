@@ -33,6 +33,12 @@ public class CourseServiceImpl implements CourseService {
     EnrollmentRepository enrollmentRepository;
     UserRepository userRepository;
     CourseMapper courseMapper;
+    com.ai.learning.backend.repository.LessonRepository lessonRepository;
+    com.ai.learning.backend.repository.CommentRepository commentRepository;
+
+    @lombok.experimental.NonFinal
+    @org.springframework.beans.factory.annotation.Value("${app.upload.dir:uploads}")
+    String uploadDir;
 
     @Override
     public List<CourseResponse> getAllCourses(Long userId) {
@@ -64,6 +70,7 @@ public class CourseServiceImpl implements CourseService {
 
         CourseDetailResponse response = courseMapper.toCourseDetailResponse(course);
         response.setCanAccess(canAccess);
+        response.setUnlocked(canAccess);
 
         return response;
     }
@@ -85,5 +92,123 @@ public class CourseServiceImpl implements CourseService {
                 .existsByUserUserIdAndCourseCourseIdAndStatus(
                         user.getUserId(), course.getCourseId(), "COMPLETED"
                 );
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public CourseResponse createCourse(String title, String description, Double price, boolean isPremiumRequired, org.springframework.web.multipart.MultipartFile thumbnail) {
+        Course course = Course.builder()
+                .title(title)
+                .description(description)
+                .price(price)
+                .isPremiumRequired(isPremiumRequired)
+                .build();
+
+        // Save first to get courseId (which computes slug too)
+        course = courseRepository.saveAndFlush(course);
+
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            try {
+                String slug = course.getSlug();
+                String folderName = slug + "_" + course.getCourseId();
+                java.nio.file.Path targetDir = java.nio.file.Paths.get(uploadDir, "courses", folderName);
+                java.nio.file.Files.createDirectories(targetDir);
+
+                String originalFilename = thumbnail.getOriginalFilename();
+                String ext = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                        : ".png";
+
+                String filename = "thumbnail" + ext;
+                java.nio.file.Path targetFile = targetDir.resolve(filename);
+                java.nio.file.Files.copy(thumbnail.getInputStream(), targetFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                String thumbnailUrl = "/uploads/courses/" + folderName + "/" + filename;
+                course.setThumbnailUrl(thumbnailUrl);
+                course = courseRepository.save(course);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Failed to upload thumbnail: " + e.getMessage());
+            }
+        }
+
+        return courseMapper.toCourseResponse(course);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public CourseResponse updateCourse(Long courseId, String title, String description, Double price, boolean isPremiumRequired, org.springframework.web.multipart.MultipartFile thumbnail) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
+
+        course.setTitle(title);
+        course.setDescription(description);
+        course.setPrice(price);
+        course.setPremiumRequired(isPremiumRequired);
+
+        // Save to update fields and trigger PreUpdate (updating slug)
+        course = courseRepository.saveAndFlush(course);
+
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            try {
+                String slug = course.getSlug();
+                String folderName = slug + "_" + course.getCourseId();
+                java.nio.file.Path targetDir = java.nio.file.Paths.get(uploadDir, "courses", folderName);
+                java.nio.file.Files.createDirectories(targetDir);
+
+                String originalFilename = thumbnail.getOriginalFilename();
+                String ext = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                        : ".png";
+
+                String filename = "thumbnail" + ext;
+                java.nio.file.Path targetFile = targetDir.resolve(filename);
+                java.nio.file.Files.copy(thumbnail.getInputStream(), targetFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                String thumbnailUrl = "/uploads/courses/" + folderName + "/" + filename;
+                course.setThumbnailUrl(thumbnailUrl);
+                course = courseRepository.save(course);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Failed to upload thumbnail: " + e.getMessage());
+            }
+        }
+
+        return courseMapper.toCourseResponse(course);
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteCourse(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
+
+        // Delete physical files first
+        String slug = course.getSlug();
+        String folderName = (slug != null ? slug : "course") + "_" + course.getCourseId();
+        java.nio.file.Path targetDir = java.nio.file.Paths.get(uploadDir, "courses", folderName);
+        if (java.nio.file.Files.exists(targetDir)) {
+            try {
+                java.nio.file.Files.walk(targetDir)
+                        .sorted(java.util.Comparator.reverseOrder())
+                        .map(java.nio.file.Path::toFile)
+                        .forEach(java.io.File::delete);
+            } catch (java.io.IOException e) {
+                System.err.println("Failed to delete physical files for course " + courseId + ": " + e.getMessage());
+            }
+        }
+
+        // Delete comments for lessons in this course
+        List<Lesson> lessons = course.getLessons();
+        if (lessons != null) {
+            for (Lesson lesson : lessons) {
+                commentRepository.deleteByLessonLessonId(lesson.getLessonId());
+            }
+        }
+
+        // Delete enrollments and transactions
+        enrollmentRepository.deleteByCourseCourseId(courseId);
+        transactionRepository.deleteByCourseCourseId(courseId);
+
+        // Delete course
+        courseRepository.delete(course);
     }
 }

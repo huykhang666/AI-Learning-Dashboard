@@ -114,6 +114,52 @@ export const courseDetailApi = {
       console.error("[CourseDetailApi] submitQuizAnswers error:", error);
       throw error;
     }
+  },
+
+  // --- 💬 API BÌNH LUẬN ---
+  getComments: async (lessonId) => {
+    try {
+      const response = await axiosClient.get(`/comments/lesson/${lessonId}`);
+      if (response.data?.result) return response.data.result;
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] getComments error:", error);
+      throw error;
+    }
+  },
+
+  addComment: async (lessonId, content) => {
+    try {
+      const response = await axiosClient.post("/comments", {
+        lessonId: Number(lessonId),
+        content,
+      });
+      if (response.data?.result) return response.data.result;
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] addComment error:", error);
+      throw error;
+    }
+  },
+  likeComment: async (commentId) => {
+    try {
+      const response = await axiosClient.post(`/comments/${commentId}/like`);
+      if (response.data?.result) return response.data.result;
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] likeComment error:", error);
+      throw error;
+    }
+  },
+  dislikeComment: async (commentId) => {
+    try {
+      const response = await axiosClient.post(`/comments/${commentId}/dislike`);
+      if (response.data?.result) return response.data.result;
+      return response.data;
+    } catch (error) {
+      console.error("[CourseDetailApi] dislikeComment error:", error);
+      throw error;
+    }
   }
 };
 

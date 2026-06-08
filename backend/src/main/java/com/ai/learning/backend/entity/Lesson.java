@@ -18,7 +18,9 @@ public class Lesson {
 
     private String title;
 
-    private String videoId;
+    private String videoUrl;
+
+    private String thumbnailUrl;
 
     private Integer orderIndex;
 

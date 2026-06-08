@@ -11,7 +11,8 @@ import java.util.List;
 public interface LessonMapper {
     @Mapping(target = "lessonId", source = "lessonId")
     @Mapping(target = "title", source = "title")
-    @Mapping(target = "videoId", source = "videoId")
+    @Mapping(target = "videoUrl", source = "videoUrl")
+    @Mapping(target = "thumbnailUrl", source = "thumbnailUrl")
     @Mapping(target = "orderIndex", source = "orderIndex")
     LessonResponse toLessonResponse(Lesson lesson);
 
