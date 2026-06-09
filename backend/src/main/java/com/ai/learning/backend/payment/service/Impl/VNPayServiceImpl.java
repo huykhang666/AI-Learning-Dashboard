@@ -72,6 +72,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        formatter.setTimeZone(TimeZone.getTimeZone("Etc/GMT+7"));
         vnpParams.put(VNPayParams.CREATE_DATE, formatter.format(cld.getTime()));
         cld.add(Calendar.MINUTE, 15);
         vnpParams.put(VNPayParams.EXPIRE_DATE, formatter.format(cld.getTime()));
