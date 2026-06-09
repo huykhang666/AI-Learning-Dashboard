@@ -42,7 +42,7 @@ function LanguageSwitcher({ className = "" }) {
         className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white/80 backdrop-blur-md px-3.5 py-2 text-sm font-bold text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 transition-colors shadow-sm cursor-pointer select-none"
         type="button"
       >
-        <span>🌐</span>
+        <span className="text-base select-none">{currentLang.flag}</span>
         <span className="uppercase">{currentLang.short}</span>
         <svg
           viewBox="0 0 20 20"

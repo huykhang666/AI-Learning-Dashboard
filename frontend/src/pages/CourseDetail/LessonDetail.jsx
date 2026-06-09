@@ -11,6 +11,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AIChatBox from "../../components/common/AIChatBox";
+import LanguageSwitcher from "../../components/common/LanguageSwitcher";
 
 const getFullUrl = (url) => {
   if (!url) return "";
@@ -239,20 +240,51 @@ const LessonDetail = () => {
   return (
     <div className="h-screen flex flex-col bg-slate-50 font-sans text-slate-800 overflow-hidden">
       {/* HEADER */}
-      <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100 shrink-0 shadow-sm">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            <ArrowLeft size={18} className="text-blue-600" />
-            <span className="font-medium text-sm text-blue-600">
-              {t("course_detail.back")}
-            </span>
-          </button>
-          <h1 className="font-bold text-lg uppercase tracking-wide text-slate-900">
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-4 md:px-6 py-3.5 border-b border-slate-100 bg-white shrink-0 shadow-sm z-10">
+        {/* Left Side: Back + Logo + Title */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 w-full md:w-auto">
+          {/* Back button and Logo Row (Mobile-friendly layout) */}
+          <div className="flex items-center justify-between sm:justify-start gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors group cursor-pointer"
+            >
+              <ArrowLeft size={18} className="text-blue-600 transition-transform group-hover:-translate-x-0.5" />
+              <span className="font-semibold text-sm text-blue-600 select-none">
+                {t("course_detail.back")}
+              </span>
+            </button>
+
+            <div className="w-[1px] h-5 bg-slate-200 hidden sm:block" />
+
+            {/* App Logo */}
+            <div className="flex items-center gap-2 select-none">
+              <div className="bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-xl p-1.5 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-100">
+                <Zap size={14} className="text-amber-400 fill-amber-400 animate-pulse" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-xs text-slate-800">AI-Learning</span>
+                <span className="text-indigo-600 font-black text-[10px]">DASHBOARD</span>
+              </div>
+            </div>
+
+            {/* Language Switcher for Mobile only (Row 1 right corner) */}
+            <div className="md:hidden">
+              <LanguageSwitcher />
+            </div>
+          </div>
+
+          <div className="w-[1px] h-5 bg-slate-200 hidden md:block" />
+
+          {/* Long Video/Lesson Title */}
+          <h1 className="font-bold text-sm sm:text-base text-slate-900 tracking-wide uppercase line-clamp-1 max-w-full md:max-w-[400px] lg:max-w-[600px]" title={courseData?.title}>
             {courseData?.title}
           </h1>
+        </div>
+
+        {/* Right Side: Language Switcher (Desktop/Tablet) */}
+        <div className="hidden md:block shrink-0">
+          <LanguageSwitcher />
         </div>
       </header>
 

@@ -16,6 +16,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AIChatBox from "../../components/common/AIChatBox";
+import LanguageSwitcher from "../../components/common/LanguageSwitcher";
 
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -328,45 +329,79 @@ const CourseDetail = () => {
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
       {/* HEADER */}
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 md:px-6 py-4 border-b border-slate-100 shrink-0">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors"
-          >
-            <ArrowLeft size={18} className="text-blue-600" />
-            <span className="font-medium text-sm text-blue-600">
-              {t("course_detail.back")}
-            </span>
-          </button>
-          <h1 className="font-bold text-lg uppercase tracking-wide">
+      <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-4 md:px-6 py-3.5 border-b border-slate-100 bg-white shrink-0 shadow-sm z-10">
+        {/* Left Side: Back + Logo + Title */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 w-full md:w-auto">
+          {/* Back button and Logo Row (Mobile-friendly layout) */}
+          <div className="flex items-center justify-between sm:justify-start gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors group cursor-pointer"
+            >
+              <ArrowLeft size={18} className="text-blue-600 transition-transform group-hover:-translate-x-0.5" />
+              <span className="font-semibold text-sm text-blue-600 select-none">
+                {t("course_detail.back")}
+              </span>
+            </button>
+
+            <div className="w-[1px] h-5 bg-slate-200 hidden sm:block" />
+
+            {/* App Logo */}
+            <div className="flex items-center gap-2 select-none">
+              <div className="bg-gradient-to-tr from-indigo-600 to-blue-600 rounded-xl p-1.5 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-100">
+                <Zap size={14} className="text-amber-400 fill-amber-400 animate-pulse" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-xs text-slate-800">AI-Learning</span>
+                <span className="text-indigo-600 font-black text-[10px]">DASHBOARD</span>
+              </div>
+            </div>
+
+            {/* Language Switcher for Mobile only (Row 1 right corner) */}
+            <div className="md:hidden">
+              <LanguageSwitcher />
+            </div>
+          </div>
+
+          <div className="w-[1px] h-5 bg-slate-200 hidden md:block" />
+
+          {/* Long Video/Lesson Title */}
+          <h1 className="font-bold text-sm sm:text-base text-slate-900 tracking-wide uppercase line-clamp-1 max-w-full md:max-w-[320px] lg:max-w-[450px]" title={courseData?.title}>
             {courseData?.title || t("course_detail.summary")}
           </h1>
         </div>
 
-        {/* KHU VỰC CÁC NÚT ĐIỀU HƯỚNG TÁC VỤ */}
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={handleOpenQuiz}
-            className="flex items-center gap-2 bg-amber-50 text-amber-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-100 transition-all hover:scale-[1.02] active:scale-95 shadow-sm"
-          >
-            <Zap size={16} fill="currentColor" className="animate-pulse" /> {t("course_detail.create_quiz_ai", { defaultValue: "Tạo Quiz AI" })}
-          </button>
+        {/* Right Side: Tasks + Language Switcher (Desktop/Tablet) */}
+        <div className="flex items-center justify-between sm:justify-end gap-3 w-full md:w-auto mt-2 sm:mt-0">
+          <div className="flex items-center gap-2 flex-1 sm:flex-initial">
+            <button
+              onClick={handleOpenQuiz}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] active:scale-95 shadow-sm border border-amber-100/50 cursor-pointer"
+            >
+              <Zap size={14} fill="currentColor" className="animate-pulse shrink-0" /> 
+              <span>{t("course_detail.create_quiz_ai", { defaultValue: "Tạo Quiz AI" })}</span>
+            </button>
 
-          <button
-            onClick={handleExportPdf}
-            disabled={isExportingPdf}
-            className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FileText size={16} />
-            {isExportingPdf ? t("course_detail.exporting", { defaultValue: "Đang xuất..." }) : t("course_detail.export_pdf")}
-          </button>
+            <button
+              onClick={handleExportPdf}
+              disabled={isExportingPdf}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed border border-blue-100/50 cursor-pointer"
+            >
+              <FileText size={14} className="shrink-0" />
+              <span>{isExportingPdf ? t("course_detail.exporting", { defaultValue: "Đang xuất..." }) : t("course_detail.export_pdf")}</span>
+            </button>
+          </div>
+
+          {/* Language Switcher for Desktop/Tablet */}
+          <div className="hidden md:block shrink-0">
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
+      <main className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
         {/* CỘT TRÁI: VIDEO + KEY POINTS */}
-        <div className="flex-[7] flex flex-col p-4 md:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-100 w-full">
+        <div className="flex-[7] flex flex-col p-4 md:p-6 overflow-y-visible md:overflow-y-auto border-b md:border-b-0 md:border-r border-slate-100 w-full">
           {/* Video Player */}
           <div className="w-full aspect-video h-auto max-h-[600px] bg-[#0B0A1A] rounded-2xl relative shadow-lg overflow-hidden mb-6">
             {courseData?.videoId ? (
@@ -406,9 +441,9 @@ const CourseDetail = () => {
         </div>
 
         {/* CỘT PHẢI: TRANSCRIPT & SUMMARY */}
-        <div className="flex-[3] w-full lg:w-auto lg:min-w-[350px] flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-slate-100 shrink-0">
+        <div className="flex-[3] w-full md:w-auto md:min-w-[300px] lg:min-w-[350px] flex flex-col bg-white border-t md:border-t-0 md:border-l border-slate-100 shrink-0">
           {/* Tab */}
-          <div className="flex items-center gap-8 px-8 pt-8 border-b border-slate-100">
+          <div className="flex items-center gap-8 px-6 md:px-8 pt-6 md:pt-8 border-b border-slate-100">
             {["TRANSCRIPT", "SUMMARY"].map((tab) => (
               <button
                 key={tab}
@@ -427,7 +462,7 @@ const CourseDetail = () => {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar h-[400px] md:h-auto">
             {midTab === "TRANSCRIPT" ? (
               <div className="space-y-6 animate-in fade-in duration-300">
                 {courseData?.transcript?.map((item, idx) => (
