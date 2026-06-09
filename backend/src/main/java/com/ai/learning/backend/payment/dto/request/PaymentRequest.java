@@ -4,7 +4,7 @@ import com.ai.learning.backend.payment.entity.PaymentGateway;
 
 public record PaymentRequest(
         Long userId,
-        Long amount,
+        Double amount,
         String planType,
         PaymentGateway gateway,
         Long courseId

@@ -102,7 +102,7 @@ export default function CourseLanding() {
                 
                 const paymentRequest = {
                     userId: Number(userId),
-                    amount: course.price,
+                    amount: Math.round(Number(course.price)),
                     planType: "COURSE",
                     gateway: selectedGateway,
                     courseId: Number(courseId)

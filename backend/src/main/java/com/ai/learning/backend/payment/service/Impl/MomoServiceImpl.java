@@ -51,7 +51,7 @@ public class MomoServiceImpl implements MomoService {
 
             // 1. Tạo Payment record lưu DB
             Payment payment = Payment.builder()
-                    .amount(request.amount())
+                    .amount(request.amount().longValue())
                     .user(user)
                     .status(PaymentStatus.PENDING)
                     .gateway(PaymentGateway.MOMO)
@@ -82,7 +82,7 @@ public class MomoServiceImpl implements MomoService {
             Map<String, Object> body = new HashMap<>();
             body.put(MomoParams.PARTNER_CODE, moMoConfig.getPartnerCode());
             body.put(MomoParams.REQUEST_ID,   requestId);
-            body.put(MomoParams.AMOUNT,       request.amount());
+            body.put(MomoParams.AMOUNT,       request.amount().longValue());
             body.put(MomoParams.ORDER_ID,     orderId);
             body.put(MomoParams.ORDER_INFO,   savedPayment.getOrderInfo());
             body.put(MomoParams.REDIRECT_URL, moMoConfig.getReturnUrl());

@@ -54,7 +54,7 @@ public class VNPayServiceImpl implements VNPayService {
         }
 
         Payment newPayment = Payment.builder()
-                .amount((long) request.amount())
+                .amount(request.amount().longValue())
                 .user(user)
                 .status(PaymentStatus.PENDING)
                 .gateway(PaymentGateway.VNPAY)
@@ -70,7 +70,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnpParams.put(VNPayParams.VERSION,    vnPayConfig.vnp_Version);
         vnpParams.put(VNPayParams.COMMAND,    vnPayConfig.vnp_Command);
         vnpParams.put(VNPayParams.TMN_CODE,   vnPayConfig.getVnp_TmnCode());
-        vnpParams.put(VNPayParams.AMOUNT,     String.valueOf(request.amount() * 100));
+        vnpParams.put(VNPayParams.AMOUNT,     String.valueOf(request.amount().longValue() * 100));
         vnpParams.put(VNPayParams.CURR_CODE,  "VND");
         vnpParams.put(VNPayParams.TXN_REF,    txnRef);
         vnpParams.put(VNPayParams.ORDER_INFO, "Thanh toan don hang: " + txnRef);
