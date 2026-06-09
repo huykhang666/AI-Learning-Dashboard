@@ -143,7 +143,19 @@ services:
     networks:
       - ai-learning-network
 
-  # ── 7. FRONTEND (Nginx) ─────────────────────
+  # ── 7. EXAM SERVICE (Spring Boot) ─────────────────────
+  api-exam:
+    build:
+      context: .
+      dockerfile: api-exam.Dockerfile
+    container_name: api-exam
+    restart: always
+    expose:
+      - "8081"
+    networks:
+      - ai-learning-network
+
+  # ── 8. FRONTEND (Nginx) ─────────────────────
   ai-learning-frontend:
     build:
       context: ./frontend
