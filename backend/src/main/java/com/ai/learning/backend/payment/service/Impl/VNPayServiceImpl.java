@@ -28,7 +28,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +58,9 @@ public class VNPayServiceImpl implements VNPayService {
                 .status(PaymentStatus.PENDING)
                 .gateway(PaymentGateway.VNPAY)
                 .planType(Subscription.PlanType.valueOf(request.planType()))
-                .orderInfo(course != null ? "Thanh toan khoa hoc: " + course.getTitle() : "Thanh toan goi " + request.planType())
+                .orderInfo(course != null
+                        ? "Thanh toan khoa hoc: " + course.getTitle()
+                        : "Thanh toan goi " + request.planType())
                 .course(course)
                 .build();
 
@@ -86,28 +87,24 @@ public class VNPayServiceImpl implements VNPayService {
         cld.add(Calendar.MINUTE, 15);
         vnpParams.put(VNPayParams.EXPIRE_DATE, formatter.format(cld.getTime()));
 
+        // FIX: Sort keys rồi lặp theo đúng thứ tự đã sort
         List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(fieldNames);
 
-        Iterator<String> itr = fieldNames.iterator();
-        List<String> hashParts = new ArrayList<>();
+        List<String> hashParts  = new ArrayList<>();
         List<String> queryParts = new ArrayList<>();
 
-        for (String fieldName : fieldNames) {
+        for (String fieldName : fieldNames) {                          // ← lặp qua list đã sort
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String exactKey = fieldName.toLowerCase();
-
-                String encodedKey = encode(exactKey);
                 String encodedValue = encode(fieldValue).replace("+", "%20");
-
-                hashParts.add(exactKey + "=" + encodedValue);
-                queryParts.add(encodedKey + "=" + encodedValue);
+                hashParts.add(fieldName + "=" + encodedValue);         // key raw cho hash
+                queryParts.add(encode(fieldName) + "=" + encodedValue);// key encoded cho query
             }
         }
 
         String hashDataStr = String.join("&", hashParts);
-        String queryStr = String.join("&", queryParts);
+        String queryStr    = String.join("&", queryParts);
 
         String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashDataStr);
         return vnPayConfig.getVnp_PayUrl() + "?" + queryStr + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
@@ -116,25 +113,32 @@ public class VNPayServiceImpl implements VNPayService {
     @Override
     @Transactional
     public IpnResponse processIpn(Map<String, String> params) {
-        Map<String, String> mutableParams = new java.util.HashMap<>(params);
+        Map<String, String> mutableParams = new HashMap<>(params);
 
-        String receivedHash = mutableParams.get(VNPayParams.SECURE_HASH);
+        String receivedHash = mutableParams.remove(VNPayParams.SECURE_HASH);
         if (receivedHash == null)
             return new IpnResponse(VnpIpnResponseConst.UNKNOWN_ERROR, "Missing signature");
 
         mutableParams.remove("vnp_SecureHashType");
-        mutableParams.remove(VNPayParams.SECURE_HASH);
 
+        // FIX: Không encode lại value – VNPay gửi callback dưới dạng plain text đã được
+        //      server container decode sẵn (query string → HttpServletRequest.getParameterMap).
+        //      Encode thêm sẽ tạo ra hash khác với phía VNPay → chữ ký không khớp.
+        List<String> sortedKeys = new ArrayList<>(mutableParams.keySet());
+        Collections.sort(sortedKeys);
 
-        String hashData = mutableParams.entrySet().stream()
-                .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
-                .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey() + "=" + encode(e.getValue()).replace("+", "%20"))
-                .collect(Collectors.joining("&"));
+        List<String> hashParts = new ArrayList<>();
+        for (String key : sortedKeys) {
+            String value = mutableParams.get(key);
+            if (value != null && !value.isEmpty()) {
+                hashParts.add(key + "=" + value);   // plain key=value, không encode
+            }
+        }
+        String hashData = String.join("&", hashParts);
 
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
 
-        if (!checkSum.equals(receivedHash))
+        if (!checkSum.equalsIgnoreCase(receivedHash))
             return new IpnResponse(VnpIpnResponseConst.INVALID_CHECKSUM, "Invalid checksum");
 
         if (!"00".equals(mutableParams.get(VNPayParams.RESPONSE_CODE))) {
@@ -148,9 +152,7 @@ public class VNPayServiceImpl implements VNPayService {
             return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Invalid order ID");
         }
 
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElse(null);
-
+        Payment payment = paymentRepository.findById(paymentId).orElse(null);
         if (payment == null)
             return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Order not found");
 
@@ -168,7 +170,7 @@ public class VNPayServiceImpl implements VNPayService {
 
     private String encode(String value) {
         try {
-            return URLEncoder.encode(value, "UTF-8");
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
         } catch (java.io.UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
