@@ -96,11 +96,12 @@ public class VNPayServiceImpl implements VNPayService {
         for (String fieldName : fieldNames) {
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String encodedKey = encode(fieldName);
+                String exactKey = fieldName.toLowerCase();
+
+                String encodedKey = encode(exactKey);
                 String encodedValue = encode(fieldValue).replace("+", "%20");
 
-                // Đẩy vào mảng tạm để chuẩn bị join
-                hashParts.add(fieldName + "=" + encodedValue);
+                hashParts.add(exactKey + "=" + encodedValue);
                 queryParts.add(encodedKey + "=" + encodedValue);
             }
         }
