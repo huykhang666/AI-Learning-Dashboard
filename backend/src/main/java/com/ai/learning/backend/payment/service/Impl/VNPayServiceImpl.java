@@ -97,7 +97,7 @@ public class VNPayServiceImpl implements VNPayService {
             String fieldName  = itr.next();
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8);
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8).replace("+", "%20");
                 hashData.append(fieldName).append('=').append(encodedValue);
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8))
                         .append('=').append(encodedValue);
@@ -115,19 +115,20 @@ public class VNPayServiceImpl implements VNPayService {
     @Override
     @Transactional
     public IpnResponse processIpn(Map<String, String> params) {
+        Map<String, String> mutableParams = new java.util.HashMap<>(params);
 
-        String receivedHash = params.get(VNPayParams.SECURE_HASH);
+        String receivedHash = mutableParams.get(VNPayParams.SECURE_HASH);
         if (receivedHash == null)
             return new IpnResponse(VnpIpnResponseConst.UNKNOWN_ERROR, "Missing signature");
 
-        params.remove("vnp_SecureHashType");
-        params.remove(VNPayParams.SECURE_HASH);
+        mutableParams.remove("vnp_SecureHashType");
+        mutableParams.remove(VNPayParams.SECURE_HASH);
 
 
-        String hashData = params.entrySet().stream()
+        String hashData = mutableParams.entrySet().stream()
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
                 .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8).replace("+", "%20"))
                 .collect(Collectors.joining("&"));
 
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -135,13 +136,13 @@ public class VNPayServiceImpl implements VNPayService {
         if (!checkSum.equals(receivedHash))
             return new IpnResponse(VnpIpnResponseConst.INVALID_CHECKSUM, "Invalid checksum");
 
-        if (!"00".equals(params.get(VNPayParams.RESPONSE_CODE))) {
+        if (!"00".equals(mutableParams.get(VNPayParams.RESPONSE_CODE))) {
             return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Transaction failed but IPN received");
         }
 
         UUID paymentId;
         try {
-            paymentId = UUID.fromString(params.get(VNPayParams.TXN_REF));
+            paymentId = UUID.fromString(mutableParams.get(VNPayParams.TXN_REF));
         } catch (IllegalArgumentException e) {
             return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Invalid order ID");
         }
@@ -156,7 +157,7 @@ public class VNPayServiceImpl implements VNPayService {
             return new IpnResponse(VnpIpnResponseConst.ALREADY_CONFIRMED, "Order already confirmed");
 
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setGatewayTransactionId(params.get(VNPayParams.TRANSACTION_NO));
+        payment.setGatewayTransactionId(mutableParams.get(VNPayParams.TRANSACTION_NO));
         paymentRepository.save(payment);
 
         subscriptionService.activatePremium(payment);

@@ -94,10 +94,16 @@ public class MessageServiceImpl implements MessageService {
                 .map(m -> Map.of("role", m.getRole().name().toLowerCase(), "content", m.getContent()))
                 .toList();
 
+        String transcriptText = "";
+        if (session.getAiResult() != null && session.getAiResult().getTranscript() != null) {
+            transcriptText = session.getAiResult().getTranscript();
+        }
+
         Map<String, Object> apiRequest = Map.of(
                 "session_id", sessionId.toString(),
                 "query", request.getContent(),
-                "history", history
+                "history", history,
+                "transcript", transcriptText
         );
 
         chatBotAsyncTask.callFastApiAndUpdateMessage(apiRequest, aiPendingMessage.getMessageId());

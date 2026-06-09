@@ -552,6 +552,11 @@ const CourseDetail = () => {
               courseDetailApi={courseDetailApi}
               aiApi={aiApi}
               onClose={() => setIsChatOpen(false)}
+              transcript={courseData?.transcript ? (
+                Array.isArray(courseData.transcript)
+                  ? courseData.transcript.map(item => item.text || item.content || item).join(" ")
+                  : courseData.transcript
+              ) : ""}
             />
           </div>
         )}

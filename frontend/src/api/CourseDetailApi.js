@@ -181,12 +181,13 @@ export const courseDetailApi = {
    4. AI CHAT API (PYTHON)
 ======================== */
 export const aiApi = {
-  chat: async (sessionId, query, history = []) => {
+  chat: async (sessionId, query, history = [], transcript = "") => {
     try {
       const response = await aiClient.post("chat", {
         session_id: sessionId,
         query,
         history,
+        transcript,
       });
       return response.data;
     } catch (error) {

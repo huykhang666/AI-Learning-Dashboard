@@ -172,7 +172,9 @@ const LessonDetail = () => {
           videoUrl: data.videoUrl,
           thumbnailUrl: data.thumbnailUrl,
           videoId: getYoutubeID(data.videoUrl),
-          learningSessionId: data.learningSessionId
+          learningSessionId: data.learningSessionId,
+          transcript: data.transcript,
+          summaryJson: data.summaryJson
         });
       } catch (error) {
         console.error("[LessonDetail] fetchDetail error:", error);
@@ -428,6 +430,11 @@ const LessonDetail = () => {
               courseDetailApi={courseDetailApi}
               aiApi={aiApi}
               onClose={() => setIsChatOpen(false)}
+              transcript={courseData?.transcript ? (
+                Array.isArray(courseData.transcript)
+                  ? courseData.transcript.map(item => item.text || item.content || item).join(" ")
+                  : courseData.transcript
+              ) : ""}
             />
           </div>
         )}

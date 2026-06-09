@@ -3,7 +3,7 @@ import { Send, Zap, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 
-const AIChatBox = ({ onClose, sessionId, courseDetailApi, aiApi }) => {
+const AIChatBox = ({ onClose, sessionId, courseDetailApi, aiApi, transcript = "" }) => {
   const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -72,7 +72,7 @@ const AIChatBox = ({ onClose, sessionId, courseDetailApi, aiApi }) => {
       await courseDetailApi.sendMessage(sessionId, input);
 
       // 2. Gọi AI Python
-      const res = await aiApi.chat(sessionId, input, currentMessages);
+      const res = await aiApi.chat(sessionId, input, currentMessages, transcript);
 
       console.log("AI RESPONSE:", res);
 

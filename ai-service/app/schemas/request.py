@@ -5,6 +5,7 @@ class ChatRequest(BaseModel):
     session_id: str
     query: str
     history: Optional[List[Dict[str, str]]] = []
+    transcript: Optional[str] = ""
 class IngestRequest(BaseModel):
     session_id: str
     transcript: str

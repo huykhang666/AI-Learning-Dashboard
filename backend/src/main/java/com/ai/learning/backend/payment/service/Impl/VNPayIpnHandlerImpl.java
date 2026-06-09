@@ -31,18 +31,19 @@ public class VNPayIpnHandlerImpl implements IpnHandlerService {
 
     @Override
     public IpnResponse handle(Map<String, String> params) {
-        String receivedHash = params.get(VNPayParams.SECURE_HASH);
+        Map<String, String> mutableParams = new java.util.HashMap<>(params);
+        String receivedHash = mutableParams.get(VNPayParams.SECURE_HASH);
         if(receivedHash == null)
             return new IpnResponse(VnpIpnResponseConst.UNKNOWN_ERROR, "Missing signature");
 
-        params.remove("vnp_SecureHashType");
-        params.remove(VNPayParams.SECURE_HASH);
+        mutableParams.remove("vnp_SecureHashType");
+        mutableParams.remove(VNPayParams.SECURE_HASH);
 
         // Build hash data
-        String hashData = params.entrySet().stream()
+        String hashData = mutableParams.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
-                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.US_ASCII))
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8).replace("+", "%20"))
                 .collect(Collectors.joining("&"));
 
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -50,10 +51,10 @@ public class VNPayIpnHandlerImpl implements IpnHandlerService {
         if (!checkSum.equals(receivedHash))
             return new IpnResponse(VnpIpnResponseConst.INVALID_CHECKSUM, "Invalid checksum");
 
-        if (!"00".equals(params.get(VNPayParams.RESPONSE_CODE)))
+        if (!"00".equals(mutableParams.get(VNPayParams.RESPONSE_CODE)))
             return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Transaction failed but IPN received");
 
-        UUID paymentId = UUID.fromString(params.get(VNPayParams.TXN_REF));
+        UUID paymentId = UUID.fromString(mutableParams.get(VNPayParams.TXN_REF));
         Payment payment = paymentRepository.findById(paymentId)
                 .orElse(null);
 

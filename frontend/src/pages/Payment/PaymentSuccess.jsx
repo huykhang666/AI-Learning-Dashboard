@@ -9,8 +9,6 @@ export default function PaymentSuccessPage() {
   const [countdown, setCountdown] = useState(5);
 
 useEffect(() => {
-  localStorage.removeItem("user"); 
-
   const timer = setInterval(() => {
     setCountdown((prev) => {
       if (prev <= 1) {
