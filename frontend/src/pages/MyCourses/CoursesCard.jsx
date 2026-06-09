@@ -7,8 +7,10 @@ const getFullUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   const safeUrl = url.replace(/#/g, "%23").replace(/\?/g, "%3F");
-  if (safeUrl.startsWith("/uploads")) return safeUrl;
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  if (safeUrl.startsWith("/uploads") && (!apiUrl.startsWith("http://") && !apiUrl.startsWith("https://"))) {
+    return safeUrl;
+  }
   const baseUrl = apiUrl.includes("/api/v1") ? apiUrl.replace("/api/v1", "") : apiUrl;
   const cleanBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   const cleanUrl = safeUrl.startsWith("/") ? safeUrl : `/${safeUrl}`;
