@@ -374,7 +374,11 @@ export default function UserProfileModal({ isOpen, onClose, initialTab = "profil
                                   #{item.paymentId.substring(0, 8).toUpperCase()}
                                 </td>
                                 <td className="py-4 px-4 text-slate-800 font-bold text-[15.5px]">
-                                  {item.planType === "PREMIUM_YEARLY" ? t("user_profile_modal.billing.plan_yearly") : t("user_profile_modal.billing.plan_monthly")}
+                                  {item.planType === "COURSE" 
+                                    ? (item.orderInfo || "Mua khóa học")
+                                    : (item.planType === "PREMIUM_YEARLY" 
+                                      ? t("user_profile_modal.billing.plan_yearly") 
+                                      : t("user_profile_modal.billing.plan_monthly"))}
                                 </td>
                                 <td className="py-4 px-4 text-blue-600 font-extrabold text-[16px]">
                                   {item.amount.toLocaleString()} {item.currency}

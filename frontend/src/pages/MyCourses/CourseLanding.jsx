@@ -11,13 +11,13 @@
         Star,
         CheckCircle,
         Award,
-        ShieldCheck,
-        X,
+        ShoppingCart,
+        ArrowRight,
+        Unlock,
+        ShieldCheck
     } from 'lucide-react';
     import { courseApi } from '../../api/CourseApi';
     import { paymentApi } from '../../api/PaymentApi';
-    import momoLogo from '../../img/MoMo.png';
-    import vnpayLogo from '../../img/VNPay.png';
     import styles from './CourseLanding.module.css';
 
 const getFullUrl = (url) => {
@@ -47,24 +47,43 @@ export default function CourseLanding() {
         const navigate = useNavigate();
         const { t } = useTranslation();
         const [course, setCourse] = useState(null);
-        const [showPaymentModal, setShowPaymentModal] = useState(false);
-        const [selectedGateway, setSelectedGateway] = useState('VNPAY');
-        const [isProcessing, setIsProcessing] = useState(false);
+        const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+        const [selectedGateway, setSelectedGateway] = useState("VNPAY");
+        const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-        const gatewayOptions = [
-            {
-                id: 'VNPAY',
-                name: 'VNPay',
-                description: t('pricing.gateways.vnpay.description', { defaultValue: 'Thẻ ATM, Visa, QR Code' }),
-                logo: vnpayLogo,
-            },
-            {
-                id: 'MOMO',
-                name: 'MoMo',
-                description: t('pricing.gateways.momo.description', { defaultValue: 'Ví MoMo, liên kết ngân hàng' }),
-                logo: momoLogo,
-            },
-        ];
+        const handleConfirmCoursePayment = async () => {
+            try {
+                setIsProcessingPayment(true);
+                const userStr = localStorage.getItem("user");
+                if (!userStr) {
+                    toast.error(t("pricing.alerts.login_required", { defaultValue: "Vui lòng đăng nhập để mua khóa học!" }));
+                    return;
+                }
+                const userObj = JSON.parse(userStr);
+                const userId = userObj.id || userObj.userId;
+                
+                const paymentRequest = {
+                    userId: Number(userId),
+                    amount: course.price,
+                    planType: "COURSE",
+                    gateway: selectedGateway,
+                    courseId: Number(courseId)
+                };
+
+                const response = await paymentApi.createPaymentUrl(paymentRequest);
+                const resData = response?.data || response;
+                if (resData?.paymentUrl) {
+                    window.location.href = resData.paymentUrl;
+                } else {
+                    toast.error(t("pricing.alerts.service_busy", { defaultValue: "Cổng thanh toán bận, thử lại sau!" }));
+                }
+            } catch (error) {
+                console.error("Lỗi tạo link thanh toán:", error);
+                toast.error(t("pricing.alerts.service_busy", { defaultValue: "Lỗi kết nối đến cổng thanh toán!" }));
+            } finally {
+                setIsProcessingPayment(false);
+            }
+        };
 
         useEffect(() => {
             const fetchLandingData = async () => {
@@ -98,62 +117,26 @@ export default function CourseLanding() {
             return index < 2;
         };
 
-        const handleOpenPayment = () => {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                toast.error(t('pricing.alerts.login_required', { defaultValue: 'Vui lòng đăng nhập để thanh toán!' }));
-                return;
-            }
-            setSelectedGateway('VNPAY');
-            setShowPaymentModal(true);
-        };
-
-        const handleConfirmPayment = async () => {
+        const handleEnroll = async () => {
+            console.log("Đã bấm nút Đăng ký!");
             try {
-                setIsProcessing(true);
-
-                const token = localStorage.getItem('accessToken');
-                if (!token) {
-                    toast.error(t('pricing.alerts.login_required', { defaultValue: 'Vui lòng đăng nhập để thanh toán!' }));
-                    return;
-                }
-
-                const userStr = localStorage.getItem('user');
-                if (!userStr) {
-                    toast.error(t('pricing.alerts.user_not_found', { defaultValue: 'Không tìm thấy thông tin người dùng!' }));
-                    return;
-                }
-
-                const userObj = JSON.parse(userStr);
-                const userId = userObj.userId || userObj.id;
-                if (!userId) {
-                    toast.error(t('pricing.alerts.user_not_found', { defaultValue: 'Không tìm thấy thông tin người dùng!' }));
-                    return;
-                }
-
-                const paymentRequest = {
-                    userId: Number(userId),
-                    amount: Math.round(Number(course.price)),
-                    planType: 'COURSE',
-                    gateway: selectedGateway,
-                    courseId: Number(courseId),
-                };
-
-                const response = await paymentApi.createPaymentUrl(paymentRequest);
-                const resData = response?.data || response;
-                const payUrl = resData?.paymentUrl || resData?.payUrl;
-
-                if (payUrl && (resData?.code === '00' || resData?.resultCode === 0)) {
-                    window.location.href = payUrl;
-                    return;
-                }
-
-                toast.error(t('pricing.alerts.service_busy', { defaultValue: 'Cổng thanh toán đang bận, thử lại sau!' }));
+                const userStr = localStorage.getItem("user");
+                const userId = userStr ? JSON.parse(userStr).userId : 0;
+                
+                // Gọi API đăng ký
+                await courseApi.enroll(courseId, userId); 
+                
+                toast.success(t("course_landing.enroll_success", { defaultValue: "Đăng ký thành công!" }));
+                setCourse(prev => ({ ...prev, unlocked: true }));
+                
+                setTimeout(() => {
+                    navigate("/app/courses", { 
+                        state: { enrolledCourseId: Number(courseId) } 
+                    });
+                }, 1500);                
             } catch (error) {
-                console.error('Lỗi thanh toán khóa học:', error);
-                toast.error(t('pricing.alerts.service_busy', { defaultValue: 'Cổng thanh toán đang bận, thử lại sau!' }));
-            } finally {
-                setIsProcessing(false);
+                console.error("Lỗi đăng ký:", error);
+                toast.error(t("course_landing.enroll_fail", { defaultValue: "Đăng ký thất bại, thử lại nhé!" }));
             }
         };
 
@@ -324,7 +307,12 @@ export default function CourseLanding() {
                                                 className={`${styles.btnAction} ${styles.btnBuy}`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleOpenPayment();
+                                                    const userStr = localStorage.getItem("user");
+                                                    if (!userStr) {
+                                                        toast.error(t("pricing.alerts.login_required", { defaultValue: "Vui lòng đăng nhập!" }));
+                                                        return;
+                                                    }
+                                                    setIsCheckoutModalOpen(true);
                                                 }}
                                             >
                                                 {t("course_landing.pay_now")}
@@ -353,76 +341,72 @@ export default function CourseLanding() {
                         </div>
                     </div>
                 </div>
-                {showPaymentModal && (
-                    <div className={styles.paymentOverlay} onClick={() => !isProcessing && setShowPaymentModal(false)}>
-                        <div className={styles.paymentModal} onClick={(e) => e.stopPropagation()}>
-                            {isProcessing && (
-                                <div className={styles.paymentProcessing}>
-                                    <div className={styles.loadingSpinner} />
-                                    <p>{t('pricing.modal.connecting_gateway', { defaultValue: 'Đang kết nối cổng thanh toán...' })}</p>
-                                </div>
-                            )}
 
-                            <div className={styles.paymentModalHeader}>
-                                <h3 className={styles.paymentModalTitle}>
-                                    {t('course_landing.pay_now', { defaultValue: 'Thanh toán ngay' })}
-                                </h3>
-                                <button
-                                    type="button"
-                                    className={styles.paymentModalClose}
-                                    onClick={() => !isProcessing && setShowPaymentModal(false)}
-                                    disabled={isProcessing}
-                                >
-                                    <X size={18} />
-                                </button>
+                {isCheckoutModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        {/* Backdrop */}
+                        <div 
+                            className="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm transition-opacity duration-300"
+                            onClick={() => setIsCheckoutModalOpen(false)}
+                        />
+                        
+                        {/* Modal content */}
+                        <div className="bg-white rounded-3xl border border-slate-200/60 shadow-2xl w-full max-w-md relative z-10 p-6 transform transition-all duration-300 animate-in fade-in zoom-in-95">
+                            <h3 className="text-lg font-black text-slate-900 mb-2">Thanh toán khóa học</h3>
+                            <p className="text-sm text-slate-500 mb-4">Bạn đang thực hiện mua khóa học: <strong>{course.title}</strong></p>
+                            
+                            <div className="bg-slate-50 rounded-2xl p-4 mb-4 flex justify-between items-center">
+                                <span className="text-sm text-slate-600 font-bold">Giá tiền:</span>
+                                <span className="text-lg font-extrabold text-blue-600">
+                                    {Number(course.price).toLocaleString('vi-VN')} đ
+                                </span>
                             </div>
 
-                            <div className={styles.paymentModalBody}>
-                                <div className={styles.paymentSummary}>
-                                    <div>
-                                        <p className={styles.paymentSummaryLabel}>
-                                            {t('pricing.modal.selected_plan', { defaultValue: 'Khóa học' })}
-                                        </p>
-                                        <p className={styles.paymentSummaryName}>{course.title}</p>
-                                    </div>
-                                    <p className={styles.paymentSummaryPrice}>
-                                        {Number(course.price).toLocaleString('vi-VN')}đ
-                                    </p>
+                            <div className="mb-6">
+                                <label className="block text-slate-450 text-[10px] font-extrabold mb-3 uppercase tracking-widest">
+                                    Chọn cổng thanh toán
+                                </label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedGateway("VNPAY")}
+                                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
+                                            selectedGateway === "VNPAY"
+                                                ? "border-blue-600 bg-blue-50/20 text-blue-600 font-bold"
+                                                : "border-slate-200 hover:border-slate-300 text-slate-650"
+                                        }`}
+                                    >
+                                        <span className="text-sm font-bold">VNPAY</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedGateway("MOMO")}
+                                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
+                                            selectedGateway === "MOMO"
+                                                ? "border-pink-600 bg-pink-50/20 text-pink-600 font-bold"
+                                                : "border-slate-200 hover:border-slate-300 text-slate-650"
+                                        }`}
+                                    >
+                                        <span className="text-sm font-bold">MoMo</span>
+                                    </button>
                                 </div>
+                            </div>
 
-                                <div className={styles.paymentGatewayList}>
-                                    {gatewayOptions.map((gw) => {
-                                        const active = selectedGateway === gw.id;
-                                        return (
-                                            <button
-                                                key={gw.id}
-                                                type="button"
-                                                className={`${styles.paymentGatewayBtn} ${active ? styles.paymentGatewayBtnActive : ''}`}
-                                                onClick={() => !isProcessing && setSelectedGateway(gw.id)}
-                                                disabled={isProcessing}
-                                            >
-                                                <div className={styles.paymentGatewayLogo}>
-                                                    <img src={gw.logo} alt={gw.name} />
-                                                </div>
-                                                <div className={styles.paymentGatewayInfo}>
-                                                    <p className={styles.paymentGatewayName}>{gw.name}</p>
-                                                    <p className={styles.paymentGatewayDesc}>{gw.description}</p>
-                                                </div>
-                                                <div className={`${styles.paymentRadio} ${active ? styles.paymentRadioActive : ''}`}>
-                                                    {active && <div className={styles.paymentRadioDot} />}
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
+                            <div className="flex gap-3">
                                 <button
                                     type="button"
-                                    className={styles.paymentConfirmBtn}
-                                    onClick={handleConfirmPayment}
-                                    disabled={isProcessing}
+                                    onClick={() => setIsCheckoutModalOpen(false)}
+                                    className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-xs font-black transition-all active:scale-95"
                                 >
-                                    {t('pricing.modal.confirm_pay', { defaultValue: 'Xác nhận thanh toán' })}
+                                    Hủy bỏ
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={isProcessingPayment}
+                                    onClick={handleConfirmCoursePayment}
+                                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white py-3 rounded-xl text-xs font-black shadow-md shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                >
+                                    {isProcessingPayment ? "Đang kết nối..." : "Thanh toán"}
                                 </button>
                             </div>
                         </div>

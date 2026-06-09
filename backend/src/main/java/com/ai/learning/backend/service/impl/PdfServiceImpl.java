@@ -189,19 +189,8 @@ public class PdfServiceImpl implements PdfService {
             }
 
             // Row dữ liệu
-            boolean isCoursePayment = payment.getPlanType() == com.ai.learning.backend.payment.entity.Subscription.PlanType.COURSE;
-            String desc;
-            String duration;
-            if (isCoursePayment && payment.getCourse() != null) {
-                desc = payment.getCourse().getTitle();
-                duration = "KHÓA HỌC";
-            } else if (payment.getOrderInfo() != null) {
-                desc = payment.getOrderInfo();
-                duration = payment.getPlanType() != null ? payment.getPlanType().name() : "PREMIUM";
-            } else {
-                desc = "Nâng cấp tài khoản lên gói Premium";
-                duration = "PREMIUM";
-            }
+            String desc = payment.getOrderInfo() != null ? payment.getOrderInfo() : "Nâng cấp tài khoản lên gói Premium";
+            String duration = payment.getPlanType() == Subscription.PlanType.COURSE ? "KHÓA HỌC" : (payment.getPlanType() != null ? payment.getPlanType().name() : "PREMIUM");
             String currencyName = payment.getCurrency() != null ? payment.getCurrency().name() : "VND";
             String price = String.format("%,.0f %s", payment.getAmount().doubleValue(), currencyName);
 
@@ -247,13 +236,11 @@ public class PdfServiceImpl implements PdfService {
             footerCell.setPadding(14);
             footerCell.setBorder(Rectangle.NO_BORDER);
 
-            String footerMessage = isCoursePayment
-                    ? "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\n" +
-                    "Chúc mừng bạn đã sở hữu khóa học. Hãy vào mục Khóa học của tôi để bắt đầu học ngay."
-                    : "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\n" +
-                    "Tài khoản của bạn đã được kích hoạt đầy đủ tính năng Premium.";
+            String footerMsg = payment.getPlanType() == Subscription.PlanType.COURSE
+                    ? "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\nBạn đã sở hữu trọn đời khóa học này. Chúc bạn học tập tốt!"
+                    : "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\nTài khoản của bạn đã được kích hoạt đầy đủ tính năng Premium.";
             Paragraph footerText = new Paragraph(
-                    footerMessage,
+                    footerMsg,
                     new Font(bfRegular, 10, Font.NORMAL, Color.WHITE)
             );
             footerText.setAlignment(Element.ALIGN_CENTER);

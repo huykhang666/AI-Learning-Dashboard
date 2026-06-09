@@ -1,6 +1,5 @@
 package com.ai.learning.backend.payment.service.Impl;
 
-import com.ai.learning.backend.entity.Course;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
@@ -14,8 +13,8 @@ import com.ai.learning.backend.payment.entity.PaymentStatus;
 import com.ai.learning.backend.payment.entity.Subscription;
 import com.ai.learning.backend.payment.repository.PaymentRepository;
 import com.ai.learning.backend.payment.service.MomoService;
-import com.ai.learning.backend.repository.CourseRepository;
 import com.ai.learning.backend.repository.UserRepository;
+import com.ai.learning.backend.repository.CourseRepository;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,22 +43,21 @@ public class MomoServiceImpl implements MomoService {
             User user = userRepository.findById(request.userId())
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-            Course course = null;
-            String orderInfo = "Thanh toan goi " + request.planType();
+            com.ai.learning.backend.entity.Course course = null;
             if (request.courseId() != null) {
                 course = courseRepository.findById(request.courseId())
-                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_REQUEST));
-                orderInfo = "Thanh toan khoa hoc: " + course.getTitle();
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
             }
 
+            // 1. Tạo Payment record lưu DB
             Payment payment = Payment.builder()
                     .amount(request.amount())
                     .user(user)
                     .status(PaymentStatus.PENDING)
                     .gateway(PaymentGateway.MOMO)
                     .planType(Subscription.PlanType.valueOf(request.planType()))
+                    .orderInfo(course != null ? "Thanh toan khoa hoc: " + course.getTitle() : "Thanh toan goi " + request.planType())
                     .course(course)
-                    .orderInfo(orderInfo)
                     .build();
 
             Payment savedPayment = paymentRepository.save(payment);
