@@ -12,6 +12,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<?>> handlingAppException(AppException exception) {
+        exception.printStackTrace();
         ErrorCode errorCode = exception.getErrorCode();
         return ResponseEntity.status(errorCode.getStatusCode()).body(
                 ApiResponse.builder()
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(RuntimeException exception) {
+        exception.printStackTrace();
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
         return ResponseEntity.status(errorCode.getStatusCode()).body(
                 ApiResponse.builder()
