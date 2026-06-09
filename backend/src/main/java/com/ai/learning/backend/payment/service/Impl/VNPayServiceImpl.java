@@ -89,27 +89,27 @@ public class VNPayServiceImpl implements VNPayService {
         List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(fieldNames);
 
-        StringBuilder hashData = new StringBuilder();
-        StringBuilder query    = new StringBuilder();
-
         Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName  = itr.next();
+        List<String> hashParts = new ArrayList<>();
+        List<String> queryParts = new ArrayList<>();
+
+        for (String fieldName : fieldNames) {
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
+                String encodedKey = encode(fieldName);
                 String encodedValue = encode(fieldValue).replace("+", "%20");
-                hashData.append(fieldName).append('=').append(encodedValue);
-                query.append(encode(fieldName))
-                        .append('=').append(encodedValue);
-                if (itr.hasNext()) {
-                    hashData.append('&');
-                    query.append('&');
-                }
+
+                // Đẩy vào mảng tạm để chuẩn bị join
+                hashParts.add(fieldName + "=" + encodedValue);
+                queryParts.add(encodedKey + "=" + encodedValue);
             }
         }
 
-        String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
-        return vnPayConfig.getVnp_PayUrl() + "?" + query + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
+        String hashDataStr = String.join("&", hashParts);
+        String queryStr = String.join("&", queryParts);
+
+        String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashDataStr);
+        return vnPayConfig.getVnp_PayUrl() + "?" + queryStr + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
     }
 
     @Override
