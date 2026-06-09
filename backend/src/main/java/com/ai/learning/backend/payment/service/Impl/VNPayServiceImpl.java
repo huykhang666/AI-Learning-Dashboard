@@ -70,9 +70,9 @@ public class VNPayServiceImpl implements VNPayService {
         vnpParams.put(VNPayParams.RETURN_URL, vnPayConfig.getVnp_ReturnUrl());
         vnpParams.put(VNPayParams.IP_ADDR,    vnPayConfig.getIpAddress(httpRequest));
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        formatter.setTimeZone(TimeZone.getTimeZone("Etc/GMT+7"));
+        formatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         vnpParams.put(VNPayParams.CREATE_DATE, formatter.format(cld.getTime()));
         cld.add(Calendar.MINUTE, 15);
         vnpParams.put(VNPayParams.EXPIRE_DATE, formatter.format(cld.getTime()));
