@@ -42,6 +42,45 @@ const formatDuration = (seconds) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
+const getLoggedInUser = () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            window
+                .atob(base64)
+                .split('')
+                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+        );
+        const decoded = JSON.parse(jsonPayload);
+        const userId = decoded.userId || decoded.id || decoded.sub;
+        if (userId) {
+            return { id: Number(userId), token };
+        }
+    } catch (e) {
+        console.error("Error decoding token in CourseLanding:", e);
+    }
+
+    try {
+        const userStr = localStorage.getItem("user");
+        if (userStr && userStr !== "undefined") {
+            const userObj = JSON.parse(userStr);
+            const userId = userObj.id || userObj.userId;
+            if (userId) {
+                return { id: Number(userId), token };
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing user from localStorage:", e);
+    }
+
+    return null;
+};
+
 export default function CourseLanding() {
         const { courseId } = useParams();
         const navigate = useNavigate();
@@ -54,13 +93,12 @@ export default function CourseLanding() {
         const handleConfirmCoursePayment = async () => {
             try {
                 setIsProcessingPayment(true);
-                const userStr = localStorage.getItem("user");
-                if (!userStr) {
+                const loggedInUser = getLoggedInUser();
+                if (!loggedInUser) {
                     toast.error(t("pricing.alerts.login_required", { defaultValue: "Vui lòng đăng nhập để mua khóa học!" }));
                     return;
                 }
-                const userObj = JSON.parse(userStr);
-                const userId = userObj.id || userObj.userId;
+                const userId = loggedInUser.id;
                 
                 const paymentRequest = {
                     userId: Number(userId),
@@ -88,8 +126,8 @@ export default function CourseLanding() {
         useEffect(() => {
             const fetchLandingData = async () => {
                 try {
-                    const userStr = localStorage.getItem("user");
-                    const userId = userStr ? JSON.parse(userStr).userId : 0;
+                    const loggedInUser = getLoggedInUser();
+                    const userId = loggedInUser ? loggedInUser.id : 0;
                     
                     const response = await courseApi.getCourseDetail(courseId, userId);
                     const courseData = response.data;
@@ -120,8 +158,8 @@ export default function CourseLanding() {
         const handleEnroll = async () => {
             console.log("Đã bấm nút Đăng ký!");
             try {
-                const userStr = localStorage.getItem("user");
-                const userId = userStr ? JSON.parse(userStr).userId : 0;
+                const loggedInUser = getLoggedInUser();
+                const userId = loggedInUser ? loggedInUser.id : 0;
                 
                 // Gọi API đăng ký
                 await courseApi.enroll(courseId, userId); 
@@ -307,8 +345,8 @@ export default function CourseLanding() {
                                                 className={`${styles.btnAction} ${styles.btnBuy}`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    const userStr = localStorage.getItem("user");
-                                                    if (!userStr) {
+                                                    const loggedInUser = getLoggedInUser();
+                                                    if (!loggedInUser) {
                                                         toast.error(t("pricing.alerts.login_required", { defaultValue: "Vui lòng đăng nhập!" }));
                                                         return;
                                                     }
