@@ -54,6 +54,8 @@ services:
         condition: service_healthy
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE=500MB
+      - SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE=510MB
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ai_learning_dashboard
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=your_secure_password
