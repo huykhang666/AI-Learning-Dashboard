@@ -95,26 +95,38 @@ public class SessionServiceImpl implements SessionService {
             // Admin bypass
             boolean isAdmin = user.getRole() == com.ai.learning.backend.enums.UserRole.ADMIN;
             if (!isAdmin) {
-                // Check enrollment
-                boolean isEnrolled = enrollmentRepository.existsByUserUserIdAndCourseCourseIdAndInActiveFalse(
-                        user.getUserId(), course.getCourseId()
-                );
-
-                // Check successful transaction
-                boolean hasPaid = transactionRepository.existsByUserUserIdAndCourseCourseIdAndStatus(
-                        user.getUserId(), course.getCourseId(), "COMPLETED"
-                );
-
-                // Check premium status if isPremiumRequired is true
-                boolean hasPremiumAccess = false;
-                if (course.isPremiumRequired() && user.isPremium()) {
-                    if (user.getPremiumExpiredAt() != null && user.getPremiumExpiredAt().isAfter(java.time.LocalDateTime.now())) {
-                        hasPremiumAccess = true;
+                // Check if this lesson is a preview lesson (first 2 lessons sorted by orderIndex)
+                boolean isPreviewLesson = false;
+                if (course.getLessons() != null && !course.getLessons().isEmpty()) {
+                    java.util.List<Lesson> sortedLessons = new java.util.ArrayList<>(course.getLessons());
+                    sortedLessons.sort(java.util.Comparator.comparing(Lesson::getOrderIndex, 
+                            java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())));
+                    
+                    for (int i = 0; i < Math.min(2, sortedLessons.size()); i++) {
+                        if (sortedLessons.get(i).getLessonId().equals(lessonId)) {
+                            isPreviewLesson = true;
+                            break;
+                        }
                     }
                 }
 
-                if (!isEnrolled && !hasPaid && !hasPremiumAccess) {
-                    throw new AppException(ErrorCode.FORBIDDEN);
+                if (!isPreviewLesson) {
+                    // Check successful transaction
+                    boolean hasPaid = transactionRepository.existsByUserUserIdAndCourseCourseIdAndStatus(
+                            user.getUserId(), course.getCourseId(), "COMPLETED"
+                    );
+
+                    // Check premium status if isPremiumRequired is true
+                    boolean hasPremiumAccess = false;
+                    if (course.isPremiumRequired() && user.isPremium()) {
+                        if (user.getPremiumExpiredAt() != null && user.getPremiumExpiredAt().isAfter(java.time.LocalDateTime.now())) {
+                            hasPremiumAccess = true;
+                        }
+                    }
+
+                    if (!hasPaid && !hasPremiumAccess) {
+                        throw new AppException(ErrorCode.FORBIDDEN);
+                    }
                 }
             }
         }

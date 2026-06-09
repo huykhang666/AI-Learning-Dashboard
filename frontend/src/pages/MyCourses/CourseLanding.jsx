@@ -151,7 +151,9 @@ export default function CourseLanding() {
 
         const isLessonAccessible = (index) => {
             const priceValue = Number(course.price || 0);
-            if (priceValue === 0 || course.unlocked) return true;
+            const isPremium = course.isPremiumRequired;
+            const requiresPaywall = isPremium || priceValue > 0;
+            if (!requiresPaywall || course.unlocked) return true;
             return index < 2;
         };
 
@@ -263,7 +265,7 @@ export default function CourseLanding() {
                                                          <span className={styles.lessonDuration}>
                                                              <Clock size={11} /> {formatDuration(lesson.duration)}
                                                          </span>
-                                                    </div>
+                                                     </div>
                                                 </div>
                                             </div>
                                             <div className={styles.lessonRight}>
@@ -322,10 +324,10 @@ export default function CourseLanding() {
 
                                 {/* Nút bấm thay đổi theo trạng thái FREE hoặc CÓ PHÍ */}
                                 {(() => {
-                                    const isFree = Number(course.price) === 0;
                                     const isUnlocked = course.unlocked;
+                                    const isFree = Number(course.price) === 0;
                                     
-                                    if (isFree || isUnlocked) {
+                                    if (isUnlocked) {
                                         return (
                                             <button
                                                 type="button"
@@ -335,27 +337,42 @@ export default function CourseLanding() {
                                                     handleGoStudy();
                                                 }}
                                             >
-                                                {t("course_landing.owned")}
+                                                {t("course_landing.study_now", { defaultValue: "VÀO HỌC NGAY" })}
                                             </button>
                                         );
                                     } else {
-                                        return (
-                                            <button
-                                                type="button"
-                                                className={`${styles.btnAction} ${styles.btnBuy}`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    const loggedInUser = getLoggedInUser();
-                                                    if (!loggedInUser) {
-                                                        toast.error(t("pricing.alerts.login_required", { defaultValue: "Vui lòng đăng nhập!" }));
-                                                        return;
-                                                    }
-                                                    setIsCheckoutModalOpen(true);
-                                                }}
-                                            >
-                                                {t("course_landing.pay_now")}
-                                            </button>
-                                        );
+                                        if (isFree) {
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.btnAction} ${styles.btnStudy}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEnroll();
+                                                    }}
+                                                >
+                                                    {t("course_landing.enroll_now", { defaultValue: "ĐĂNG KÝ NGAY" })}
+                                                </button>
+                                            );
+                                        } else {
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    className={`${styles.btnAction} ${styles.btnBuy}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        const loggedInUser = getLoggedInUser();
+                                                        if (!loggedInUser) {
+                                                            toast.error(t("pricing.alerts.login_required", { defaultValue: "Vui lòng đăng nhập!" }));
+                                                            return;
+                                                        }
+                                                        setIsCheckoutModalOpen(true);
+                                                    }}
+                                                >
+                                                    {t("course_landing.pay_now", { defaultValue: "THANH TOÁN" })}
+                                                </button>
+                                            );
+                                        }
                                     }
                                 })()}
 

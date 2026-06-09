@@ -87,21 +87,31 @@ public class CourseServiceImpl implements CourseService {
 
     private boolean checkAccess(User user, Course course) {
         if (user == null) return false;
-        boolean isEnrolled = enrollmentRepository
-                .existsByUserUserIdAndCourseCourseIdAndInActiveFalse(
-                        user.getUserId(), course.getCourseId()
-                );
-        if (isEnrolled) return true;
-        if (course.isPremiumRequired() && user.isPremium()) {
-            if (user.getPremiumExpiredAt() != null
+
+        // Admin bypass
+        if (user.getRole() == com.ai.learning.backend.enums.UserRole.ADMIN) {
+            return true;
+        }
+
+        // If course is premium required, premium users have access
+        if (course.isPremiumRequired()) {
+            if (user.isPremium() && user.getPremiumExpiredAt() != null
                     && user.getPremiumExpiredAt().isAfter(LocalDateTime.now())) {
                 return true;
             }
         }
-        return transactionRepository
-                .existsByUserUserIdAndCourseCourseIdAndStatus(
-                        user.getUserId(), course.getCourseId(), "COMPLETED"
-                );
+
+        // If course is paid (price > 0), require completed transaction
+        if (course.getPrice() != null && course.getPrice() > 0) {
+            return transactionRepository.existsByUserUserIdAndCourseCourseIdAndStatus(
+                    user.getUserId(), course.getCourseId(), "COMPLETED"
+            );
+        }
+
+        // For free courses, require enrollment
+        return enrollmentRepository.existsByUserUserIdAndCourseCourseIdAndInActiveFalse(
+                user.getUserId(), course.getCourseId()
+        );
     }
 
     @Override
