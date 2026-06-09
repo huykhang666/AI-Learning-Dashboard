@@ -1,6 +1,7 @@
 package com.ai.learning.backend.service.impl;
 import com.ai.learning.backend.dto.QuizExportDto;
 import com.ai.learning.backend.payment.entity.Payment;
+import com.ai.learning.backend.payment.entity.Subscription;
 import com.ai.learning.backend.service.PdfService;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
