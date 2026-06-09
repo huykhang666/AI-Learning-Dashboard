@@ -8,7 +8,10 @@ class VideoService:
     def __init__(self):
         # Không tải model local nữa, chuyển sang gọi Client của Groq thông qua API Key
         print("--- [INFO] Khởi tạo Groq Client cho dịch vụ Speech-to-Text ---")
-        self.groq_client = Groq(api_key=settings.GROQ_API_KEY)
+        self.groq_client = Groq(
+            api_key=settings.GROQ_API_KEY,
+            base_url=settings.GROQ_API_BASE
+        )
 
     def get_video_id(self, url):
         # Regex thông minh để lấy Video ID từ mọi định dạng link YouTube

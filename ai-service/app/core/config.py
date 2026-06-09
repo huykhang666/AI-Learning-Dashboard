@@ -6,6 +6,7 @@ load_dotenv(os.path.join(base_dir, ".env"))
 
 class Settings:
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY")
+    GROQ_API_BASE: str = os.getenv("GROQ_API_BASE", "https://api.groq.com/openai/v1")
     JAVA_URL: str = os.getenv("JAVA_URL", "http://localhost:8080/api/v1/jobs")
     WHISPER_MODEL: str = "base"
  

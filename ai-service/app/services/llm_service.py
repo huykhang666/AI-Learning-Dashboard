@@ -8,6 +8,7 @@ class LLMService:
         self.llm = ChatGroq(
             model_name="llama-3.3-70b-versatile",
             groq_api_key=settings.GROQ_API_KEY,
+            groq_api_base=settings.GROQ_API_BASE,
             temperature=0.7 
         )
 

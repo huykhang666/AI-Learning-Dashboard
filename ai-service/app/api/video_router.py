@@ -149,7 +149,10 @@ def _split_audio(src: str, chunk_s: int = CHUNK_DURATION_S) -> list[str]:
 class VideoService:
     def __init__(self):
         print("--- [INFO] Khởi tạo Groq Client cho dịch vụ Speech-to-Text ---")
-        self.groq_client = Groq(api_key=settings.GROQ_API_KEY)
+        self.groq_client = Groq(
+            api_key=settings.GROQ_API_KEY,
+            base_url=settings.GROQ_API_BASE
+        )
 
     # ── Groq transcribe với retry ──────────────────────────────────────────
 
@@ -401,7 +404,10 @@ async def _report_progress(job_id: int | None, percent: int) -> None:
 # AI ANALYSIS & QUIZ
 # ─────────────────────────────────────────────
 
-groq_client   = Groq(api_key=settings.GROQ_API_KEY)
+groq_client   = Groq(
+    api_key=settings.GROQ_API_KEY,
+    base_url=settings.GROQ_API_BASE
+)
 video_service = VideoService()
 rag_service   = RAGService()
 
