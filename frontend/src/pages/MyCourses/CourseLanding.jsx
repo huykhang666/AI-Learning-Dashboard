@@ -105,7 +105,7 @@ export default function CourseLanding() {
             if (firstLessonId) {
                 navigate(`/app/lessons/${firstLessonId}`);
             } else {
-                toast.warn("Khóa học chưa có bài học nào!");
+                toast.warn(t("course_landing.no_lessons_toast", { defaultValue: "Khóa học chưa có bài học nào!" }));
             }
         };
         

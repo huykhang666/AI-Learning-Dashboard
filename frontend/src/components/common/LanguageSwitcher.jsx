@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "motion/react";
 const LANGUAGES = [
   { code: "vi", label: "Tiếng Việt", short: "VI", flag: "🇻🇳" },
   { code: "en", label: "English", short: "EN", flag: "🇬🇧" },
+  { code: "ja", label: "日本語", short: "JA", flag: "🇯🇵" },
+  { code: "ko", label: "한국어", short: "KO", flag: "🇰🇷" },
 ];
 
 function LanguageSwitcher({ className = "" }) {

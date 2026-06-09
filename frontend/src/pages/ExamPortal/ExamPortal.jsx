@@ -336,7 +336,7 @@ export default function ExamPortal() {
   const [isSubjectDropdownOpen, setIsSubjectDropdownOpen] = useState(false);
   const [gradeSearch, setGradeSearch] = useState("");
   const [subjectSearch, setSubjectSearch] = useState("");
-  const [currentUserName, setCurrentUserName] = useState("Học viên ẩn danh");
+  const [currentUserName, setCurrentUserName] = useState("{t("exam_portal.anonymous_student", { defaultValue: t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }) })}");
   const [leaderboard, setLeaderboard] = useState(() => {
     try {
       const stored = localStorage.getItem("examLeaderboards");
@@ -440,7 +440,7 @@ export default function ExamPortal() {
       const userStr = localStorage.getItem("user");
       if (userStr) {
         const u = JSON.parse(userStr);
-        setCurrentUserName(u.name || u.fullName || u.username || "Học viên ẩn danh");
+        setCurrentUserName(u.name || u.fullName || u.username || "{t("exam_portal.anonymous_student", { defaultValue: t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }) })}");
       }
     } catch (e) {}
   }, []);
@@ -747,7 +747,7 @@ export default function ExamPortal() {
     // Tắt giám sát trước khi hiện confirm modal (nó sẽ làm mất focus trình duyệt)
     isReadyForMonitoringRef.current = false;
 
-    if (window.confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?")) {
+    if (window.confirm(t("exam_portal.testing_confirm_submit", { defaultValue: "Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?" }))) {
       if (document.fullscreenElement) {
         try {
           await document.exitFullscreen();
@@ -840,10 +840,10 @@ export default function ExamPortal() {
       
       // Add result to exam-specific leaderboard
       const newLeaderboardEntry = {
-        name: currentUserName || "Học viên ẩn danh",
+        name: currentUserName || "{t("exam_portal.anonymous_student", { defaultValue: t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }) })}",
         score: finalScore,
         timeSeconds: timeSpentSeconds,
-        date: "Vừa xong"
+        date: "{t("header.time_ago", { defaultValue: t("header.time_ago", { defaultValue: "Vừa xong" }) })}"
       };
 
       setLeaderboard((prev) => {
@@ -1394,7 +1394,7 @@ export default function ExamPortal() {
                                     {user.name}
                                   </span>
                                   <span className="text-[10px] text-slate-450 block font-semibold">
-                                    {user.date || "Vừa xong"}
+                                    {user.date || "{t("header.time_ago", { defaultValue: t("header.time_ago", { defaultValue: "Vừa xong" }) })}"}
                                   </span>
                                 </div>
                               </div>
@@ -1694,7 +1694,7 @@ export default function ExamPortal() {
                             className="w-full border border-slate-200 rounded-2xl px-6 py-4.5 text-[17px] md:text-[18px] text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 bg-slate-50/20 hover:bg-slate-50/50 transition-all font-medium"
                           />
                           <p className="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                            <TbInfoCircle size={13} /> Nhập kết số nguyên hoặc số thực thập phân, không chứa ký tự chữ.
+                            <TbInfoCircle size={13} /> {t("exam_portal.short_answer_desc", { defaultValue: "Nhập kết số nguyên hoặc số thực thập phân, không chứa ký tự chữ." })}
                           </p>
                         </div>
                       )}
@@ -1723,7 +1723,7 @@ export default function ExamPortal() {
                     }}
                     className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-black shadow-sm active:scale-95 transition-all cursor-pointer"
                   >
-                    {activeQuestionIndex === examDetail.questions.length - 1 ? "Nộp Bài Thi" : "Câu Tiếp Theo"}
+                    {activeQuestionIndex === examDetail.questions.length - 1 ? t("exam_portal.testing_submit_btn") : t("exam_portal.next_btn", { defaultValue: "Câu Tiếp Theo" })}
                   </button>
                 </div>
               </div>

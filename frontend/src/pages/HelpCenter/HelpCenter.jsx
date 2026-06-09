@@ -144,12 +144,7 @@ export default function HelpCenter() {
           {t("help_center.popular_topics")}
         </p>
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: 14,
-            marginBottom: 36,
-          }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-9"
         >
           {topics.map((topic) => (
             <div

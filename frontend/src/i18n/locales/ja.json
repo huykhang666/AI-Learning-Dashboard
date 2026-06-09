@@ -1,0 +1,861 @@
+{
+  "nav": {
+    "home": "家",
+    "features": "特徴",
+    "pricing": "価格設定",
+    "about": "について",
+    "faq": "よくある質問",
+    "contact": "接触",
+    "login": "ログイン",
+    "sign_up": "無料でサインアップ",
+    "logout": "ログアウト",
+    "profile": "プロフィール"
+  },
+  "header": {
+    "search_placeholder": "コース、ビデオ、メモを検索...",
+    "time_ago": "ちょうど今",
+    "default_user_name": "ユーザー",
+    "account_label": "アカウント",
+    "aria": {
+      "open_menu": "メニューを開く"
+    },
+    "notifications": {
+      "title": "通知",
+      "mark_read": "既読としてマークする",
+      "empty": "通知はありません",
+      "welcome": "AI-Learning-Dashboard へようこそ!",
+      "system_processed": "システムはリクエストの処理を完了しました。"
+    },
+    "user_menu": {
+      "profile": "プロフィール情報",
+      "billing": "支払い履歴",
+      "logout": "ログアウト",
+      "admin": "管理者ダッシュボード"
+    }
+  },
+  "hero": {
+    "made_for": "ベトナム人学生向けに作られた",
+    "title_line1": "講義ビデオを回す",
+    "title_line2": "知識の中に",
+    "title_span": "吸収しやすい",
+    "description": "講義ビデオをアップロード - AI が自動的に書き起こし、要約し、質問に回答します。より効果的に学習でき、結果が 3 倍向上します。",
+    "cta_free": "無料で始める",
+    "cta_feature": "機能を見る"
+  },
+  "sidebar": {
+    "loading": "読み込み中...",
+    "error_loading": "サイドバー情報の読み込みに失敗しました:",
+    "default_name": "グエン・カン",
+    "dashboard": "概要",
+    "courses": "コース",
+    "exams": "オンライン試験",
+    "history": "歴史",
+    "analytics": "分析",
+    "premium": "プレミアム",
+    "help": "サポート",
+    "plan": {
+      "free": "無料プラン",
+      "premium": "プレミアムプラン"
+    },
+    "badges": {
+      "pro": "プロ",
+      "free": "無料"
+    }
+  },
+  "history": {
+    "title": "歴史",
+    "lectures_count": "{{count}}件の講義が見つかりました",
+    "search_placeholder": "講義履歴を検索する",
+    "stats": {
+      "total_lectures": "総講義数",
+      "completed": "完了しました"
+    },
+    "duration_minutes": "分",
+    "duration_seconds": "秒",
+    "duration_missing": "利用可能な期間はありません",
+    "status": {
+      "completed": "✓ 完了",
+      "in_progress": "進行中",
+      "started": "始めたばかりです",
+      "not_started": "未閲覧"
+    },
+    "no_results": "一致する結果が見つかりませんでした。"
+  },
+  "dashboard": {
+    "welcome": "おかえりなさい、{{name}}!",
+    "subtitle": "学習を大幅に強化します。",
+    "upload_widget": "ウィジェットをアップロードする",
+    "learning_overview": "学習の概要",
+    "total_study_time": "総学習時間",
+    "total_all_time": "すべての時間の合計",
+    "lectures_done": "講義は終了しました",
+    "lectures": "講義",
+    "goal_progress": "目標の進捗状況",
+    "goal_label": "100%目標",
+    "weekly_activity": "週間アクティビティ (時間)",
+    "top_keywords": "人気のキーワード",
+    "recent_courses": "最近のコース",
+    "view_all": "すべて見る →",
+    "loading": "ダッシュボードを読み込んでいます...",
+    "error_loading": "ダッシュボード データをロードできません。",
+    "no_data": "利用可能なダッシュボード データがありません。",
+    "retry": "リトライ"
+  },
+  "my_courses": {
+    "title": "私のコース",
+    "subtitle": "登録した講義と進捗状況を管理します。",
+    "search_placeholder": "コース内検索",
+    "tabs": {
+      "all": "全て",
+      "in_progress": "進行中",
+      "completed": "完了しました"
+    },
+    "lessons": "{{count}}レッスン",
+    "progress_complete": "{{percent}}% 完了",
+    "button": {
+      "view_course": "コースを見る",
+      "latest_lesson": "最新のレッスン"
+    },
+    "badge": {
+      "done": "終わり"
+    }
+  },
+  "help_center": {
+    "title": "どうすれば助けられるでしょうか？",
+    "search_placeholder": "ヘルプ、チュートリアル、FAQ を検索...",
+    "popular_topics": "人気のヘルプ トピック",
+    "popular_faqs": "よくあるよくある質問",
+    "contact_support": "サポートに連絡する",
+    "contact_description": "私たちのチームに連絡するか、ライブチャットを開始してください。",
+    "start_live_chat": "ライブチャットを開始する",
+    "topics": {
+      "getting_started": "はじめる",
+      "upload": "アップロードとAI処理",
+      "chatbot": "チャットボット支援",
+      "account_billing": "アカウントと請求"
+    },
+    "faqs": {
+      "upload": {
+        "q": "ファイルをアップロードするにはどうすればよいですか?",
+        "a": "ダッシュボードのアップロード ボタンをクリックするか、ファイルをドラッグ アンド ドロップします。サポートされている形式には、PDF、MP4、YouTube リンクが含まれます。"
+      },
+      "premium": {
+        "q": "プレミアムとは何ですか?",
+        "a": "プレミアムでは、無制限のアップロード、高速な AI 処理、高度なチャットボット機能へのアクセスが提供されます。"
+      },
+      "processing": {
+        "q": "AIの処理にはどれくらいの時間がかかりますか？",
+        "a": "ほとんどのファイルは、サイズとサーバーの負荷に応じて 1 ～ 3 分以内に処理されます。"
+      },
+      "youtube": {
+        "q": "YouTube リンクをアップロードできますか?",
+        "a": "はい！ YouTube URL をアップロード ボックスに貼り付けると、システムが自動的にビデオを取得して処理します。"
+      }
+    }
+  },
+  "settings": {
+    "title": "アカウント",
+    "subtitle": "アカウント設定",
+    "tabs": {
+      "account": "アカウント",
+      "preferences": "設定"
+    },
+    "form": {
+      "name": "名前",
+      "email": "電子メール",
+      "avatar": "アバター",
+      "change": "変化",
+      "save_changes": "変更を保存"
+    },
+    "preferences_unavailable": "環境設定は開発中です。"
+  },
+  "analytics": {
+    "title": "学習分析と洞察",
+    "subtitle": "あなたの学習成績が一目でわかります。",
+    "study_time_trend": "学習時間の傾向 (過去 30 日間)",
+    "learning_focus": "科目別の学習重点",
+    "top_keywords": "今月のトップキーワード",
+    "goal_tracking": "目標の追跡",
+    "goals": {
+      "weekly": "週間目標",
+      "monthly": "月間目標"
+    },
+    "percentage_min": "0%",
+    "percentage_max": "100%"
+  },
+  "course": {
+    "enroll": "今すぐ登録",
+    "continue": "学び続ける",
+    "completed": "完了しました",
+    "lessons": "レッスン",
+    "duration": "間隔",
+    "level": "レベル",
+    "level_beginner": "初心者",
+    "level_intermediate": "中級",
+    "level_advanced": "高度な",
+    "free": "無料",
+    "students": "{{count}}人の生徒"
+  },
+  "upload": {
+    "title": "ファイルをアップロードする",
+    "drag_drop": "ここにファイルをドラッグ アンド ドロップします",
+    "or": "または",
+    "browse": "ファイルを参照する",
+    "uploading": "アップロード中...",
+    "success": "アップロードが成功しました!",
+    "error": "アップロードに失敗しました。もう一度試してください。"
+  },
+  "ai_chat": {
+    "title": "AIアシスタント",
+    "placeholder": "何でも聞いてください...",
+    "send": "送信",
+    "thinking": "考え...",
+    "clear": "クリアチャット",
+    "welcome": "こんにちは！あなたの学習をサポートする準備ができています。",
+    "not_answer": "AIは応答しませんでした。もう一度試してください。",
+    "error_message": "申し訳ありませんが、AI との接続中に問題が発生しました。",
+    "analysis": "AIが分析中…"
+  },
+  "course_detail": {
+    "back": "戻る",
+    "export_pdf": "PDFをエクスポート",
+    "transcript": "成績証明書",
+    "summary": "まとめ",
+    "key_points": "重要なポイント",
+    "loading_video": "ビデオを読み込んでいます...",
+    "executive_summary": "エグゼクティブサマリー",
+    "updating_summary": "概要を更新中...",
+    "ai_system_analysis": "AI学習システム分析"
+  },
+  "loading": {
+    "message": "読み込み中です、お待ちください...",
+    "courses": "コースを読み込み中..."
+  },
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "消去",
+    "edit": "編集",
+    "back": "戻る",
+    "next": "次",
+    "confirm": "確認する",
+    "close": "近い",
+    "language": "言語"
+  },
+  "pricing": {
+    "title": "価格設定",
+    "heading": "目的に合ったプランをお選びください",
+    "description": "無料で始めて、より多くの機能が必要になったときにアップグレードしてください。",
+    "plans": {
+      "free": {
+        "label": "無料",
+        "features": [
+          "1 日あたり 4 本の動画",
+          "基本的なトランスクリプト",
+          "AIチャット: 10メッセージ/日",
+          "最大 10 個のアイテムを保存できます",
+          "電子メールサポート"
+        ],
+        "button": "無料で始める"
+      },
+      "premium": {
+        "label": "プレミアム",
+        "badge": "最も人気のある🔥",
+        "features": [
+          "1 日あたり無制限の動画",
+          "高精度のトランスクリプト",
+          "無制限のAIチャット",
+          "無制限の保存",
+          "PDF エクスポート",
+          "優先処理",
+          "年中無休のサポート"
+        ],
+        "button": "7日間無料でお試しください"
+      },
+      "yearly": {
+        "label": "プレミアム年間",
+        "badge": "26% 割引🎉",
+        "features": [
+          "すべてのプレミアム機能",
+          "年間最大 179,000 ユーロを節約",
+          "最優先サポート",
+          "早期ベータアクセス",
+          "VIPプロフィールバッジ",
+          "VIPサポート"
+        ],
+        "button": "毎年選択してください"
+      }
+    },
+    "payment_supported": "サポートされている支払い方法",
+    "payment_methods": {
+      "momo": "モモ",
+      "vnpay": "VNPay",
+      "visa": "ビザ / マスターカード",
+      "atm": "国内ATM"
+    },
+    "gateways": {
+      "vnpay": {
+        "description": "VNPayウォレット・ATMカード・QRコード",
+        "note": "PCI DSS 国際セキュリティ規格"
+      },
+      "momo": {
+        "description": "MoMo電子ウォレット",
+        "note": "MoMo アプリによる素早いチェックアウト"
+      }
+    },
+    "header": {
+      "badge": "サービス価格",
+      "title": "適切なプランを選択してください",
+      "description": "アップグレードすると、AI による無制限の学習が可能になります。",
+      "trusted_partners": "信頼できる支払いパートナー"
+    },
+    "modal": {
+      "connecting_gateway": "決済ゲートウェイの接続",
+      "do_not_close": "ページを閉じないでください...",
+      "confirm_order": "注文を確認する",
+      "selected_plan": "選択したプラン",
+      "payment_method": "支払方法",
+      "terms_note": "確認すると、利用規約に同意したことになります。{{gateway}}に安全にリダイレクトされます。",
+      "processing": "処理...",
+      "start_payment": "支払いに進む",
+      "cancel": "取引をキャンセルする",
+      "one_time": "一度"
+    },
+    "alerts": {
+      "login_required": "支払いを続けるにはサインインしてください。",
+      "user_not_found": "ユーザー情報が見つかりません。もう一度サインインしてください。",
+      "service_busy": "システムがビジー状態です!",
+      "payment_error": "価格設定エラーの詳細:",
+      "parse_user_error": "ユーザーオブジェクトを解析できません"
+    }
+  },
+  "payment_result": {
+    "success": {
+      "title": "支払いが成功しました！",
+      "button": "ダッシュボードに移動",
+      "redirect": "{{count}}秒以内に自動的にリダイレクトします"
+    },
+    "failed": {
+      "title": "支払いに失敗しました",
+      "button": "もう一度やり直してください"
+    }
+  },
+  "user_profile_modal": {
+    "tabs": {
+      "profile": "プロフィール情報",
+      "billing": "支払い履歴"
+    },
+    "defaults": {
+      "avatar": "NK"
+    },
+    "success": {
+      "update_account": "アカウント情報が正常に更新されました。"
+    },
+    "errors": {
+      "load_history": "トランザクション履歴のロードに失敗しました:",
+      "invalid_image": "画像ファイル（png、jpg、jpeg...）を選択してください。",
+      "download_invoice": "システムは請求書をエクスポートできませんでした。"
+    },
+    "billing": {
+      "loading": "注文履歴を読み込んでいます...",
+      "empty": "まだ支払い取引を行っていません。",
+      "table": {
+        "order_id": "注文ID",
+        "plan": "プラン",
+        "amount": "額",
+        "gateway": "ゲートウェイ",
+        "time": "時間",
+        "status": "状態",
+        "action": "アクション"
+      },
+      "plan_monthly": "プレミアムマンスリー",
+      "plan_yearly": "プレミアム年間",
+      "status": {
+        "success": "成功",
+        "pending": "保留中",
+        "failed": "失敗した"
+      },
+      "download_invoice": "請求書のダウンロード"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "badge": "管理者の概要",
+      "title": "システム概要",
+      "loading": "データをロード中...",
+      "ready": "データの準備ができました",
+      "stats": {
+        "total_users": "総ユーザー数",
+        "total_sessions": "合計セッション数",
+        "total_revenue": "総収益"
+      }
+    },
+    "layout": {
+      "brand_tag": "コントロールセンター",
+      "brand_name": "AI学習管理者",
+      "workspace_tag": "管理者ワークスペース",
+      "workspace_description": "ダッシュボード、ユーザー、支払いを 1 つの集中インターフェイスで管理します。",
+      "area_tag": "管理エリア",
+      "logout": "ログアウト",
+      "navigation": {
+        "dashboard": "ダッシュボード",
+        "users": "ユーザー",
+        "payments": "支払い"
+      },
+      "titles": {
+        "dashboard": "ダッシュボード",
+        "users": "ユーザー管理",
+        "payments": "支払い管理"
+      },
+      "aria": {
+        "open_sidebar": "ナビゲーションサイドバーを開く",
+        "close_sidebar": "ナビゲーションサイドバーを閉じる",
+        "close_overlay": "ナビゲーションオーバーレイを閉じる"
+      }
+    },
+    "user_management": {
+      "badge": "ユーザー",
+      "title": "ユーザー管理",
+      "search_placeholder": "名前、メールアドレス、役割で検索...",
+      "user_id": "ID番号",
+      "loading": "処理...",
+      "table": {
+        "user": "ユーザー",
+        "email": "電子メール",
+        "role": "役割",
+        "status": "状態",
+        "premium": "プレミアム",
+        "actions": "アクション"
+      },
+      "roles": {
+        "user": "ユーザー",
+        "admin": "管理者",
+        "moderator": "モデレータ"
+      },
+      "status": {
+        "active": "アクティブ",
+        "blocked": "ブロックされました"
+      },
+      "premium": {
+        "pro": "プロ",
+        "free": "無料",
+        "enable": "アップグレードプロ",
+        "disable": "プロを削除"
+      },
+      "buttons": {
+        "edit": "編集",
+        "delete": "消去",
+        "cancel": "キャンセル",
+        "save": "変更を保存する",
+        "saving": "保存中...",
+        "deleting": "削除中...",
+        "loading": "..."
+      },
+      "modals": {
+        "edit_title": "ユーザー情報の編集",
+        "edit_description": "ユーザーの名前と役割を更新します",
+        "name_label": "名前",
+        "name_placeholder": "ユーザー名を入力してください",
+        "role_label": "役割",
+        "delete_title": "ユーザーの削除を確認する",
+        "delete_description": "このユーザーを削除してもよろしいですか?この操作は元に戻すことができません。"
+      },
+      "messages": {
+        "nameRequired": "名前を空にすることはできません",
+        "updateSuccess": "ユーザー情報が正常に更新されました。",
+        "updateFailed": "ユーザー情報の更新に失敗しました",
+        "deleteSuccess": "ユーザーは正常に削除されました。",
+        "deleteFailed": "ユーザーの削除に失敗しました",
+        "premiumEnableSuccess": "Pro アクセスが正常に付与されました。",
+        "premiumDisableSuccess": "Pro アクセスが正常に削除されました。",
+        "premiumUpdateFailed": "プレミアムステータスを更新できませんでした"
+      }
+    },
+    "payment_management": {
+      "badge": "支払い",
+      "title": "支払い管理",
+      "search_placeholder": "トランザクション ID、ユーザー、ゲートウェイで検索...",
+      "payment_record": "支払い記録",
+      "table": {
+        "transaction": "取引",
+        "user": "ユーザー",
+        "amount": "額",
+        "gateway": "ゲートウェイ",
+        "status": "状態",
+        "date": "日付"
+      },
+      "status": {
+        "success": "成功",
+        "pending": "保留中",
+        "failed": "失敗した"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "back": "← 戻る",
+      "right": {
+        "title": "おかえり！",
+        "subtitle": "サインインして学習の旅を続けましょう",
+        "divider": "または電子メールでサインインします",
+        "remember": "私を覚えてますか",
+        "forgot_password": "パスワードをお忘れですか？",
+        "button": "サインイン",
+        "signing_in": "サインイン中...",
+        "no_account": "まだアカウントをお持ちですか?",
+        "sign_up": "今すぐサインアップ"
+      },
+      "google": {
+        "button": "Googleでサインイン",
+        "connecting": ""
+      },
+      "left": {
+        "title_line1": "より賢く学ぶ",
+        "title_line2": "AIの力で",
+        "description": "講義ビデオをアップロードすると、AI が自動的に文字に起こし、要約し、質問に答えます。",
+        "features": {
+          "whisper": "AI Whisper自動文字起こし",
+          "summary": "スマートなコンテンツの概要",
+          "chat": "講義型チャットボットQ&A"
+        },
+        "stats": {
+          "users": "ユーザー",
+          "videos": "処理されたビデオ",
+          "satisfaction": "満足"
+        }
+      },
+      "form": {
+        "username": "ユーザー名",
+        "username_placeholder": "ユーザー名を入力してください",
+        "password": "パスワード",
+        "password_placeholder": "••••••••"
+      },
+      "errors": {
+        "username_required": "ユーザー名を入力してください",
+        "password_required": "パスワードを入力してください",
+        "invalid_credentials": "ユーザー名またはパスワードが間違っています!",
+        "server_unreachable": "サーバーに接続できません。",
+        "decode_token": "トークンをデコードできません:",
+        "login_error": "ログインエラー:"
+      }
+    }
+  },
+  "about": {
+    "title": "私たちについて",
+    "heading": "私たちは教育の未来を築きます",
+    "description": {
+      "line1": "AI-Learning DashBoard は、教育と AI に情熱を注ぐエンジニアによって 2024 年に設立されました。",
+      "line2": "私たちの使命は、ベトナムの学生がより効果的に講義コンテンツにアクセスし、時間を節約し、高度な AI テクノロジーを使用して学習の質を向上できるよう支援することです。"
+    },
+    "stats": {
+      "students": "学生",
+      "videos": "処理されたビデオ",
+      "accuracy": "AIの精度",
+      "rating": "平均評価"
+    },
+    "vision": {
+      "tag": "ビジョン",
+      "heading": "すべての講義は無限の学習コンテンツになる可能性があります。",
+      "description": "私たちは、学習コンテンツへのアクセスとレビューに対する障壁を取り除くことを目指しています。ビデオを巻き戻す必要はもうありません。AI に質問するだけですぐに答えが得られます。"
+    },
+    "badges": {
+      "edtech": "2024 年のトップ教育技術",
+      "vietnam": "ベトナム製",
+      "gdpr": "GDPR準拠"
+    },
+    "team": {
+      "title": "創設チーム",
+      "roles": {
+        "backend": "バックエンド",
+        "frontend": "フロントエンド"
+      },
+      "description": "UTC2 の学生"
+    }
+  },
+  "faq": {
+    "title": "よくある質問",
+    "section_title": "よくある質問",
+    "items": [
+      {
+        "question": "AI ラーニング ダッシュボードはどのように機能しますか?",
+        "answer": "講義ビデオ (MP4) をアップロードするか、YouTube リンクを貼り付けます。このシステムは、音声テキスト化に AI Whisper を使用し、要約に ViT5 を使用します。プロセス全体には 2 ～ 5 分かかります。"
+      },
+      {
+        "question": "無料で使えますか？",
+        "answer": "はい！無料プランでは、1 日あたり 4 つのビデオ、1 日あたり最大 10 件の保存アイテム、および 10 件の AI チャット メッセージが許可されます。クレジットカードは必要ありません。"
+      },
+      {
+        "question": "どの言語がサポートされていますか?",
+        "answer": "AI Whisper は、ベトナム語、英語、日本語を含む 50 以上の言語を高精度でサポートします。"
+      },
+      {
+        "question": "私のビデオデータは安全ですか?",
+        "answer": "はい。ビデオはアップロード中に暗号化され、あなただけがアクセスできます。私たちはGDPRを遵守します。"
+      },
+      {
+        "question": "プレミアムはいつでもキャンセルできますか?",
+        "answer": "はい、設定ページからいつでもキャンセル料なしでキャンセルできます。"
+      },
+      {
+        "question": "どのような支払いオプションが利用できますか?",
+        "answer": "MoMo、VNPay、Visa/MasterCard、国内ATMでの支払いをサポートしています。すべてのトランザクションは SSL で保護されています。"
+      }
+    ]
+  },
+  "feature": {
+    "title": "コア機能",
+    "heading": "より賢く学習できるように設計されています",
+    "description": "AI を活用した講義処理、スマートな要約、即時回答により、学生の学習速度が向上します。",
+    "process": {
+      "title": "仕組み",
+      "heading": "シンプルな 3 ステップのワークフロー"
+    },
+    "cards": {
+      "whisper": {
+        "title": "音声からテキストへの文字起こし",
+        "description": "AI Whisper を使用して講義音声を自動的に文字起こしし、正確なキャプションを作成します。"
+      },
+      "summary": {
+        "title": "スマートな概要の生成",
+        "description": "すべての講義ビデオから簡潔なメモとトピックのハイライトを取得します。"
+      },
+      "chat": {
+        "title": "インタラクティブAIチャット",
+        "description": "動画コンテンツについて質問すると、AI から即座に回答が得られます。"
+      },
+      "progress": {
+        "title": "学習分析",
+        "description": "学習の進捗状況を追跡し、明確なパフォーマンスの洞察でモチベーションを維持します。"
+      },
+      "youtube": {
+        "title": "YouTube のサポート",
+        "description": "ファイルを手動でダウンロードせずに、YouTube リンクから講義ビデオを分析します。"
+      },
+      "export": {
+        "title": "メモをエクスポートする",
+        "description": "トランスクリプトと要約を PDF として保存し、オフラインでの学習や復習に使用します。"
+      },
+      "tags": {
+        "title": "トピックのタグ付け",
+        "description": "重要な概念をタグで整理し、最も重要なセクションに戻ります。"
+      },
+      "security": {
+        "title": "安全なプライバシー",
+        "description": "あなたのアップロードは保護されており、GDPR に対応した処理によりあなただけがアクセスできます。"
+      }
+    },
+    "steps": {
+      "upload": {
+        "title": "講義をアップロードする",
+        "description": "動画ファイルまたは YouTube リンクを送信して、AI 処理を開始します。"
+      },
+      "process": {
+        "title": "AI処理",
+        "description": "システムはコンテンツを自動的に転記、要約、インデックス付けします。"
+      },
+      "learn": {
+        "title": "AIで学ぶ",
+        "description": "AI ガイダンスで講義内容をインタラクションし、よりスマートに復習できます。"
+      }
+    }
+  },
+  "premium": {
+    "banner": "プレミアムアカウントにアップグレードする",
+    "heading_line1": "AI 学習の能力を最大限に活用して、",
+    "heading_line2": "勉強をスピードアップする",
+    "benefit": {
+      "focus": "集中的な学習",
+      "save_time": "時間を節約する"
+    },
+    "cta": "今すぐアップグレードしてください"
+  },
+  "footer": {
+    "ready_title": "始める準備はできていますか?",
+    "description": "AI-Learning DashBoard に参加して、学習方法を変革しましょう。",
+    "cta_register": "今すぐ登録してください",
+    "cta_feature": "機能を見る",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "copyright": "©{{year}}AI 学習ダッシュボード。",
+    "made_with": "で作られました",
+    "in_vietnam": "ベトナムで"
+  },
+  "register_page": {
+    "title": "新しいアカウントを作成する",
+    "subtitle": "AI 学習の旅を始めましょう",
+    "google_btn": "Google に登録する",
+    "connecting": "接続中...",
+    "firstname": "名とミドルネーム",
+    "lastname": "苗字",
+    "username": "ユーザー名",
+    "email": "電子メール",
+    "dob": "生年月日 (オプション)",
+    "password": "パスワード",
+    "confirm_password": "パスワードを認証する",
+    "agree": "利用規約に同意します",
+    "btn": "今すぐサインアップ",
+    "btn_loading": "アカウントを作成しています...",
+    "has_account": "すでにアカウントをお持ちですか?",
+    "login_here": "ここからログインしてください",
+    "back": "戻る",
+    "strength": "強さ",
+    "strength_weak": "弱い",
+    "strength_fair": "公平",
+    "strength_good": "良い",
+    "strength_strong": "強い",
+    "features": {
+      "hero_title": "AI の力でより賢く学習",
+      "hero_desc": "講義動画をアップロードすると、AIが自動で文字起こし、要約、質問に回答します。",
+      "whisper": "AI Whisper 自動文字起こし",
+      "summary": "インテリジェントなコンテンツの要約",
+      "chat": "講義Q&Aチャットボット"
+    },
+    "stats": {
+      "users": "ユーザー",
+      "videos": "処理されたビデオ",
+      "satisfied": "満足"
+    },
+    "errors": {
+      "firstName": "あなたの名前を入力してください",
+      "lastName": "姓を入力してください",
+      "username": "ユーザー名を入力してください",
+      "email_required": "メールアドレスを入力してください",
+      "email_invalid": "無効なメールアドレス",
+      "pass_required": "パスワードを入力してください",
+      "pass_length": "パスワードは8文字以上である必要があります",
+      "confirm_mismatch": "パスワードが一致しません",
+      "agree_required": "規約に同意する必要があります"
+    }
+  },
+  "course_landing": {
+    "recommended": "おすすめコース",
+    "loading": "コースの詳細を読み込み中...",
+    "students": "学生",
+    "lessons": "レッスン",
+    "objectives": "コースの目的",
+    "objectives_items": [
+      "プログラミングの概念をマスターする",
+      "実際のプロジェクトで練習する",
+      "独占的な学習リソース",
+      "修了証を取得する"
+    ],
+    "lesson_list": "コースレッスン",
+    "preview_badge": "無料プレビュー",
+    "view_intro": "イントロを見る",
+    "study_now": "今すぐ勉強しましょう",
+    "enroll_now": "今すぐ登録",
+    "owned": "所有",
+    "pay_now": "今すぐ支払う",
+    "guarantee": "学習成果の保証",
+    "includes": "このコースに含まれるもの:",
+    "anytime": "いつでもどこでもアクセス",
+    "cert": "証明書のサポート",
+    "locked_alert": "このレッスンにアクセスするには、コースを購入してください。"
+  },
+  "dashboard_extra": {
+    "premium_unlimited": "プレミアムプラン：無制限に使用可能",
+    "limit_status": "今日: <strong class=\"text-base font-bold\">{{used}}</strong> / 10 件の講義のアップロード",
+    "upgrade_more": "プレミアムにアップグレードするとさらに多くのロックが解除されます",
+    "limit_reached_title": "無料制限に達しました!",
+    "limit_reached_desc": "無料利用枠は 1 日あたり 10 回のアップロードに制限されています。学習を続けるにはアップグレードしてください。",
+    "upgrade_now": "今すぐプレミアムにアップグレードしてください"
+  },
+  "admin_extra": {
+    "control_center": "コントロールセンター",
+    "admin_brand": "AI学習管理者",
+    "workspace_title": "管理者ワークスペース",
+    "workspace_desc": "統合コンソールでダッシュボード、ユーザー、トランザクションを管理します。",
+    "logout": "ログアウト",
+    "area": "管理エリア"
+  },
+  "exam_portal": {
+    "title": "オンライン試験および能力評価ポータル",
+    "subtitle": "リアルタイムの AI モニタリングを活用した透明性のある客観的な試験を体験してください。",
+    "ai_monitor_title": "AI 監視・監視システム",
+    "ai_monitor_desc": "システムは、タブの切り替え、他のアプリを開く、顔の不一致などの不審な動作を自動的に検出します。",
+    "national_system": "国家評価制度",
+    "proctoring_environment_status": "安全なテスト環境がアクティブです",
+    "camera_monitoring_label": "カメラの監視",
+    "camera_monitoring_desc": "セッション中は継続的なカメラ録画がアクティブになります。",
+    "anti_cheat_label": "アンチチートエンジン",
+    "anti_cheat_desc": "タブの切り替え、焦点が合っていない画面、または右クリックにフラグを立てます。",
+    "honesty_score_label": "正直スコア",
+    "honesty_score_desc": "正直さ指数を計算し、違反が繰り返されると自動送信します。",
+    "grade_filter_label": "学年レベル",
+    "grade_search_placeholder": "成績を検索...",
+    "subject_search_placeholder": "件名を検索...",
+    "filter_all": "すべての試験",
+    "filter_math": "数学",
+    "filter_physics": "物理",
+    "filter_chemistry": "化学",
+    "filter_literature": "文学",
+    "filter_english": "英語",
+    "filter_university_prep": "大学 / 国家準備",
+    "filter_grade_12": "12年生",
+    "filter_grade_11": "11年生",
+    "filter_grade_10": "10年生",
+    "exam_card": {
+      "duration": "{{minutes}}分",
+      "questions": "{{count}}の質問",
+      "start_btn": "試験を開始する",
+      "need_premium": "プレミアムが必要です",
+      "duration_unit": "分",
+      "questions_unit": "質問",
+      "max_score": "スコアスケール: 10.0"
+    },
+    "leaderboard": "リーダーボード",
+    "details_card": "試験の詳細",
+    "details_desc": "公式構造化試験。",
+    "details_duration": "間隔",
+    "details_questions": "質問数",
+    "details_proctoring": "AI監視",
+    "details_proctoring_enabled": "有効",
+    "details_subject": "主題",
+    "details_unlocked": "状態",
+    "details_free": "無料",
+    "details_locked": "ロック済み (プレミアム)",
+    "details_start": "試験を開始する",
+    "testing_room": "オンライン試験室",
+    "testing_warn_leave": "警告: 試験室から出たり、タブを切り替えたりすると、違反のフラグが立てられます。",
+    "testing_proctoring_active": "AI 監督が有効です...",
+    "testing_violation_count": "違反数:",
+    "testing_time_remaining": "残り時間",
+    "testing_card_title": "解答用紙",
+    "testing_total_questions": "合計質問数:",
+    "testing_done_count": "答えた:",
+    "testing_submit_btn": "試験を提出する",
+    "testing_submitting": "送信中...",
+    "testing_confirm_submit": "試験を提出してもよろしいですか?",
+    "testing_true": "真実",
+    "testing_false": "間違い",
+    "testing_short_placeholder": "ここに短い答えを入力してください...",
+    "results": {
+      "title": "試験結果",
+      "score": "スコア",
+      "honesty": "正直さ指数（AI）",
+      "correct_ratio": "正しい比率",
+      "exit_btn": "試験室を出る",
+      "overview": "質問の概要",
+      "correct": "正しい",
+      "incorrect": "正しくない",
+      "unanswered": "未回答",
+      "explanation": "説明：",
+      "sub_correct": "正しい",
+      "sub_incorrect": "正しくない",
+      "your_ans": "あなたの選択:",
+      "correct_ans": "正解:",
+      "total_weight": "合計加重スコア",
+      "update_time_label": "更新日時:",
+      "status_passed": "合格した",
+      "status_failed": "失敗した",
+      "completed_title": "試験が完了しました！",
+      "no_explanation": "説明はまだ更新されていません。",
+      "honesty_good": "良い行動",
+      "honesty_warn": "違反警告",
+      "honesty_voided": "結果は無効"
+    },
+    "score_unit": "ポイント",
+    "leaderboard_criteria_label": "ランキング基準:",
+    "leaderboard_criteria_value": "高スコア → 短い時間"
+  }
+}

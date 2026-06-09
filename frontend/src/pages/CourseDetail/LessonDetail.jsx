@@ -73,7 +73,7 @@ const LessonDetail = () => {
       setComments((prev) => [newComment, ...prev]);
     } catch (error) {
       console.error("[LessonDetail] Post comment failed:", error);
-      alert("Không thể đăng bình luận lúc này!");
+      alert(t("lesson_detail.alert_comment_fail", { defaultValue: "Không thể đăng bình luận lúc này!" }));
     } finally {
       setSubmittingComment(false);
     }
@@ -280,7 +280,7 @@ const LessonDetail = () => {
         <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-6">
           <h2 className="font-bold text-xl text-slate-900 mb-2">{courseData?.title}</h2>
           <p className="text-sm text-slate-500">
-            Chào mừng bạn đến với bài học này. Hãy xem kỹ nội dung video và tham gia thảo luận bên dưới nếu có thắc mắc nhé.
+            {t("lesson_detail.welcome_desc", { defaultValue: "Chào mừng bạn đến với bài học này. Hãy xem kỹ nội dung video và tham gia thảo luận bên dưới nếu có thắc mắc nhé." })}
           </p>
         </div>
 
@@ -288,7 +288,7 @@ const LessonDetail = () => {
         <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm flex flex-col gap-4 mb-12">
           <h3 className="font-bold text-slate-900 text-sm uppercase flex items-center gap-2">
             <MessageSquare size={16} className="text-blue-600" />
-            <span>Thảo luận bài học ({comments.length})</span>
+            <span>{t("lesson_detail.discussion", { defaultValue: "Thảo luận bài học" })} ({comments.length})</span>
           </h3>
           
           {/* Form viết bình luận */}
@@ -297,7 +297,7 @@ const LessonDetail = () => {
               rows="3"
               value={newCommentText}
               onChange={(e) => setNewCommentText(e.target.value)}
-              placeholder="Nhập nội dung thảo luận hoặc thắc mắc của bạn..."
+              placeholder={t("lesson_detail.comment_placeholder", { defaultValue: "Nhập nội dung thảo luận hoặc thắc mắc của bạn..." })}
               className="w-full rounded-xl border border-slate-200 p-3 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 resize-none bg-white text-slate-800"
             />
             <div className="flex justify-end">
@@ -306,7 +306,7 @@ const LessonDetail = () => {
                 disabled={submittingComment || !newCommentText.trim()}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {submittingComment ? "Đang gửi..." : "Gửi bình luận"}
+                {submittingComment ? t("lesson_detail.sending", { defaultValue: "Đang gửi..." }) : t("lesson_detail.send_comment", { defaultValue: "Gửi bình luận" })}
               </button>
             </div>
           </form>
@@ -314,13 +314,13 @@ const LessonDetail = () => {
           {/* Danh sách bình luận */}
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
             {commentsLoading ? (
-              <p className="text-center text-xs text-slate-400">Đang tải bình luận...</p>
+              <p className="text-center text-xs text-slate-400">{t("lesson_detail.loading_comments", { defaultValue: "Đang tải bình luận..." })}</p>
             ) : comments.length === 0 ? (
-              <p className="text-center text-xs text-slate-400 italic py-4">Chưa có thảo luận nào. Hãy bắt đầu cuộc thảo luận đầu tiên!</p>
+              <p className="text-center text-xs text-slate-400 italic py-4">{t("lesson_detail.empty_comments", { defaultValue: "Chưa có thảo luận nào. Hãy bắt đầu cuộc thảo luận đầu tiên!" })}</p>
             ) : (
               comments.map((comment) => {
                 const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  comment.userFullName || comment.username || "Học viên"
+                  comment.userFullName || comment.username || t("lesson_detail.student", { defaultValue: "Học viên" })
                 )}&background=random&color=fff&rounded=true&size=64`;
                 
                 return (
@@ -336,7 +336,7 @@ const LessonDetail = () => {
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-bold text-sm text-slate-900 truncate">
-                          {comment.userFullName || comment.username || "Học viên"}
+                          {comment.userFullName || comment.username || t("lesson_detail.student", { defaultValue: "Học viên" })}
                         </span>
                         <span className="text-[10px] text-slate-400 shrink-0">
                           {comment.createdAt ? new Date(comment.createdAt).toLocaleString("vi-VN") : ""}
@@ -353,7 +353,7 @@ const LessonDetail = () => {
                           type="button"
                           onClick={() => handleLike(comment.commentId)}
                           className="flex items-center gap-1.5 text-slate-400 hover:text-blue-600 active:scale-90 transition"
-                          title="Thích"
+                          title={t("lesson_detail.like", { defaultValue: "Thích" })}
                         >
                           <ThumbsUp size={13} />
                           <span className="text-[11px] font-medium">{comment.likes || 0}</span>
@@ -363,7 +363,7 @@ const LessonDetail = () => {
                           type="button"
                           onClick={() => handleDislike(comment.commentId)}
                           className="flex items-center gap-1.5 text-slate-400 hover:text-red-500 active:scale-90 transition"
-                          title="Không thích"
+                          title={t("lesson_detail.dislike", { defaultValue: "Không thích" })}
                         >
                           <ThumbsDown size={13} />
                           <span className="text-[11px] font-medium">{comment.dislikes || 0}</span>

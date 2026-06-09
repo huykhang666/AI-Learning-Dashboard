@@ -84,7 +84,7 @@ const CourseDetail = () => {
 
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        alert("Không tìm thấy Token! Bạn đã đăng nhập chưa?");
+        alert(t("course_detail.alert_no_token", { defaultValue: "Không tìm thấy Token! Bạn đã đăng nhập chưa?" }));
         return;
       }
 
@@ -102,7 +102,7 @@ const CourseDetail = () => {
       );
 
       if (response.status === 204) {
-        alert("Chưa có bộ câu hỏi nào! Hãy tạo Quiz trước khi xuất PDF.");
+        alert(t("course_detail.alert_no_quiz", { defaultValue: "Chưa có bộ câu hỏi nào! Hãy tạo Quiz trước khi xuất PDF." }));
         return;
       }
 
@@ -122,7 +122,7 @@ const CourseDetail = () => {
 
     } catch (error) {
       console.error("[CourseDetail] Lỗi xuất PDF Quiz:", error.message);
-      alert("Không thể xuất file PDF lúc này!");
+      alert(t("course_detail.alert_export_fail", { defaultValue: "Không thể xuất file PDF lúc này!" }));
     } finally {
       setIsExportingPdf(false);
     }
@@ -135,7 +135,7 @@ const CourseDetail = () => {
     setQuizResult(null);
 
     if (!courseData || !courseData.transcript) {
-      alert("Dữ liệu bản ghi chữ (transcript) chưa sẵn sàng để tạo Quiz!");
+      alert(t("course_detail.alert_no_transcript", { defaultValue: "Dữ liệu bản ghi chữ (transcript) chưa sẵn sàng để tạo Quiz!" }));
       return;
     }
 
@@ -149,7 +149,7 @@ const CourseDetail = () => {
       setQuizzes(data);
     } catch (error) {
       console.error("Lỗi tải bộ câu hỏi Quiz từ Backend:", error);
-      alert("Không thể khởi tạo bộ câu hỏi trắc nghiệm lúc này!");
+      alert(t("course_detail.alert_init_quiz_fail", { defaultValue: "Không thể khởi tạo bộ câu hỏi trắc nghiệm lúc này!" }));
     } finally {
       setQuizLoading(false);
     }
@@ -177,7 +177,7 @@ const CourseDetail = () => {
       });
     } catch (error) {
       console.error("Lỗi nộp bài chấm điểm:", error);
-      alert("Nộp bài thất bại, vui lòng kiểm tra lại kết nối!");
+      alert(t("course_detail.alert_submit_fail", { defaultValue: "Nộp bài thất bại, vui lòng kiểm tra lại kết nối!" }));
     } finally {
       setQuizLoading(false);
     }
@@ -328,7 +328,7 @@ const CourseDetail = () => {
   return (
     <div className="h-screen flex flex-col bg-white font-sans text-slate-800">
       {/* HEADER */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 md:px-6 py-4 border-b border-slate-100 shrink-0">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -345,12 +345,12 @@ const CourseDetail = () => {
         </div>
 
         {/* KHU VỰC CÁC NÚT ĐIỀU HƯỚNG TÁC VỤ */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleOpenQuiz}
             className="flex items-center gap-2 bg-amber-50 text-amber-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-amber-100 transition-all hover:scale-[1.02] active:scale-95 shadow-sm"
           >
-            <Zap size={16} fill="currentColor" className="animate-pulse" /> Tạo Quiz AI
+            <Zap size={16} fill="currentColor" className="animate-pulse" /> {t("course_detail.create_quiz_ai", { defaultValue: "Tạo Quiz AI" })}
           </button>
 
           <button
@@ -359,16 +359,16 @@ const CourseDetail = () => {
             className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FileText size={16} />
-            {isExportingPdf ? "Đang xuất..." : t("course_detail.export_pdf")}
+            {isExportingPdf ? t("course_detail.exporting", { defaultValue: "Đang xuất..." }) : t("course_detail.export_pdf")}
           </button>
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* CỘT TRÁI: VIDEO + KEY POINTS */}
-        <div className="flex-[7] flex flex-col p-6 overflow-y-auto border-r border-slate-100">
+        <div className="flex-[7] flex flex-col p-4 md:p-6 overflow-y-auto border-b lg:border-b-0 lg:border-r border-slate-100 w-full">
           {/* Video Player */}
-          <div className="w-full h-[600px] bg-[#0B0A1A] rounded-2xl relative shadow-lg overflow-hidden mb-6">
+          <div className="w-full aspect-video h-auto max-h-[600px] bg-[#0B0A1A] rounded-2xl relative shadow-lg overflow-hidden mb-6">
             {courseData?.videoId ? (
               <div ref={playerRef} className="w-full h-full" />
             ) : courseData?.videoUrl ? (
@@ -406,7 +406,7 @@ const CourseDetail = () => {
         </div>
 
         {/* CỘT PHẢI: TRANSCRIPT & SUMMARY */}
-        <div className="flex-[3] min-w-[350px] flex flex-col bg-white border-l border-slate-100">
+        <div className="flex-[3] w-full lg:w-auto lg:min-w-[350px] flex flex-col bg-white border-t lg:border-t-0 lg:border-l border-slate-100 shrink-0">
           {/* Tab */}
           <div className="flex items-center gap-8 px-8 pt-8 border-b border-slate-100">
             {["TRANSCRIPT", "SUMMARY"].map((tab) => (
@@ -529,10 +529,10 @@ const CourseDetail = () => {
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
               <div>
                 <h2 className="font-bold text-lg text-slate-900 flex items-center gap-2">
-                  <FileText size={20} className="text-blue-600" /> Bài Kiểm Tra Trắc Nghiệm Bài Giảng (AI Generated)
+                  <FileText size={20} className="text-blue-600" /> {t("course_detail.quiz_title", { defaultValue: "Bài Kiểm Tra Trắc Nghiệm Bài Giảng (AI Generated)" })}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Dựa trên nội dung bản ghi chữ để sinh câu hỏi tự động
+                  {t("course_detail.quiz_subtitle", { defaultValue: "Dựa trên nội dung bản ghi chữ để sinh câu hỏi tự động" })}
                 </p>
               </div>
               <button
@@ -550,7 +550,7 @@ const CourseDetail = () => {
                 <div className="h-full flex flex-col items-center justify-center space-y-3 py-12">
                   <Zap size={40} className="text-amber-500 animate-bounce" fill="currentColor" />
                   <p className="text-sm font-medium text-slate-500 animate-pulse">
-                    FlySpeech AI đang phân tích bài giảng và tạo bộ đề thi, vui lòng đợi giây lát...
+                    {t("course_detail.quiz_generating", { defaultValue: "FlySpeech AI đang phân tích bài giảng và tạo bộ đề thi, vui lòng đợi giây lát..." })}
                   </p>
                 </div>
               )}
@@ -559,22 +559,22 @@ const CourseDetail = () => {
               {quizResult?.isSubmitted && (
                 <div className="p-6 bg-blue-50/70 border border-blue-100 rounded-2xl flex items-center justify-around text-center animate-in fade-in duration-300">
                   <div>
-                    <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Tổng Điểm</p>
+                    <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{t("course_detail.quiz_score", { defaultValue: "Tổng Điểm" })}</p>
                     <p className="text-4xl font-black text-blue-600 mt-1">{quizResult.score} / 10</p>
                   </div>
                   <div className="w-[1px] h-12 bg-slate-200" />
                   <div>
                     <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1 justify-center">
-                      <CheckCircle2 size={14} className="text-green-600" /> Câu Đúng
+                      <CheckCircle2 size={14} className="text-green-600" /> {t("course_detail.quiz_correct", { defaultValue: "Câu Đúng" })}
                     </p>
-                    <p className="text-2xl font-bold text-green-600 mt-1">{quizResult.correctCount} câu</p>
+                    <p className="text-2xl font-bold text-green-600 mt-1">{quizResult.correctCount} {t("course_detail.quiz_count_unit", { defaultValue: "câu" })}</p>
                   </div>
                   <div className="w-[1px] h-12 bg-slate-200" />
                   <div>
                     <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1 justify-center">
-                      <XCircle size={14} className="text-red-600" /> Câu Sai
+                      <XCircle size={14} className="text-red-600" /> {t("course_detail.quiz_wrong", { defaultValue: "Câu Sai" })}
                     </p>
-                    <p className="text-2xl font-bold text-red-600 mt-1">{quizResult.wrongCount} câu</p>
+                    <p className="text-2xl font-bold text-red-600 mt-1">{quizResult.wrongCount} {t("course_detail.quiz_count_unit", { defaultValue: "câu" })}</p>
                   </div>
                 </div>
               )}
@@ -588,7 +588,7 @@ const CourseDetail = () => {
                   >
                     <h4 className="font-bold text-base text-slate-900 flex items-start gap-2">
                       <span className="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded mt-0.5 shrink-0">
-                        Câu {qIdx + 1}
+                        {t("exam_portal.testing_question", { defaultValue: "Câu" })} {qIdx + 1}
                       </span>
                       {quiz.question}
                     </h4>
@@ -651,7 +651,7 @@ const CourseDetail = () => {
                       <div className="p-4 bg-amber-50/60 border border-amber-100 rounded-xl text-xs text-amber-800 leading-relaxed animate-in slide-in-from-top-2 flex items-start gap-2">
                         <HelpCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
                         <div>
-                          <strong>Giải thích từ AI:</strong> {quiz.explanation}
+                          <strong>{t("course_detail.ai_explanation", { defaultValue: "Giải thích từ AI:" })}</strong> {quiz.explanation}
                         </div>
                       </div>
                     )}
@@ -666,7 +666,7 @@ const CourseDetail = () => {
                 disabled={quizLoading}
                 className="px-5 py-2 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-200 transition-colors"
               >
-                {quizResult?.isSubmitted ? "Đóng lại" : "Hủy bỏ"}
+                {quizResult?.isSubmitted ? t("course_detail.close", { defaultValue: "Đóng lại" }) : t("course_detail.cancel", { defaultValue: "Hủy bỏ" })}
               </button>
 
               {/* Nút xuất PDF — chỉ hiện sau khi nộp bài */}
@@ -677,7 +677,7 @@ const CourseDetail = () => {
                   className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Download size={15} />
-                  {isExportingPdf ? "Đang xuất..." : "Xuất PDF đề thi"}
+                  {isExportingPdf ? t("course_detail.exporting", { defaultValue: "Đang xuất..." }) : t("course_detail.export_quiz_pdf", { defaultValue: "Xuất PDF đề thi" })}
                 </button>
               )}
 
@@ -687,7 +687,7 @@ const CourseDetail = () => {
                   disabled={Object.keys(userAnswers).length === 0 || quizLoading}
                   className="px-6 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shadow-blue-100 hover:scale-[1.02] active:scale-95"
                 >
-                  {quizLoading ? "Đang xử lý..." : "Nộp bài chấm điểm"}
+                  {quizLoading ? t("course_detail.processing", { defaultValue: "Đang xử lý..." }) : t("course_detail.submit_quiz", { defaultValue: "Nộp bài chấm điểm" })}
                 </button>
               )}
             </div>

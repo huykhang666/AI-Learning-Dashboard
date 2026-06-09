@@ -4,6 +4,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import en from "./locales/en.json";
 import vi from "./locales/vi.json";
+import ja from "./locales/ja.json";
+import ko from "./locales/ko.json";
 
 i18n
   .use(LanguageDetector)
@@ -12,10 +14,12 @@ i18n
     resources: {
       en: { translation: en },
       vi: { translation: vi },
+      ja: { translation: ja },
+      ko: { translation: ko },
     },
     lng: localStorage.getItem("language") || "vi",
     fallbackLng: "vi",
-    supportedLngs: ["en", "vi"],
+    supportedLngs: ["en", "vi", "ja", "ko"],
     interpolation: {
       escapeValue: false,
     },
