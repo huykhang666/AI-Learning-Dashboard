@@ -49,7 +49,7 @@ public class VNPayServiceImpl implements VNPayService {
         com.ai.learning.backend.entity.Course course = null;
         if (request.courseId() != null) {
             course = courseRepository.findById(request.courseId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
+                    .orElseThrow(() -> new RuntimeException("Khong tim thay khoa hoc"));
         }
 
         Payment newPayment = Payment.builder()
@@ -105,8 +105,6 @@ public class VNPayServiceImpl implements VNPayService {
         String hashDataStr = String.join("&", hashParts);
         String queryStr    = String.join("&", queryParts);
 
-        System.out.println("HashData: " + hashDataStr);
-
         String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashDataStr);
         return vnPayConfig.getVnp_PayUrl() + "?" + queryStr + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
     }
@@ -133,15 +131,13 @@ public class VNPayServiceImpl implements VNPayService {
             }
         }
         String hashData = String.join("&", hashParts);
-
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
 
         if (!checkSum.equalsIgnoreCase(receivedHash))
             return new IpnResponse(VnpIpnResponseConst.INVALID_CHECKSUM, "Invalid checksum");
 
-        if (!"00".equals(mutableParams.get(VNPayParams.RESPONSE_CODE))) {
+        if (!"00".equals(mutableParams.get(VNPayParams.RESPONSE_CODE)))
             return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Transaction failed but IPN received");
-        }
 
         UUID paymentId;
         try {
