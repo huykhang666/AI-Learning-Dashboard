@@ -97,9 +97,9 @@ public class VNPayServiceImpl implements VNPayService {
             String fieldName  = itr.next();
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8).replace("+", "%20");
+                String encodedValue = encode(fieldValue).replace("+", "%20");
                 hashData.append(fieldName).append('=').append(encodedValue);
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8))
+                query.append(encode(fieldName))
                         .append('=').append(encodedValue);
                 if (itr.hasNext()) {
                     hashData.append('&');
@@ -128,7 +128,7 @@ public class VNPayServiceImpl implements VNPayService {
         String hashData = mutableParams.entrySet().stream()
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
                 .sorted(Map.Entry.comparingByKey())
-                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8).replace("+", "%20"))
+                .map(e -> e.getKey() + "=" + encode(e.getValue()).replace("+", "%20"))
                 .collect(Collectors.joining("&"));
 
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -163,5 +163,13 @@ public class VNPayServiceImpl implements VNPayService {
         subscriptionService.activatePremium(payment);
 
         return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Confirm success");
+    }
+
+    private String encode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

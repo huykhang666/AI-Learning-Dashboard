@@ -43,7 +43,7 @@ public class VNPayIpnHandlerImpl implements IpnHandlerService {
         String hashData = mutableParams.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
-                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8).replace("+", "%20"))
+                .map(e -> e.getKey() + "=" + encode(e.getValue()).replace("+", "%20"))
                 .collect(Collectors.joining("&"));
 
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
@@ -72,5 +72,13 @@ public class VNPayIpnHandlerImpl implements IpnHandlerService {
         subscriptionService.activatePremium(payment);
 
         return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Confirm success");
+    }
+
+    private String encode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
