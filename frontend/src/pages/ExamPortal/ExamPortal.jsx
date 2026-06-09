@@ -336,7 +336,7 @@ export default function ExamPortal() {
   const [isSubjectDropdownOpen, setIsSubjectDropdownOpen] = useState(false);
   const [gradeSearch, setGradeSearch] = useState("");
   const [subjectSearch, setSubjectSearch] = useState("");
-  const [currentUserName, setCurrentUserName] = useState("{t("exam_portal.anonymous_student", { defaultValue: t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }) })}");
+  const [currentUserName, setCurrentUserName] = useState(t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }));
   const [leaderboard, setLeaderboard] = useState(() => {
     try {
       const stored = localStorage.getItem("examLeaderboards");
@@ -440,7 +440,7 @@ export default function ExamPortal() {
       const userStr = localStorage.getItem("user");
       if (userStr) {
         const u = JSON.parse(userStr);
-        setCurrentUserName(u.name || u.fullName || u.username || "{t("exam_portal.anonymous_student", { defaultValue: t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }) })}");
+        setCurrentUserName(u.name || u.fullName || u.username || t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }));
       }
     } catch (e) {}
   }, []);
@@ -840,10 +840,10 @@ export default function ExamPortal() {
       
       // Add result to exam-specific leaderboard
       const newLeaderboardEntry = {
-        name: currentUserName || "{t("exam_portal.anonymous_student", { defaultValue: t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }) })}",
+        name: currentUserName || t("exam_portal.anonymous_student", { defaultValue: "Học viên ẩn danh" }),
         score: finalScore,
         timeSeconds: timeSpentSeconds,
-        date: "{t("header.time_ago", { defaultValue: t("header.time_ago", { defaultValue: "Vừa xong" }) })}"
+        date: t("header.time_ago", { defaultValue: "Vừa xong" })
       };
 
       setLeaderboard((prev) => {
@@ -1394,7 +1394,7 @@ export default function ExamPortal() {
                                     {user.name}
                                   </span>
                                   <span className="text-[10px] text-slate-450 block font-semibold">
-                                    {user.date || "{t("header.time_ago", { defaultValue: t("header.time_ago", { defaultValue: "Vừa xong" }) })}"}
+                                    {user.date || t("header.time_ago", { defaultValue: "Vừa xong" })}
                                   </span>
                                 </div>
                               </div>

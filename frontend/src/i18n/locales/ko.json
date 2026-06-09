@@ -1,0 +1,460 @@
+{
+  "nav": {
+    "home": "집",
+    "features": "특징",
+    "pricing": "가격",
+    "about": "에 대한",
+    "faq": "FAQ",
+    "contact": "연락하다",
+    "login": "로그인",
+    "sign_up": "무료로 가입하세요",
+    "logout": "로그아웃",
+    "profile": "윤곽"
+  },
+  "header": {
+    "search_placeholder": "강좌, 동영상, 노트 검색...",
+    "time_ago": "방금",
+    "default_user_name": "사용자",
+    "account_label": "계정",
+    "aria": {
+      "open_menu": "메뉴 열기"
+    },
+    "notifications": {
+      "title": "알림",
+      "mark_read": "읽음으로 표시",
+      "empty": "알림이 없습니다",
+      "welcome": "AI 학습 대시보드에 다시 오신 것을 환영합니다!",
+      "system_processed": "시스템이 귀하의 요청 처리를 완료했습니다."
+    },
+    "user_menu": {
+      "profile": "프로필 정보",
+      "billing": "결제 내역",
+      "logout": "로그아웃",
+      "admin": "관리 대시보드"
+    }
+  },
+  "hero": {
+    "made_for": "베트남 학생들을 위해 제작됨",
+    "title_line1": "강의 영상을 돌려보세요",
+    "title_line2": "지식 속으로",
+    "title_span": "흡수하기 쉬운",
+    "description": "강의 동영상 업로드 - AI가 자동으로 질문을 복사하고 요약하고 답변합니다. 3배 더 나은 결과로 더 효과적으로 학습하세요!",
+    "cta_free": "무료로 시작하세요",
+    "cta_feature": "기능 보기"
+  },
+  "sidebar": {
+    "loading": "로드 중...",
+    "error_loading": "사이드바 정보를 로드하지 못했습니다:",
+    "default_name": "응우옌 캉",
+    "dashboard": "개요",
+    "courses": "행동",
+    "exams": "온라인 시험",
+    "history": "역사",
+    "analytics": "해석학",
+    "premium": "프리미엄",
+    "help": "지원하다",
+    "plan": {
+      "free": "무료 플랜",
+      "premium": "프리미엄 플랜"
+    },
+    "badges": {
+      "pro": "찬성",
+      "free": "무료"
+    }
+  },
+  "history": {
+    "title": "역사",
+    "lectures_count": "{{count}}강의를 찾았습니다.",
+    "search_placeholder": "강의이력조회",
+    "stats": {
+      "total_lectures": "총 강의수",
+      "completed": "완전한"
+    },
+    "duration_minutes": "분",
+    "duration_seconds": "초",
+    "duration_missing": "사용 가능한 기간이 없습니다.",
+    "status": {
+      "completed": "✓ 완료",
+      "in_progress": "진행중",
+      "started": "방금 시작했어요",
+      "not_started": "보지 않음"
+    },
+    "no_results": "일치하는 결과가 없습니다."
+  },
+  "dashboard": {
+    "welcome": "돌아온 것을 환영합니다,{{name}}!",
+    "subtitle": "학습을 강화하세요.",
+    "upload_widget": "위젯 업로드",
+    "learning_overview": "학습 개요",
+    "total_study_time": "총 학습 시간",
+    "total_all_time": "총 전체 시간",
+    "lectures_done": "강의 완료",
+    "lectures": "강의",
+    "goal_progress": "목표 진행상황",
+    "goal_label": "100% 목표",
+    "weekly_activity": "주간 활동(시간)",
+    "top_keywords": "인기 키워드",
+    "recent_courses": "최근 강좌",
+    "view_all": "모두 보기 →",
+    "loading": "대시보드 로드 중...",
+    "error_loading": "대시보드 데이터를 로드할 수 없습니다.",
+    "no_data": "대시보드 데이터가 없습니다.",
+    "retry": "다시 해 보다"
+  },
+  "my_courses": {
+    "title": "내 강좌",
+    "subtitle": "등록한 강의 및 진행 상황을 관리하세요.",
+    "search_placeholder": "코스 내에서 검색",
+    "tabs": {
+      "all": "모두",
+      "in_progress": "진행 중",
+      "completed": "완전한"
+    },
+    "lessons": "{{count}}수업",
+    "progress_complete": "{{percent}}% 완료",
+    "button": {
+      "view_course": "강좌 보기",
+      "latest_lesson": "최신 레슨"
+    },
+    "badge": {
+      "done": "완료"
+    }
+  },
+  "help_center": {
+    "title": "어떻게 도와드릴까요?",
+    "search_placeholder": "도움말, 튜토리얼, FAQ를 검색해 보세요...",
+    "popular_topics": "인기 있는 도움말 항목",
+    "popular_faqs": "인기있는 FAQ",
+    "contact_support": "지원팀에 문의",
+    "contact_description": "우리 팀에 연락하거나 실시간 채팅을 시작하세요.",
+    "start_live_chat": "라이브 채팅 시작",
+    "topics": {
+      "getting_started": "시작하기",
+      "upload": "업로드 및 AI 처리",
+      "chatbot": "챗봇 지원",
+      "account_billing": "계정 및 청구"
+    },
+    "faqs": {
+      "upload": {
+        "q": "파일을 업로드하는 방법은 무엇입니까?",
+        "a": "대시보드에서 업로드 버튼을 클릭하거나 파일을 끌어다 놓습니다. 지원되는 형식에는 PDF, MP4 및 YouTube 링크가 포함됩니다."
+      },
+      "premium": {
+        "q": "프리미엄이란 무엇입니까?",
+        "a": "프리미엄은 무제한 업로드, 더 빠른 AI 처리, 고급 챗봇 기능에 대한 액세스를 제공합니다."
+      },
+      "processing": {
+        "q": "AI 처리에는 시간이 얼마나 걸리나요?",
+        "a": "대부분의 파일은 크기와 서버 부하에 따라 1~3분 내에 처리됩니다."
+      },
+      "youtube": {
+        "q": "YouTube 링크를 업로드할 수 있나요?",
+        "a": "예! 업로드 상자에 YouTube URL을 붙여넣으면 시스템이 자동으로 동영상을 가져와 처리합니다."
+      }
+    }
+  },
+  "settings": {
+    "title": "계정",
+    "subtitle": "계정 설정",
+    "tabs": {
+      "account": "계정",
+      "preferences": "환경설정"
+    },
+    "form": {
+      "name": "이름",
+      "email": "이메일",
+      "avatar": "화신",
+      "change": "변화",
+      "save_changes": "변경 사항 저장"
+    },
+    "preferences_unavailable": "환경설정은 개발 중입니다."
+  },
+  "analytics": {
+    "title": "학습 분석 및 통찰력",
+    "subtitle": "학습 성과를 한눈에 볼 수 있습니다.",
+    "study_time_trend": "학습 시간 추세(지난 30일)",
+    "learning_focus": "과목별 학습 중점",
+    "top_keywords": "이번달 인기 키워드",
+    "goal_tracking": "목표 추적",
+    "goals": {
+      "weekly": "주간 목표",
+      "monthly": "월간 목표"
+    },
+    "percentage_min": "0%",
+    "percentage_max": "100%"
+  },
+  "course": {
+    "enroll": "지금 등록하세요",
+    "continue": "계속 학습",
+    "completed": "완전한",
+    "lessons": "수업",
+    "duration": "지속",
+    "level": "수준",
+    "level_beginner": "초보자",
+    "level_intermediate": "중급",
+    "level_advanced": "고급의",
+    "free": "무료",
+    "students": "{{count}}학생"
+  },
+  "upload": {
+    "title": "파일 업로드",
+    "drag_drop": "여기에 파일을 드래그 앤 드롭하세요.",
+    "or": "또는",
+    "browse": "파일 찾아보기",
+    "uploading": "업로드 중...",
+    "success": "업로드가 완료되었습니다.",
+    "error": "업로드에 실패했습니다. 다시 시도해 주세요."
+  },
+  "ai_chat": {
+    "title": "AI 어시스턴트",
+    "placeholder": "무엇이든 물어보세요...",
+    "send": "보내다",
+    "thinking": "생각...",
+    "clear": "채팅 지우기",
+    "welcome": "안녕하세요! 나는 당신의 학습을 지원할 준비가 되어 있습니다.",
+    "not_answer": "AI는 응답하지 않았습니다. 다시 시도해 주세요.",
+    "error_message": "죄송합니다. AI에 연결하는 중에 문제가 발생했습니다.",
+    "analysis": "AI가 분석 중…"
+  },
+  "course_detail": {
+    "back": "뒤쪽에",
+    "export_pdf": "PDF 내보내기",
+    "transcript": "성적 증명서",
+    "summary": "요약",
+    "key_points": "핵심 포인트",
+    "loading_video": "동영상 로드 중...",
+    "executive_summary": "요약",
+    "updating_summary": "요약 업데이트 중...",
+    "ai_system_analysis": "AI 학습 시스템 분석"
+  },
+  "loading": {
+    "message": "로드 중입니다. 잠시 기다려 주세요.",
+    "courses": "강좌 로드 중..."
+  },
+  "common": {
+    "save": "구하다",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집하다",
+    "back": "뒤쪽에",
+    "next": "다음",
+    "confirm": "확인하다",
+    "close": "닫다",
+    "language": "언어"
+  },
+  "pricing": {
+    "title": "가격",
+    "heading": "목표에 맞는 계획을 선택하세요",
+    "description": "무료로 시작하고 더 많은 기능이 필요할 때 업그레이드하세요.",
+    "plans": {
+      "free": {
+        "label": "무료",
+        "features": [
+          "하루에 4개의 동영상",
+          "기본 성적표",
+          "AI 채팅: 메시지 10개/일",
+          "최대 10개 항목 저장",
+          "이메일 지원"
+        ],
+        "button": "무료로 시작하세요"
+      },
+      "premium": {
+        "label": "프리미엄",
+        "badge": "가장 인기 있는 🔥",
+        "features": [
+          "하루에 무제한 동영상",
+          "정확도가 높은 성적표",
+          "무제한 AI 채팅",
+          "무제한 저장",
+          "PDF 내보내기",
+          "우선 처리",
+          "연중무휴 지원"
+        ],
+        "button": "7일 무료로 사용해 보세요"
+      },
+      "yearly": {
+        "label": "프리미엄 연간",
+        "badge": "26% 할인 🎉",
+        "features": [
+          "모든 프리미엄 기능",
+          "~179.000đ/년 절약",
+          "최우선 지원",
+          "초기 베타 액세스",
+          "VIP 프로필 배지",
+          "VIP 지원"
+        ],
+        "button": "연간 선택"
+      }
+    },
+    "payment_supported": "지원되는 결제 방법",
+    "payment_methods": {
+      "momo": "모모",
+      "vnpay": "VNPay",
+      "visa": "비자/마스터카드",
+      "atm": "국내 ATM"
+    },
+    "gateways": {
+      "vnpay": {
+        "description": "VNPay 지갑 · ATM 카드 · QR 코드",
+        "note": "PCI DSS 국제 보안 표준"
+      },
+      "momo": {
+        "description": "MoMo 전자지갑",
+        "note": "MoMo 앱을 통한 빠른 결제"
+      }
+    },
+    "header": {
+      "badge": "서비스 가격",
+      "title": "올바른 계획을 선택하세요",
+      "description": "AI를 통한 무제한 학습을 ​​위해 업그레이드하세요.",
+      "trusted_partners": "신뢰할 수 있는 결제 파트너"
+    },
+    "modal": {
+      "connecting_gateway": "결제 게이트웨이 연결",
+      "do_not_close": "페이지를 닫지 말아주세요...",
+      "confirm_order": "주문 확인",
+      "selected_plan": "선택한 플랜",
+      "payment_method": "결제수단",
+      "terms_note": "확인하시면 서비스 약관에 동의하시는 것으로 간주됩니다.{{gateway}}(으)로 안전하게 리디렉션됩니다.",
+      "processing": "처리 중...",
+      "start_payment": "결제를 진행하세요",
+      "cancel": "거래 취소",
+      "one_time": "일회성"
+    },
+    "alerts": {
+      "login_required": "결제를 계속하려면 로그인하세요!",
+      "user_not_found": "사용자 정보를 찾을 수 없습니다. 다시 로그인해주세요!",
+      "service_busy": "시스템이 사용 중입니다!",
+      "payment_error": "가격 오류 세부정보:",
+      "parse_user_error": "사용자 개체를 구문 분석할 수 없습니다."
+    }
+  },
+  "payment_result": {
+    "success": {
+      "title": "결제 성공!",
+      "button": "대시보드로 이동",
+      "redirect": "{{count}}초 후에 자동으로 리디렉션됩니다."
+    },
+    "failed": {
+      "title": "결제 실패",
+      "button": "다시 시도하세요"
+    }
+  },
+  "user_profile_modal": {
+    "tabs": {
+      "profile": "프로필 정보",
+      "billing": "결제 내역"
+    },
+    "defaults": {
+      "avatar": "북한"
+    },
+    "success": {
+      "update_account": "계정 정보가 성공적으로 업데이트되었습니다!"
+    },
+    "errors": {
+      "load_history": "거래 내역을 로드하지 못했습니다.",
+      "invalid_image": "이미지 파일(png, jpg, jpeg...)을 선택해주세요!",
+      "download_invoice": "시스템에서 송장을 내보낼 수 없습니다!"
+    },
+    "billing": {
+      "loading": "주문 내역 로드 중...",
+      "empty": "아직 결제 거래를 하지 않으셨습니다.",
+      "table": {
+        "order_id": "주문 ID",
+        "plan": "계획",
+        "amount": "양",
+        "gateway": "게이트웨이",
+        "time": "시간",
+        "status": "상태",
+        "action": "행동"
+      },
+      "plan_monthly": "프리미엄 월간",
+      "plan_yearly": "프리미엄 연간",
+      "status": {
+        "success": "성공",
+        "pending": "보류 중",
+        "failed": "실패한"
+      },
+      "download_invoice": "송장 다운로드"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "badge": "관리 개요",
+      "title": "시스템 개요",
+      "loading": "데이터 로드 중...",
+      "ready": "데이터가 준비되었습니다",
+      "stats": {
+        "total_users": "총 사용자",
+        "total_sessions": "총 세션수",
+        "total_revenue": "총 수익"
+      }
+    },
+    "layout": {
+      "brand_tag": "제어 센터",
+      "brand_name": "AI 학습 관리자",
+      "workspace_tag": "관리 작업공간",
+      "workspace_description": "하나의 집중된 인터페이스에서 대시보드, 사용자 및 결제를 관리하세요.",
+      "area_tag": "관리 구역",
+      "logout": "로그아웃",
+      "navigation": {
+        "dashboard": "계기반",
+        "users": "사용자",
+        "payments": "결제"
+      },
+      "titles": {
+        "dashboard": "계기반",
+        "users": "사용자 관리",
+        "payments": "결제관리"
+      },
+      "aria": {
+        "open_sidebar": "탐색 사이드바 열기",
+        "close_sidebar": "탐색 사이드바 닫기",
+        "close_overlay": "탐색 오버레이 닫기"
+      }
+    },
+    "user_management": {
+      "badge": "사용자",
+      "title": "사용자 관리",
+      "search_placeholder": "이름, 이메일, 역할로 검색하세요...",
+      "user_id": "ID #",
+      "loading": "처리 중...",
+      "table": {
+        "user": "사용자",
+        "email": "이메일",
+        "role": "역할",
+        "status": "상태",
+        "premium": "프리미엄",
+        "actions": "행위"
+      },
+      "roles": {
+        "user": "사용자",
+        "admin": "관리자",
+        "moderator": "중재자"
+      },
+      "status": {
+        "active": "활동적인",
+        "blocked": "막힌"
+      },
+      "premium": {
+        "pro": "찬성",
+        "free": "무료",
+        "enable": "업그레이드 프로",
+        "disable": "프로 제거"
+      },
+      "buttons": {
+        "edit": "편집하다",
+        "delete": "삭제",
+        "cancel": "취소",
+        "save": "변경사항 저장",
+        "saving": "절약...",
+        "deleting": "삭제 중...",
+        "loading": "..."
+      },
+      "modals": {
+        "edit_title": "사용자 정보 편집",
+        "edit_description": "사용자 이름 및 역할 업데이트"
+      }
+    }
+  }
+}
