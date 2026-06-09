@@ -87,24 +87,25 @@ public class VNPayServiceImpl implements VNPayService {
         cld.add(Calendar.MINUTE, 15);
         vnpParams.put(VNPayParams.EXPIRE_DATE, formatter.format(cld.getTime()));
 
-        // FIX: Sort keys rồi lặp theo đúng thứ tự đã sort
         List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(fieldNames);
 
         List<String> hashParts  = new ArrayList<>();
         List<String> queryParts = new ArrayList<>();
 
-        for (String fieldName : fieldNames) {                          // ← lặp qua list đã sort
+        for (String fieldName : fieldNames) {
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String encodedValue = encode(fieldValue).replace("+", "%20");
-                hashParts.add(fieldName + "=" + encodedValue);         // key raw cho hash
-                queryParts.add(encode(fieldName) + "=" + encodedValue);// key encoded cho query
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8).replace("+", "%20");
+                hashParts.add(fieldName + "=" + encodedValue);
+                queryParts.add(URLEncoder.encode(fieldName, StandardCharsets.UTF_8) + "=" + encodedValue);
             }
         }
 
         String hashDataStr = String.join("&", hashParts);
         String queryStr    = String.join("&", queryParts);
+
+        System.out.println("HashData: " + hashDataStr);
 
         String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashDataStr);
         return vnPayConfig.getVnp_PayUrl() + "?" + queryStr + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
@@ -121,9 +122,6 @@ public class VNPayServiceImpl implements VNPayService {
 
         mutableParams.remove("vnp_SecureHashType");
 
-        // FIX: Không encode lại value – VNPay gửi callback dưới dạng plain text đã được
-        //      server container decode sẵn (query string → HttpServletRequest.getParameterMap).
-        //      Encode thêm sẽ tạo ra hash khác với phía VNPay → chữ ký không khớp.
         List<String> sortedKeys = new ArrayList<>(mutableParams.keySet());
         Collections.sort(sortedKeys);
 
@@ -131,7 +129,7 @@ public class VNPayServiceImpl implements VNPayService {
         for (String key : sortedKeys) {
             String value = mutableParams.get(key);
             if (value != null && !value.isEmpty()) {
-                hashParts.add(key + "=" + value);   // plain key=value, không encode
+                hashParts.add(key + "=" + value);
             }
         }
         String hashData = String.join("&", hashParts);
@@ -166,13 +164,5 @@ public class VNPayServiceImpl implements VNPayService {
         subscriptionService.activatePremium(payment);
 
         return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Confirm success");
-    }
-
-    private String encode(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
-        } catch (java.io.UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
