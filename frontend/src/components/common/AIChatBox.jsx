@@ -67,10 +67,12 @@ const AIChatBox = ({ onClose, sessionId, courseDetailApi, aiApi, transcript = ""
     setInput("");
     setLoading(true);
 
-    try {
-      // 1. Lưu vào Java (optional)
-      await courseDetailApi.sendMessage(sessionId, input);
+    // 1. Lưu vào Java (chạy ngầm, không block luồng trả lời của AI nếu xảy ra lỗi)
+    courseDetailApi.sendMessage(sessionId, input).catch((saveErr) => {
+      console.warn("[AIChatBox] Failed to save message to Java backend:", saveErr);
+    });
 
+    try {
       // 2. Gọi AI Python
       const res = await aiApi.chat(sessionId, input, currentMessages, transcript);
 
@@ -84,7 +86,7 @@ const AIChatBox = ({ onClose, sessionId, courseDetailApi, aiApi, transcript = ""
         },
       ]);
     } catch (err) {
-      console.error(err);
+      console.error("[AIChatBox] AI connection error:", err);
 
       setMessages((prev) => [
         ...prev,
