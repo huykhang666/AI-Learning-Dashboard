@@ -189,8 +189,19 @@ public class PdfServiceImpl implements PdfService {
             }
 
             // Row dữ liệu
-            String desc = payment.getOrderInfo() != null ? payment.getOrderInfo() : "Nâng cấp tài khoản lên gói Premium";
-            String duration = payment.getPlanType() != null ? payment.getPlanType().name() : "PREMIUM";
+            boolean isCoursePayment = payment.getPlanType() == com.ai.learning.backend.payment.entity.Subscription.PlanType.COURSE;
+            String desc;
+            String duration;
+            if (isCoursePayment && payment.getCourse() != null) {
+                desc = payment.getCourse().getTitle();
+                duration = "KHÓA HỌC";
+            } else if (payment.getOrderInfo() != null) {
+                desc = payment.getOrderInfo();
+                duration = payment.getPlanType() != null ? payment.getPlanType().name() : "PREMIUM";
+            } else {
+                desc = "Nâng cấp tài khoản lên gói Premium";
+                duration = "PREMIUM";
+            }
             String currencyName = payment.getCurrency() != null ? payment.getCurrency().name() : "VND";
             String price = String.format("%,.0f %s", payment.getAmount().doubleValue(), currencyName);
 
@@ -236,9 +247,13 @@ public class PdfServiceImpl implements PdfService {
             footerCell.setPadding(14);
             footerCell.setBorder(Rectangle.NO_BORDER);
 
+            String footerMessage = isCoursePayment
+                    ? "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\n" +
+                    "Chúc mừng bạn đã sở hữu khóa học. Hãy vào mục Khóa học của tôi để bắt đầu học ngay."
+                    : "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\n" +
+                    "Tài khoản của bạn đã được kích hoạt đầy đủ tính năng Premium.";
             Paragraph footerText = new Paragraph(
-                    "Cảm ơn bạn đã sử dụng AI Learning Dashboard!\n" +
-                            "Tài khoản của bạn đã được kích hoạt đầy đủ tính năng Premium.",
+                    footerMessage,
                     new Font(bfRegular, 10, Font.NORMAL, Color.WHITE)
             );
             footerText.setAlignment(Element.ALIGN_CENTER);

@@ -22,7 +22,7 @@ axiosClient.interceptors.request.use((config) => {
 // Nginx có location /ai { proxy_pass http://ai-learning-ai:8080 }
 // Nên AI luôn dùng path /ai tuyệt đối, không ghép với VITE_API_URL
 const _apiBase = import.meta.env.VITE_API_URL || "http://localhost:8080";
-const _aiBase = _apiBase.startsWith("http") ? `${_apiBase}/ai` : "/ai";
+const _aiBase = _apiBase.startsWith("http") ? `${_apiBase}/ai/` : "/ai/";
 const aiClient = axios.create({
   baseURL: _aiBase,
 });
@@ -183,7 +183,7 @@ export const courseDetailApi = {
 export const aiApi = {
   chat: async (sessionId, query, history = []) => {
     try {
-      const response = await aiClient.post("/chat", {
+      const response = await aiClient.post("chat", {
         session_id: sessionId,
         query,
         history,

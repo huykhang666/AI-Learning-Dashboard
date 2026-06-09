@@ -52,6 +52,7 @@ public class Subscription {
     public enum PlanType {
         FREE,
         PREMIUM_MONTHLY,
-        PREMIUM_YEARLY
+        PREMIUM_YEARLY,
+        COURSE
     }
 }

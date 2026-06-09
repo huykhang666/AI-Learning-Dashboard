@@ -1,4 +1,5 @@
 package com.ai.learning.backend.payment.entity;
+import com.ai.learning.backend.entity.Course;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.enums.SessionStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,6 +44,10 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     private Subscription.PlanType planType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

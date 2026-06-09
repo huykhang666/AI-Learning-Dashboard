@@ -24,7 +24,7 @@ public class ChatBotAsyncTask {
     public void callFastApiAndUpdateMessage(Map<String,Object> apiRequest, Long aiMessageId) {
         try {
             Map<String,String> response = webClient.post()
-                    .uri("http://localhost:8000/ai/chat")
+                    .uri("/ai/chat")
                     .bodyValue(apiRequest)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<Map<String,String>>() {})

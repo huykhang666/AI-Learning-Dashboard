@@ -43,7 +43,8 @@ public class PaymentServiceImpl implements PaymentService {
                     request.userId(),
                     request.amount(),
                     request.planType(),
-                    null
+                    null,
+                    request.courseId()
             );
             String paymentUrl = vnPayService.createPaymentUrl(vnPayRequest, httpRequest);
             return new VNPayResponse("00", "Tạo URL thành công", paymentUrl);
@@ -59,7 +60,8 @@ public class PaymentServiceImpl implements PaymentService {
             MomoRequest moMoRequest = new MomoRequest(
                     request.userId(),
                     request.amount(),
-                    request.planType()
+                    request.planType(),
+                    request.courseId()
             );
             return momoService.createPayment(moMoRequest);
 

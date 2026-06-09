@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +47,9 @@ public class PaymentController {
     PaymentRepository paymentRepository;
     PdfService pdfService;
     UserRepository userRepository;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    String frontendUrl;
 
     @PostMapping("/create-url")
     public ResponseEntity<?> createPaymentUrl(
@@ -71,10 +75,11 @@ public class PaymentController {
         }
 
         String code = params.get(VNPayParams.RESPONSE_CODE);
+        String base = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
         if ("00".equals(code)) {
-            response.sendRedirect("http://localhost:5173/payment/success");
+            response.sendRedirect(base + "/payment/success");
         } else {
-            response.sendRedirect("http://localhost:5173/payment/failed");
+            response.sendRedirect(base + "/payment/failed");
         }
     }
 

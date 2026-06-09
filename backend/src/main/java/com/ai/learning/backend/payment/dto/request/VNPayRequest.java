@@ -4,5 +4,6 @@ public record VNPayRequest(
         Long userId,
         Long amount,
         String planType,
-        String ipAddress
+        String ipAddress,
+        Long courseId
 ) {}

@@ -71,3 +71,11 @@ vnpay:
   pay-url: ${VNPAY_PAY_URL}
   return-url: ${VNPAY_RETURN_URL}
   ipn-url: ${VNPAY_IPN_URL}
+
+momo:
+  partner-code: ${MOMO_PARTNER_CODE}
+  access-key: ${MOMO_ACCESS_KEY}
+  secret-key: ${MOMO_SECRET_KEY}
+  endpoint: ${MOMO_ENDPOINT:https://test-payment.momo.vn/v2/gateway/api/create}
+  return-url: ${app.frontend.url}/payment/success
+  notify-url: ${MOMO_NOTIFY_URL}

@@ -11,12 +11,13 @@
         Star,
         CheckCircle,
         Award,
-        ShoppingCart,
-        ArrowRight,
-        Unlock,
-        ShieldCheck
+        ShieldCheck,
+        X,
     } from 'lucide-react';
     import { courseApi } from '../../api/CourseApi';
+    import { paymentApi } from '../../api/PaymentApi';
+    import momoLogo from '../../img/MoMo.png';
+    import vnpayLogo from '../../img/VNPay.png';
     import styles from './CourseLanding.module.css';
 
 const getFullUrl = (url) => {
@@ -46,6 +47,24 @@ export default function CourseLanding() {
         const navigate = useNavigate();
         const { t } = useTranslation();
         const [course, setCourse] = useState(null);
+        const [showPaymentModal, setShowPaymentModal] = useState(false);
+        const [selectedGateway, setSelectedGateway] = useState('VNPAY');
+        const [isProcessing, setIsProcessing] = useState(false);
+
+        const gatewayOptions = [
+            {
+                id: 'VNPAY',
+                name: 'VNPay',
+                description: t('pricing.gateways.vnpay.description', { defaultValue: 'Thẻ ATM, Visa, QR Code' }),
+                logo: vnpayLogo,
+            },
+            {
+                id: 'MOMO',
+                name: 'MoMo',
+                description: t('pricing.gateways.momo.description', { defaultValue: 'Ví MoMo, liên kết ngân hàng' }),
+                logo: momoLogo,
+            },
+        ];
 
         useEffect(() => {
             const fetchLandingData = async () => {
@@ -79,26 +98,62 @@ export default function CourseLanding() {
             return index < 2;
         };
 
-        const handleEnroll = async () => {
-            console.log("Đã bấm nút Đăng ký!");
+        const handleOpenPayment = () => {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                toast.error(t('pricing.alerts.login_required', { defaultValue: 'Vui lòng đăng nhập để thanh toán!' }));
+                return;
+            }
+            setSelectedGateway('VNPAY');
+            setShowPaymentModal(true);
+        };
+
+        const handleConfirmPayment = async () => {
             try {
-                const userStr = localStorage.getItem("user");
-                const userId = userStr ? JSON.parse(userStr).userId : 0;
-                
-                // Gọi API đăng ký
-                await courseApi.enroll(courseId, userId); 
-                
-                toast.success(t("course_landing.enroll_success", { defaultValue: "Đăng ký thành công!" }));
-                setCourse(prev => ({ ...prev, unlocked: true }));
-                
-                setTimeout(() => {
-                    navigate("/app/courses", { 
-                        state: { enrolledCourseId: Number(courseId) } 
-                    });
-                }, 1500);                
+                setIsProcessing(true);
+
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    toast.error(t('pricing.alerts.login_required', { defaultValue: 'Vui lòng đăng nhập để thanh toán!' }));
+                    return;
+                }
+
+                const userStr = localStorage.getItem('user');
+                if (!userStr) {
+                    toast.error(t('pricing.alerts.user_not_found', { defaultValue: 'Không tìm thấy thông tin người dùng!' }));
+                    return;
+                }
+
+                const userObj = JSON.parse(userStr);
+                const userId = userObj.userId || userObj.id;
+                if (!userId) {
+                    toast.error(t('pricing.alerts.user_not_found', { defaultValue: 'Không tìm thấy thông tin người dùng!' }));
+                    return;
+                }
+
+                const paymentRequest = {
+                    userId: Number(userId),
+                    amount: Math.round(Number(course.price)),
+                    planType: 'COURSE',
+                    gateway: selectedGateway,
+                    courseId: Number(courseId),
+                };
+
+                const response = await paymentApi.createPaymentUrl(paymentRequest);
+                const resData = response?.data || response;
+                const payUrl = resData?.paymentUrl || resData?.payUrl;
+
+                if (payUrl && (resData?.code === '00' || resData?.resultCode === 0)) {
+                    window.location.href = payUrl;
+                    return;
+                }
+
+                toast.error(t('pricing.alerts.service_busy', { defaultValue: 'Cổng thanh toán đang bận, thử lại sau!' }));
             } catch (error) {
-                console.error("Lỗi đăng ký:", error);
-                toast.error(t("course_landing.enroll_fail", { defaultValue: "Đăng ký thất bại, thử lại nhé!" }));
+                console.error('Lỗi thanh toán khóa học:', error);
+                toast.error(t('pricing.alerts.service_busy', { defaultValue: 'Cổng thanh toán đang bận, thử lại sau!' }));
+            } finally {
+                setIsProcessing(false);
             }
         };
 
@@ -269,7 +324,7 @@ export default function CourseLanding() {
                                                 className={`${styles.btnAction} ${styles.btnBuy}`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleEnroll();
+                                                    handleOpenPayment();
                                                 }}
                                             >
                                                 {t("course_landing.pay_now")}
@@ -298,6 +353,81 @@ export default function CourseLanding() {
                         </div>
                     </div>
                 </div>
+                {showPaymentModal && (
+                    <div className={styles.paymentOverlay} onClick={() => !isProcessing && setShowPaymentModal(false)}>
+                        <div className={styles.paymentModal} onClick={(e) => e.stopPropagation()}>
+                            {isProcessing && (
+                                <div className={styles.paymentProcessing}>
+                                    <div className={styles.loadingSpinner} />
+                                    <p>{t('pricing.modal.connecting_gateway', { defaultValue: 'Đang kết nối cổng thanh toán...' })}</p>
+                                </div>
+                            )}
+
+                            <div className={styles.paymentModalHeader}>
+                                <h3 className={styles.paymentModalTitle}>
+                                    {t('course_landing.pay_now', { defaultValue: 'Thanh toán ngay' })}
+                                </h3>
+                                <button
+                                    type="button"
+                                    className={styles.paymentModalClose}
+                                    onClick={() => !isProcessing && setShowPaymentModal(false)}
+                                    disabled={isProcessing}
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+
+                            <div className={styles.paymentModalBody}>
+                                <div className={styles.paymentSummary}>
+                                    <div>
+                                        <p className={styles.paymentSummaryLabel}>
+                                            {t('pricing.modal.selected_plan', { defaultValue: 'Khóa học' })}
+                                        </p>
+                                        <p className={styles.paymentSummaryName}>{course.title}</p>
+                                    </div>
+                                    <p className={styles.paymentSummaryPrice}>
+                                        {Number(course.price).toLocaleString('vi-VN')}đ
+                                    </p>
+                                </div>
+
+                                <div className={styles.paymentGatewayList}>
+                                    {gatewayOptions.map((gw) => {
+                                        const active = selectedGateway === gw.id;
+                                        return (
+                                            <button
+                                                key={gw.id}
+                                                type="button"
+                                                className={`${styles.paymentGatewayBtn} ${active ? styles.paymentGatewayBtnActive : ''}`}
+                                                onClick={() => !isProcessing && setSelectedGateway(gw.id)}
+                                                disabled={isProcessing}
+                                            >
+                                                <div className={styles.paymentGatewayLogo}>
+                                                    <img src={gw.logo} alt={gw.name} />
+                                                </div>
+                                                <div className={styles.paymentGatewayInfo}>
+                                                    <p className={styles.paymentGatewayName}>{gw.name}</p>
+                                                    <p className={styles.paymentGatewayDesc}>{gw.description}</p>
+                                                </div>
+                                                <div className={`${styles.paymentRadio} ${active ? styles.paymentRadioActive : ''}`}>
+                                                    {active && <div className={styles.paymentRadioDot} />}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className={styles.paymentConfirmBtn}
+                                    onClick={handleConfirmPayment}
+                                    disabled={isProcessing}
+                                >
+                                    {t('pricing.modal.confirm_pay', { defaultValue: 'Xác nhận thanh toán' })}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }

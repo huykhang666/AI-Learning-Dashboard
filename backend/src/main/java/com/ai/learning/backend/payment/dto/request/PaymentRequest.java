@@ -6,5 +6,6 @@ public record PaymentRequest(
         Long userId,
         Long amount,
         String planType,
-        PaymentGateway gateway
+        PaymentGateway gateway,
+        Long courseId
 ) {}

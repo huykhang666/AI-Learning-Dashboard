@@ -1,5 +1,6 @@
 package com.ai.learning.backend.payment.service.Impl;
 
+import com.ai.learning.backend.entity.Course;
 import com.ai.learning.backend.entity.User;
 import com.ai.learning.backend.exception.AppException;
 import com.ai.learning.backend.exception.ErrorCode;
@@ -15,6 +16,7 @@ import com.ai.learning.backend.payment.entity.Subscription;
 import com.ai.learning.backend.payment.repository.PaymentRepository;
 import com.ai.learning.backend.payment.service.SubscriptionService;
 import com.ai.learning.backend.payment.service.VNPayService;
+import com.ai.learning.backend.repository.CourseRepository;
 import com.ai.learning.backend.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -38,6 +40,7 @@ public class VNPayServiceImpl implements VNPayService {
     PaymentRepository paymentRepository;
     SubscriptionService subscriptionService;
     UserRepository userRepository;
+    CourseRepository courseRepository;
 
     @Override
     @Transactional
@@ -45,13 +48,22 @@ public class VNPayServiceImpl implements VNPayService {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        Course course = null;
+        String orderInfo = "Thanh toan goi " + request.planType();
+        if (request.courseId() != null) {
+            course = courseRepository.findById(request.courseId())
+                    .orElseThrow(() -> new AppException(ErrorCode.INVALID_REQUEST));
+            orderInfo = "Thanh toan khoa hoc: " + course.getTitle();
+        }
+
         Payment newPayment = Payment.builder()
                 .amount((long) request.amount())
                 .user(user)
                 .status(PaymentStatus.PENDING)
                 .gateway(PaymentGateway.VNPAY)
                 .planType(Subscription.PlanType.valueOf(request.planType()))
-                .orderInfo("Thanh toan goi " + request.planType())
+                .course(course)
+                .orderInfo(orderInfo)
                 .build();
 
         Payment savedPayment = paymentRepository.save(newPayment);
@@ -64,7 +76,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnpParams.put(VNPayParams.AMOUNT,     String.valueOf(request.amount() * 100));
         vnpParams.put(VNPayParams.CURR_CODE,  "VND");
         vnpParams.put(VNPayParams.TXN_REF,    txnRef);
-        vnpParams.put(VNPayParams.ORDER_INFO, "Thanh toan don hang: " + txnRef);
+        vnpParams.put(VNPayParams.ORDER_INFO, savedPayment.getOrderInfo());
         vnpParams.put(VNPayParams.ORDER_TYPE, "other");
         vnpParams.put(VNPayParams.LOCALE,     "vn");
         vnpParams.put(VNPayParams.RETURN_URL, vnPayConfig.getVnp_ReturnUrl());
