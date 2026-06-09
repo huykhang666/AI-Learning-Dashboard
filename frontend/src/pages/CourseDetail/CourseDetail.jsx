@@ -17,10 +17,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import AIChatBox from "../../components/common/AIChatBox";
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const getFullUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  if (url.startsWith("/uploads")) return url;
   const baseUrl = apiUrl.includes("/api/v1") ? apiUrl.replace("/api/v1", "") : apiUrl;
   const cleanBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   const cleanUrl = url.startsWith("/") ? url : `/${url}`;
