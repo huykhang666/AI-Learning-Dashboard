@@ -724,6 +724,10 @@ export default function ExamPortal() {
   // --- AUTO SUBMISSION PROCESS ---
   const handleAutoSubmit = async (finalHonesty) => {
     if (isSubmitting || activeTab !== "testing") return;
+    
+    // Tắt giám sát trước khi thoát fullscreen
+    isReadyForMonitoringRef.current = false;
+    
     toast.error(t("exam_portal.proctoring_toast_exam_locked", { defaultValue: "KỲ THI ĐÃ KHÓA: Điểm trung thực quá thấp hoặc hết thời gian. Đang nộp bài tự động..." }));
     
     // Exit Fullscreen if active
@@ -740,6 +744,9 @@ export default function ExamPortal() {
 
   // --- SUBMIT CONFIRM BUTTON CLICK ---
   const handleManualSubmit = async () => {
+    // Tắt giám sát trước khi hiện confirm modal (nó sẽ làm mất focus trình duyệt)
+    isReadyForMonitoringRef.current = false;
+
     if (window.confirm("Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?")) {
       if (document.fullscreenElement) {
         try {
@@ -749,6 +756,11 @@ export default function ExamPortal() {
         }
       }
       await executeSubmission(honestyScore);
+    } else {
+      // Nếu hủy nộp bài, kích hoạt lại giám sát sau 1 giây
+      setTimeout(() => {
+        isReadyForMonitoringRef.current = true;
+      }, 1000);
     }
   };
 
