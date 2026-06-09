@@ -24,13 +24,13 @@ import {
 import { adminApi } from "../../api/AdminApi";
 import { toast } from "react-toastify";
 
-// Helper to get full asset URL from backend uploads
 const getFullUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/uploads")) return url;
+  const safeUrl = url.replace(/#/g, "%23").replace(/\?/g, "%3F");
+  if (safeUrl.startsWith("/uploads")) return safeUrl;
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
-  return `${baseUrl}${url}`;
+  return `${baseUrl}${safeUrl}`;
 };
 
 // Generates a backup premium gradient layout if no thumbnail exists
