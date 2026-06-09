@@ -28,6 +28,7 @@ import { toast } from "react-toastify";
 const getFullUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/uploads")) return url;
   const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
   return `${baseUrl}${url}`;
 };

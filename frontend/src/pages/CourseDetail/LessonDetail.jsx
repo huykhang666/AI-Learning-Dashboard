@@ -15,6 +15,7 @@ import AIChatBox from "../../components/common/AIChatBox";
 const getFullUrl = (url) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/uploads")) return url;
   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
   const baseUrl = apiUrl.includes("/api/v1") ? apiUrl.replace("/api/v1", "") : apiUrl;
   const cleanBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
