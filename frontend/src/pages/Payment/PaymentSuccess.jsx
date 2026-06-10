@@ -9,13 +9,15 @@ export default function PaymentSuccessPage() {
   const [countdown, setCountdown] = useState(5);
 
 useEffect(() => {
+  localStorage.removeItem("user"); 
+
   const timer = setInterval(() => {
     setCountdown((prev) => {
       if (prev <= 1) {
         clearInterval(timer);
-        
+
         window.location.href = "/app/dash"; 
-        
+
         return 0;
       }
       return prev - 1;
