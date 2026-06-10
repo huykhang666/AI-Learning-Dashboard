@@ -28,6 +28,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class VNPayServiceImpl implements VNPayService {
         com.ai.learning.backend.entity.Course course = null;
         if (request.courseId() != null) {
             course = courseRepository.findById(request.courseId())
-                    .orElseThrow(() -> new RuntimeException("Khong tim thay khoa hoc"));
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
         }
 
         Payment newPayment = Payment.builder()
@@ -58,9 +59,7 @@ public class VNPayServiceImpl implements VNPayService {
                 .status(PaymentStatus.PENDING)
                 .gateway(PaymentGateway.VNPAY)
                 .planType(Subscription.PlanType.valueOf(request.planType()))
-                .orderInfo(course != null
-                        ? "Thanh toan khoa hoc: " + course.getTitle()
-                        : "Thanh toan goi " + request.planType())
+                .orderInfo(course != null ? "Thanh toan khoa hoc: " + course.getTitle() : "Thanh toan goi " + request.planType())
                 .course(course)
                 .build();
 
@@ -71,7 +70,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnpParams.put(VNPayParams.VERSION,    vnPayConfig.vnp_Version);
         vnpParams.put(VNPayParams.COMMAND,    vnPayConfig.vnp_Command);
         vnpParams.put(VNPayParams.TMN_CODE,   vnPayConfig.getVnp_TmnCode());
-        vnpParams.put(VNPayParams.AMOUNT,     String.valueOf(request.amount().longValue() * 100));
+        vnpParams.put(VNPayParams.AMOUNT,     String.valueOf(request.amount() * 100));
         vnpParams.put(VNPayParams.CURR_CODE,  "VND");
         vnpParams.put(VNPayParams.TXN_REF,    txnRef);
         vnpParams.put(VNPayParams.ORDER_INFO, "Thanh toan don hang: " + txnRef);
@@ -90,75 +89,77 @@ public class VNPayServiceImpl implements VNPayService {
         List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(fieldNames);
 
-        List<String> hashParts  = new ArrayList<>();
-        List<String> queryParts = new ArrayList<>();
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query    = new StringBuilder();
 
-        for (String fieldName : fieldNames) {
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName  = itr.next();
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8).replace("+", "%20");
-                hashParts.add(fieldName + "=" + encodedValue);
-                queryParts.add(URLEncoder.encode(fieldName, StandardCharsets.UTF_8) + "=" + encodedValue);
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8);
+                hashData.append(fieldName).append('=').append(encodedValue);
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8))
+                        .append('=').append(encodedValue);
+                if (itr.hasNext()) {
+                    hashData.append('&');
+                    query.append('&');
+                }
             }
         }
 
-        String hashDataStr = String.join("&", hashParts);
-        String queryStr    = String.join("&", queryParts);
-
-        String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashDataStr);
-        return vnPayConfig.getVnp_PayUrl() + "?" + queryStr + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
+        String secureHash = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData.toString());
+        return vnPayConfig.getVnp_PayUrl() + "?" + query + "&" + VNPayParams.SECURE_HASH + "=" + secureHash;
     }
 
     @Override
     @Transactional
     public IpnResponse processIpn(Map<String, String> params) {
-        Map<String, String> mutableParams = new HashMap<>(params);
-
-        String receivedHash = mutableParams.remove(VNPayParams.SECURE_HASH);
+        String receivedHash = params.get(VNPayParams.SECURE_HASH);
         if (receivedHash == null)
             return new IpnResponse(VnpIpnResponseConst.UNKNOWN_ERROR, "Missing signature");
 
-        mutableParams.remove("vnp_SecureHashType");
+        params.remove("vnp_SecureHashType");
+        params.remove(VNPayParams.SECURE_HASH);
 
-        List<String> sortedKeys = new ArrayList<>(mutableParams.keySet());
-        Collections.sort(sortedKeys);
 
-        List<String> hashParts = new ArrayList<>();
-        for (String key : sortedKeys) {
-            String value = mutableParams.get(key);
-            if (value != null && !value.isEmpty()) {
-                hashParts.add(key + "=" + value);
-            }
-        }
-        String hashData = String.join("&", hashParts);
+        String hashData = params.entrySet().stream()
+                .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+                .sorted(Map.Entry.comparingByKey())
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
+
         String checkSum = vnPayConfig.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
 
-        if (!checkSum.equalsIgnoreCase(receivedHash))
+        if (!checkSum.equals(receivedHash))
             return new IpnResponse(VnpIpnResponseConst.INVALID_CHECKSUM, "Invalid checksum");
 
-        if (!"00".equals(mutableParams.get(VNPayParams.RESPONSE_CODE)))
-            return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Transaction failed but IPN received");
+        if (!"00".equals(params.get(VNPayParams.RESPONSE_CODE))) {
+                return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Transaction failed but IPN received");
+            }
 
-        UUID paymentId;
-        try {
-            paymentId = UUID.fromString(mutableParams.get(VNPayParams.TXN_REF));
-        } catch (IllegalArgumentException e) {
-            return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Invalid order ID");
+            UUID paymentId;
+            try {
+                paymentId = UUID.fromString(params.get(VNPayParams.TXN_REF));
+            } catch (IllegalArgumentException e) {
+                return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Invalid order ID");
+            }
+
+            Payment payment = paymentRepository.findById(paymentId)
+                    .orElse(null);
+
+            if (payment == null)
+                return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Order not found");
+
+            if (!PaymentStatus.PENDING.equals(payment.getStatus()))
+                return new IpnResponse(VnpIpnResponseConst.ALREADY_CONFIRMED, "Order already confirmed");
+
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setGatewayTransactionId(params.get(VNPayParams.TRANSACTION_NO));
+            paymentRepository.save(payment);
+
+            subscriptionService.activatePremium(payment);
+
+            return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Confirm success");
         }
-
-        Payment payment = paymentRepository.findById(paymentId).orElse(null);
-        if (payment == null)
-            return new IpnResponse(VnpIpnResponseConst.ORDER_NOT_FOUND, "Order not found");
-
-        if (!PaymentStatus.PENDING.equals(payment.getStatus()))
-            return new IpnResponse(VnpIpnResponseConst.ALREADY_CONFIRMED, "Order already confirmed");
-
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setGatewayTransactionId(mutableParams.get(VNPayParams.TRANSACTION_NO));
-        paymentRepository.save(payment);
-
-        subscriptionService.activatePremium(payment);
-
-        return new IpnResponse(VnpIpnResponseConst.SUCCESS_CODE, "Confirm success");
-    }
-}
+        }
