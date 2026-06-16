@@ -1,5 +1,16 @@
 # AI Learning Dashboard - Hệ Thống Học Tập Thông Minh Tích Hợp AI
 
+<p align="left">
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" /></a>
+  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/Spring_Boot-20232A?style=for-the-badge&logo=spring-boot&logoColor=6DB33F" alt="Spring Boot" /></a>
+  <a href="https://www.oracle.com/java/"><img src="https://img.shields.io/badge/Java_21-20232A?style=for-the-badge&logo=openjdk&logoColor=ED8B00" alt="Java" /></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-20232A?style=for-the-badge&logo=postgresql&logoColor=316192" alt="PostgreSQL" /></a>
+  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-20232A?style=for-the-badge&logo=fastapi&logoColor=009688" alt="FastAPI" /></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python_3-20232A?style=for-the-badge&logo=python&logoColor=3776AB" alt="Python" /></a>
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-20232A?style=for-the-badge&logo=docker&logoColor=2496ED" alt="Docker" /></a>
+  <a href="https://nginx.org/"><img src="https://img.shields.io/badge/Nginx-20232A?style=for-the-badge&logo=nginx&logoColor=009639" alt="Nginx" /></a>
+</p>
+
 AI Learning Dashboard là một nền tảng E-learning thông minh tích hợp Trí tuệ Nhân tạo (AI) giúp tối ưu hóa trải nghiệm học tập của học viên và tự động hóa quy trình chuẩn bị học liệu của giảng viên. Hệ thống được thiết kế theo kiến trúc Microservices/Services-oriented, tích hợp giám sát hệ thống (Monitoring) và các cổng thanh toán trực tuyến hàng đầu tại Việt Nam.
 
 ---
