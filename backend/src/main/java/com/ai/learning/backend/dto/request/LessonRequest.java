@@ -13,4 +13,5 @@ public class LessonRequest {
     String videoUrl;
     String thumbnailUrl;
     Integer orderIndex;
+    String chapter;
 }

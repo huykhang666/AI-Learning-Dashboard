@@ -8,7 +8,7 @@ public interface LessonService {
     List<LessonResponse> getLessonsByCourse(Long courseId);
     LessonResponse getLessonDetails(Long lessonId);
     LessonResponse createLesson(Long courseId, com.ai.learning.backend.dto.request.LessonRequest request);
-    LessonResponse createLesson(Long courseId, String title, Integer orderIndex, MultipartFile video, MultipartFile thumbnail);
-    LessonResponse updateLesson(Long lessonId, String title, Integer orderIndex, MultipartFile video, MultipartFile thumbnail);
+    LessonResponse createLesson(Long courseId, String title, Integer orderIndex, String chapter, MultipartFile video, MultipartFile thumbnail, MultipartFile document);
+    LessonResponse updateLesson(Long lessonId, String title, Integer orderIndex, String chapter, MultipartFile video, MultipartFile thumbnail, MultipartFile document);
     void deleteLesson(Long lessonId);
 }

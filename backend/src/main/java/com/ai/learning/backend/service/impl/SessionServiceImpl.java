@@ -148,6 +148,11 @@ public class SessionServiceImpl implements SessionService {
         SessionDetailResponse response = sessionMapper.toDetailResponse(session, aiResult);
         // Crucial: keep the learningSessionId as the input id (lessonId) so frontend routes/actions map correctly!
         response.setLearningSessionId(lessonId);
+        response.setCourseId(course.getCourseId());
+        response.setChapter(lesson.getChapter());
+        response.setDocumentUrl(lesson.getDocumentUrl());
+        response.setDocumentName(lesson.getDocumentName());
+
         return response;
     }
 

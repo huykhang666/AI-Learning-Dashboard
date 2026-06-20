@@ -18,4 +18,8 @@ public class SessionDetailResponse {
     String keyPoints;
     SessionStatus status;
     String summaryJson;
+    Long courseId;
+    String chapter;
+    String documentUrl;
+    String documentName;
 }

@@ -81,11 +81,14 @@ export default function AdminCourseManagement() {
   const [lessonForm, setLessonForm] = useState({
     title: "",
     orderIndex: "",
+    chapter: "",
     video: null,
-    thumbnail: null
+    thumbnail: null,
+    document: null
   });
   const [lessonThumbnailPreview, setLessonThumbnailPreview] = useState("");
   const [videoPreviewName, setVideoPreviewName] = useState("");
+  const [documentPreviewName, setDocumentPreviewName] = useState("");
   const [uploadProgress, setUploadProgress] = useState(null);
   const [lessonActionLoading, setLessonActionLoading] = useState(false);
 
@@ -230,11 +233,14 @@ export default function AdminCourseManagement() {
     setLessonForm({
       title: "",
       orderIndex: nextOrder.toString(),
+      chapter: "Chương 1: Tổng quan",
       video: null,
-      thumbnail: null
+      thumbnail: null,
+      document: null
     });
     setVideoPreviewName("");
     setLessonThumbnailPreview("");
+    setDocumentPreviewName("");
     setUploadProgress(null);
     setShowLessonForm(true);
   };
@@ -244,11 +250,14 @@ export default function AdminCourseManagement() {
     setLessonForm({
       title: lesson.title,
       orderIndex: lesson.orderIndex !== undefined ? lesson.orderIndex.toString() : "1",
+      chapter: lesson.chapter || "Chương 1: Tổng quan",
       video: null,
-      thumbnail: null
+      thumbnail: null,
+      document: null
     });
     setVideoPreviewName(lesson.videoUrl ? lesson.videoUrl.split("/").pop() : "");
     setLessonThumbnailPreview(lesson.thumbnailUrl ? getFullUrl(lesson.thumbnailUrl) : "");
+    setDocumentPreviewName(lesson.documentName || "");
     setUploadProgress(null);
     setShowLessonForm(true);
   };
@@ -264,11 +273,15 @@ export default function AdminCourseManagement() {
     const formData = new FormData();
     formData.append("title", lessonForm.title.trim());
     formData.append("orderIndex", lessonForm.orderIndex || "1");
+    formData.append("chapter", lessonForm.chapter.trim() || "Chương 1: Tổng quan");
     if (lessonForm.video) {
       formData.append("video", lessonForm.video);
     }
     if (lessonForm.thumbnail) {
       formData.append("thumbnail", lessonForm.thumbnail);
+    }
+    if (lessonForm.document) {
+      formData.append("document", lessonForm.document);
     }
 
     const onUploadProgress = (progressEvent) => {
@@ -784,6 +797,17 @@ export default function AdminCourseManagement() {
                       />
                     </div>
 
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Chương (Chapter)</label>
+                      <input
+                        type="text"
+                        value={lessonForm.chapter}
+                        onChange={(e) => setLessonForm({ ...lessonForm, chapter: e.target.value })}
+                        placeholder="Ví dụ: Chương 1: Tổng quan..."
+                        className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
+                      />
+                    </div>
+
                     {/* Premium Video Dropzone with Framer Motion Progress */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center justify-between">
@@ -891,6 +915,50 @@ export default function AdminCourseManagement() {
                           )}
                         </div>
                       </div>
+                    </div>
+
+                    {/* Lesson Document Dropzone */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center justify-between">
+                        <span>Tài liệu đính kèm (PDF, Word, ...)</span>
+                        {editingLesson && (
+                          <span className="text-[10px] text-gray-400 normal-case font-normal">(Bỏ qua nếu giữ nguyên)</span>
+                        )}
+                      </label>
+                      
+                      <div className="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-slate-50/50 p-4 text-center hover:bg-slate-50 transition cursor-pointer">
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              setLessonForm({ ...lessonForm, document: file });
+                              setDocumentPreviewName(file.name);
+                            }
+                          }}
+                          className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                        />
+                        <Upload className="mx-auto h-5 w-5 text-gray-400 mb-1" />
+                        <span className="text-xs font-bold text-gray-700">Chọn tài liệu</span>
+                        <span className="text-[9px] text-gray-400 mt-0.5">Hỗ trợ PDF, DOCX, XLSX, PPTX, TXT</span>
+                      </div>
+
+                      {documentPreviewName && (
+                        <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3.5 py-2 text-xs font-semibold text-emerald-700 border border-emerald-100">
+                          <span className="truncate max-w-[220px]">{documentPreviewName}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLessonForm({ ...lessonForm, document: null });
+                              setDocumentPreviewName("");
+                            }}
+                            className="rounded-full p-0.5 hover:bg-emerald-100 text-emerald-500 hover:text-emerald-800 transition"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-2 flex gap-2">

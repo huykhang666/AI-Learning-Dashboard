@@ -51,6 +51,7 @@ public class LessonServiceImpl implements LessonService {
                 .title(request.getTitle())
                 .orderIndex(request.getOrderIndex())
                 .videoUrl(request.getVideoUrl())
+                .chapter(request.getChapter())
                 .course(course)
                 .build();
 
@@ -58,13 +59,14 @@ public class LessonServiceImpl implements LessonService {
     }
     @Override
     @org.springframework.transaction.annotation.Transactional
-    public LessonResponse createLesson(Long courseId, String title, Integer orderIndex, org.springframework.web.multipart.MultipartFile video, org.springframework.web.multipart.MultipartFile thumbnail) {
+    public LessonResponse createLesson(Long courseId, String title, Integer orderIndex, String chapter, org.springframework.web.multipart.MultipartFile video, org.springframework.web.multipart.MultipartFile thumbnail, org.springframework.web.multipart.MultipartFile document) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
 
         Lesson lesson = Lesson.builder()
                 .title(title)
                 .orderIndex(orderIndex)
+                .chapter(chapter)
                 .course(course)
                 .build();
 
@@ -121,17 +123,47 @@ public class LessonServiceImpl implements LessonService {
             }
         }
 
+        if (document != null && !document.isEmpty()) {
+            try {
+                String courseSlug = course.getSlug();
+                String courseFolder = (courseSlug != null ? courseSlug : "course") + "_" + course.getCourseId();
+                java.nio.file.Path targetDir = java.nio.file.Paths.get(uploadDir, "courses", courseFolder);
+                java.nio.file.Files.createDirectories(targetDir);
+
+                String originalFilename = document.getOriginalFilename();
+                String ext = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                        : "";
+                String baseName = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(0, originalFilename.lastIndexOf("."))
+                        : "document";
+
+                String lessonSlug = com.ai.learning.backend.util.SlugUtils.makeSlug(title);
+                String filename = lessonSlug + "_" + lesson.getLessonId() + "_doc_" + com.ai.learning.backend.util.SlugUtils.makeSlug(baseName) + ext;
+                java.nio.file.Path targetFile = targetDir.resolve(filename);
+                java.nio.file.Files.copy(document.getInputStream(), targetFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                String documentUrl = "/uploads/courses/" + courseFolder + "/" + filename;
+                lesson.setDocumentUrl(documentUrl);
+                lesson.setDocumentName(originalFilename);
+                lesson = lessonRepository.save(lesson);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Failed to upload lesson document: " + e.getMessage());
+            }
+        }
+
         return lessonMapper.toLessonResponse(lesson);
     }
 
     @Override
     @org.springframework.transaction.annotation.Transactional
-    public LessonResponse updateLesson(Long lessonId, String title, Integer orderIndex, org.springframework.web.multipart.MultipartFile video, org.springframework.web.multipart.MultipartFile thumbnail) {
+    public LessonResponse updateLesson(Long lessonId, String title, Integer orderIndex, String chapter, org.springframework.web.multipart.MultipartFile video, org.springframework.web.multipart.MultipartFile thumbnail, org.springframework.web.multipart.MultipartFile document) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bài học"));
 
         lesson.setTitle(title);
         lesson.setOrderIndex(orderIndex);
+        lesson.setChapter(chapter);
 
         if (video != null && !video.isEmpty()) {
             // Delete old physical video if exists
@@ -203,6 +235,45 @@ public class LessonServiceImpl implements LessonService {
             }
         }
 
+        if (document != null && !document.isEmpty()) {
+            // Delete old physical document if exists
+            if (lesson.getDocumentUrl() != null) {
+                java.nio.file.Path oldPath = java.nio.file.Paths.get(uploadDir, lesson.getDocumentUrl().replace("/uploads/", ""));
+                try {
+                    java.nio.file.Files.deleteIfExists(oldPath);
+                } catch (java.io.IOException e) {
+                    System.err.println("Failed to delete old document file: " + e.getMessage());
+                }
+            }
+
+            try {
+                Course course = lesson.getCourse();
+                String courseSlug = course.getSlug();
+                String courseFolder = (courseSlug != null ? courseSlug : "course") + "_" + course.getCourseId();
+                java.nio.file.Path targetDir = java.nio.file.Paths.get(uploadDir, "courses", courseFolder);
+                java.nio.file.Files.createDirectories(targetDir);
+
+                String originalFilename = document.getOriginalFilename();
+                String ext = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                        : "";
+                String baseName = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(0, originalFilename.lastIndexOf("."))
+                        : "document";
+
+                String lessonSlug = com.ai.learning.backend.util.SlugUtils.makeSlug(title);
+                String filename = lessonSlug + "_" + lesson.getLessonId() + "_doc_" + com.ai.learning.backend.util.SlugUtils.makeSlug(baseName) + ext;
+                java.nio.file.Path targetFile = targetDir.resolve(filename);
+                java.nio.file.Files.copy(document.getInputStream(), targetFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                String documentUrl = "/uploads/courses/" + courseFolder + "/" + filename;
+                lesson.setDocumentUrl(documentUrl);
+                lesson.setDocumentName(originalFilename);
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Failed to upload lesson document: " + e.getMessage());
+            }
+        }
+
         return lessonMapper.toLessonResponse(lessonRepository.save(lesson));
     }
 
@@ -229,6 +300,16 @@ public class LessonServiceImpl implements LessonService {
                 java.nio.file.Files.deleteIfExists(thumbPath);
             } catch (java.io.IOException e) {
                 System.err.println("Failed to delete physical thumbnail for lesson " + lessonId + ": " + e.getMessage());
+            }
+        }
+
+        // Delete physical document file if exists
+        if (lesson.getDocumentUrl() != null) {
+            java.nio.file.Path docPath = java.nio.file.Paths.get(uploadDir, lesson.getDocumentUrl().replace("/uploads/", ""));
+            try {
+                java.nio.file.Files.deleteIfExists(docPath);
+            } catch (java.io.IOException e) {
+                System.err.println("Failed to delete physical document for lesson " + lessonId + ": " + e.getMessage());
             }
         }
 

@@ -14,6 +14,9 @@ public interface LessonMapper {
     @Mapping(target = "videoUrl", source = "videoUrl")
     @Mapping(target = "thumbnailUrl", source = "thumbnailUrl")
     @Mapping(target = "orderIndex", source = "orderIndex")
+    @Mapping(target = "chapter", source = "chapter")
+    @Mapping(target = "documentUrl", source = "documentUrl")
+    @Mapping(target = "documentName", source = "documentName")
     LessonResponse toLessonResponse(Lesson lesson);
 
     List<LessonResponse> toLessonResponseList(List<Lesson> lessons);

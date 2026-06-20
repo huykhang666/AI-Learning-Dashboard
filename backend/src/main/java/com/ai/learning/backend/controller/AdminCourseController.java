@@ -67,10 +67,12 @@ public class AdminCourseController {
             @PathVariable Long courseId,
             @RequestParam("title") String title,
             @RequestParam("orderIndex") Integer orderIndex,
+            @RequestParam(value = "chapter", required = false) String chapter,
             @RequestPart(value = "video", required = false) MultipartFile video,
-            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
+            @RequestPart(value = "document", required = false) MultipartFile document
     ) {
-        LessonResponse response = lessonService.createLesson(courseId, title, orderIndex, video, thumbnail);
+        LessonResponse response = lessonService.createLesson(courseId, title, orderIndex, chapter, video, thumbnail, document);
         return ApiResponse.<LessonResponse>builder()
                 .code(1000)
                 .result(response)
@@ -82,10 +84,12 @@ public class AdminCourseController {
             @PathVariable Long id,
             @RequestParam("title") String title,
             @RequestParam("orderIndex") Integer orderIndex,
+            @RequestParam(value = "chapter", required = false) String chapter,
             @RequestPart(value = "video", required = false) MultipartFile video,
-            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail
+            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
+            @RequestPart(value = "document", required = false) MultipartFile document
     ) {
-        LessonResponse response = lessonService.updateLesson(id, title, orderIndex, video, thumbnail);
+        LessonResponse response = lessonService.updateLesson(id, title, orderIndex, chapter, video, thumbnail, document);
         return ApiResponse.<LessonResponse>builder()
                 .code(1000)
                 .result(response)

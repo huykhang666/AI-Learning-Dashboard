@@ -28,6 +28,12 @@ public class Lesson {
     @Builder.Default
     private Integer duration = 600;
 
+    private String chapter;
+
+    private String documentUrl;
+
+    private String documentName;
+
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;

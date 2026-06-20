@@ -14,4 +14,7 @@ public class LessonResponse {
     String thumbnailUrl;
     Integer orderIndex;
     Integer duration;
+    String chapter;
+    String documentUrl;
+    String documentName;
 }
